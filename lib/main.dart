@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-const int numberOfButtons = 40;
-const int buttonsPerRow = 10;
-const int numberOfRows = 4;
+const int buttonsPerRow = 10; // Количество кнопок в строке
 
 void main() {
   runApp(const MyApp());
@@ -37,18 +35,28 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   int _score = 0;
-  List<Map<String, int>> selectedButtons = []; // Список, который будет хранить индексы и значения нажатых кнопок
+  List<Map<String, int>> selectedButtons = [];
+  List<List<int>> randomNumbers = List.generate(4, (_) => List.generate(buttonsPerRow, (_) => Random().nextInt(9) + 1));
 
-  // Теперь _scoreCounter принимает сумму двух значений
-  void _scoreCounter(int value1, int value2) {
+  // Метод для добавления копий всех существующих кнопок
+  void _addCopiesOfButtons() {
     setState(() {
-      _score += value1 + value2; // Добавляем сумму значений кнопок
+      // Копируем все существующие кнопки и добавляем в конец
+      List<List<int>> copiedButtons = randomNumbers.map((row) => List<int>.from(row)).toList();
+      randomNumbers.addAll(copiedButtons);
+
+      // Обновляем активные кнопки, чтобы они не были null
+      int totalButtons = randomNumbers.length * buttonsPerRow;
+      for (int i = 0; i < totalButtons; i++) {
+        activeButtons[i] = true;
+      }
     });
   }
 
-  void _incrementCounter() {
+  // Метод для обновления очков, когда кнопки удалены
+  void _scoreCounter(int value1, int value2) {
     setState(() {
-      _counter++;
+      _score += value1 + value2;
     });
   }
 
@@ -72,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // Удаляем кнопки и добавляем их значения к счету
           removeButton(firstButtonIndex);
           removeButton(secondButtonIndex);
-          _scoreCounter(firstButtonValue, secondButtonValue); // Добавляем значения обеих кнопок
+          _scoreCounter(firstButtonValue, secondButtonValue);
         }
 
         // Очищаем список выбранных кнопок в любом случае
@@ -80,6 +88,9 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
   }
+
+  // Добавляем сюда activeButtons
+  Map<int, bool> activeButtons = {};
 
   @override
   Widget build(BuildContext context) {
@@ -100,12 +111,12 @@ class _MyHomePageState extends State<MyHomePage> {
               'Score: $_score',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            ButtonList(onButtonPressed: onButtonPressed, selectedButtons: selectedButtons),
+            ButtonList(onButtonPressed: onButtonPressed, selectedButtons: selectedButtons, randomNumbers: randomNumbers, activeButtons: activeButtons),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _addCopiesOfButtons, // Добавляем копии кнопок при нажатии
         tooltip: 'add',
         child: const Icon(Icons.add),
       ),
@@ -116,48 +127,28 @@ class _MyHomePageState extends State<MyHomePage> {
 class ButtonList extends StatefulWidget {
   final Function(int, int, Function(int)) onButtonPressed;
   final List<Map<String, int>> selectedButtons;
+  final List<List<int>> randomNumbers;
+  final Map<int, bool> activeButtons;
 
-  const ButtonList({Key? key, required this.onButtonPressed, required this.selectedButtons}) : super(key: key);
+  const ButtonList({Key? key, required this.onButtonPressed, required this.selectedButtons, required this.randomNumbers, required this.activeButtons}) : super(key: key);
 
   @override
   _ButtonListState createState() => _ButtonListState();
 }
 
 class _ButtonListState extends State<ButtonList> {
-  List<List<int>> randomNumbers = List.generate(
-    numberOfRows,
-        (_) => List.generate(buttonsPerRow, (_) => Random().nextInt(9) + 1),
-  );
-
-  Map<int, bool> activeButtons = {};
-
-  @override
-  void initState() {
-    super.initState();
-    // Инициализация состояния кнопок
-    for (int i = 0; i < numberOfButtons; i++) {
-      activeButtons[i] = true;
-    }
-  }
-
-  void removeButton(int index) {
-    setState(() {
-      activeButtons[index] = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(numberOfRows, (rowIndex) {
+      children: List.generate(widget.randomNumbers.length, (rowIndex) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: List.generate(buttonsPerRow, (buttonIndex) {
-            int buttonNumber = randomNumbers[rowIndex][buttonIndex];
+            int buttonNumber = widget.randomNumbers[rowIndex][buttonIndex];
             int buttonIndexFlat = rowIndex * buttonsPerRow + buttonIndex;
 
-            if (!activeButtons[buttonIndexFlat]!) {
+            if (widget.activeButtons[buttonIndexFlat] == false) {
               return const SizedBox.shrink(); // Если кнопка была удалена, она исчезает
             }
 
@@ -165,7 +156,11 @@ class _ButtonListState extends State<ButtonList> {
               backgroundColor: widget.selectedButtons.any((element) => element['index'] == buttonIndexFlat)
                   ? Colors.red
                   : null,
-              onPressed: () => widget.onButtonPressed(buttonIndexFlat, buttonNumber, removeButton),
+              onPressed: () => widget.onButtonPressed(buttonIndexFlat, buttonNumber, (index) {
+                setState(() {
+                  widget.activeButtons[index] = false;
+                });
+              }),
               child: Text('$buttonNumber'),
             );
           }),
