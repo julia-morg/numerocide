@@ -117,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
             // Добавляем прокрутку с помощью SingleChildScrollView
             Expanded(
               child: SingleChildScrollView(
-                child: ButtonList(onButtonPressed: onButtonPressed, selectedButtons: selectedButtons, randomNumbers: randomNumbers, activeButtons: activeButtons),
+                child: ButtonGrid(onButtonPressed: onButtonPressed, selectedButtons: selectedButtons, randomNumbers: randomNumbers, activeButtons: activeButtons),
               ),
             ),
           ],
@@ -132,48 +132,48 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class ButtonList extends StatefulWidget {
+class ButtonGrid extends StatefulWidget {
   final Function(int, int, Function(int)) onButtonPressed;
   final List<Map<String, int>> selectedButtons;
   final List<List<int>> randomNumbers;
   final Map<int, bool> activeButtons;
 
-  const ButtonList({Key? key, required this.onButtonPressed, required this.selectedButtons, required this.randomNumbers, required this.activeButtons}) : super(key: key);
+  const ButtonGrid({Key? key, required this.onButtonPressed, required this.selectedButtons, required this.randomNumbers, required this.activeButtons}) : super(key: key);
 
   @override
-  _ButtonListState createState() => _ButtonListState();
+  _ButtonGridState createState() => _ButtonGridState();
 }
 
-class _ButtonListState extends State<ButtonList> {
+class _ButtonGridState extends State<ButtonGrid> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(widget.randomNumbers.length, (rowIndex) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(buttonsPerRow, (buttonIndex) {
-            int buttonNumber = widget.randomNumbers[rowIndex][buttonIndex];
-            int buttonIndexFlat = rowIndex * buttonsPerRow + buttonIndex;
+    // Превращаем двумерный массив в одномерный список для отображения в GridView
+    List<int> flatList = widget.randomNumbers.expand((i) => i).toList();
+    return GridView.builder(
+      shrinkWrap: true, // Убедимся, что GridView не занимает больше места, чем необходимо
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: buttonsPerRow, // Количество кнопок в строке
+      ),
+      itemCount: flatList.length,
+      itemBuilder: (context, index) {
+        int buttonNumber = flatList[index];
 
-            if (widget.activeButtons[buttonIndexFlat] == false) {
-              return const SizedBox.shrink(); // Если кнопка была удалена, она исчезает
-            }
+        if (widget.activeButtons[index] == false) {
+          return const SizedBox.shrink(); // Если кнопка была удалена, она исчезает
+        }
 
-            return FloatingActionButton(
-              backgroundColor: widget.selectedButtons.any((element) => element['index'] == buttonIndexFlat)
-                  ? Colors.red
-                  : null,
-              onPressed: () => widget.onButtonPressed(buttonIndexFlat, buttonNumber, (index) {
-                setState(() {
-                  widget.activeButtons[index] = false;
-                });
-              }),
-              child: Text('$buttonNumber'),
-            );
+        return FloatingActionButton(
+          backgroundColor: widget.selectedButtons.any((element) => element['index'] == index)
+              ? Colors.red
+              : null,
+          onPressed: () => widget.onButtonPressed(index, buttonNumber, (idx) {
+            setState(() {
+              widget.activeButtons[idx] = false;
+            });
           }),
+          child: Text('$buttonNumber'),
         );
-      }),
+      },
     );
   }
 }
