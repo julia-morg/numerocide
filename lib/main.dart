@@ -37,17 +37,43 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   int _score = 0;
+  List<Map<String, int>> selectedButtons = []; // Список, который будет хранить индексы и значения нажатых кнопок
 
-  // Теперь _scoreCounter принимает параметр
-  void _scoreCounter(int value) {
+  // Теперь _scoreCounter принимает два параметра: value1 и value2
+  void _scoreCounter(int value1, int value2) {
     setState(() {
-      _score += value;
+      _score += value1 + value2; // Добавляем значения обеих кнопок
     });
   }
 
   void _incrementCounter() {
     setState(() {
       _counter++;
+    });
+  }
+
+  void onButtonPressed(int index, int value, Function removeButton) {
+    setState(() {
+      // Проверяем, если кнопка уже была нажата
+      if (selectedButtons.any((element) => element['index'] == index)) {
+        return;
+      }
+      selectedButtons.add({'index': index, 'value': value});
+
+      // Когда нажаты две кнопки
+      if (selectedButtons.length == 2) {
+        int firstButtonIndex = selectedButtons[0]['index']!;
+        int secondButtonIndex = selectedButtons[1]['index']!;
+        int firstButtonValue = selectedButtons[0]['value']!;
+        int secondButtonValue = selectedButtons[1]['value']!;
+
+        removeButton(firstButtonIndex);
+        removeButton(secondButtonIndex);
+
+        // Передаем значения обеих кнопок
+        _scoreCounter(firstButtonValue, secondButtonValue);
+        selectedButtons.clear();
+      }
     });
   }
 
@@ -70,8 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
               'Score: $_score',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            // Передаем _scoreCounter в ButtonList
-            ButtonList(onButtonPressed: _scoreCounter),
+            ButtonList(onButtonPressed: onButtonPressed, selectedButtons: selectedButtons),
           ],
         ),
       ),
@@ -85,10 +110,10 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class ButtonList extends StatefulWidget {
-  final Function(int) onButtonPressed;
+  final Function(int, int, Function(int)) onButtonPressed;
+  final List<Map<String, int>> selectedButtons;
 
-  // Конструктор, который принимает функцию onButtonPressed
-  const ButtonList({Key? key, required this.onButtonPressed}) : super(key: key);
+  const ButtonList({Key? key, required this.onButtonPressed, required this.selectedButtons}) : super(key: key);
 
   @override
   _ButtonListState createState() => _ButtonListState();
@@ -97,8 +122,25 @@ class ButtonList extends StatefulWidget {
 class _ButtonListState extends State<ButtonList> {
   List<List<int>> randomNumbers = List.generate(
     numberOfRows,
-        (_) => List.generate(buttonsPerRow, (_) => Random().nextInt(9)+1),
+        (_) => List.generate(buttonsPerRow, (_) => Random().nextInt(9) + 1),
   );
+
+  Map<int, bool> activeButtons = {};
+
+  @override
+  void initState() {
+    super.initState();
+    // Инициализация состояния кнопок
+    for (int i = 0; i < numberOfButtons; i++) {
+      activeButtons[i] = true;
+    }
+  }
+
+  void removeButton(int index) {
+    setState(() {
+      activeButtons[index] = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,10 +150,18 @@ class _ButtonListState extends State<ButtonList> {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: List.generate(buttonsPerRow, (buttonIndex) {
-            int buttonNumber = randomNumbers[rowIndex][buttonIndex]; // Значение кнопки
+            int buttonNumber = randomNumbers[rowIndex][buttonIndex];
+            int buttonIndexFlat = rowIndex * buttonsPerRow + buttonIndex;
+
+            if (!activeButtons[buttonIndexFlat]!) {
+              return const SizedBox.shrink(); // Если кнопка была удалена, она исчезает
+            }
+
             return FloatingActionButton(
-              // Передаем значение кнопки в onButtonPressed
-              onPressed: () => widget.onButtonPressed(buttonNumber),
+              backgroundColor: widget.selectedButtons.any((element) => element['index'] == buttonIndexFlat)
+                  ? Colors.red
+                  : null,
+              onPressed: () => widget.onButtonPressed(buttonIndexFlat, buttonNumber, removeButton),
               child: Text('$buttonNumber'),
             );
           }),
