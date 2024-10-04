@@ -36,18 +36,23 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   int _score = 0;
   List<Map<String, int>> selectedButtons = [];
-  List<List<int>> randomNumbers = List.generate(4, (_) => List.generate(buttonsPerRow, (_) => Random().nextInt(9) + 1));
+  List<int> randomNumbers = List.generate(40, (_) => Random().nextInt(9) + 1); // Изначально 40 кнопок (4 ряда по 10 кнопок)
+  Map<int, bool> activeButtons = {for (var i = 0; i < 40; i++) i: true}; // Инициализация всех кнопок как активных
 
-  // Метод для добавления копий всех существующих кнопок и увеличения счётчика "Rows added"
+  // Метод для копирования только активных кнопок
   void _addCopiesOfButtons() {
     setState(() {
-      // Копируем все существующие кнопки и добавляем в конец
-      List<List<int>> copiedButtons = randomNumbers.map((row) => List<int>.from(row)).toList();
-      randomNumbers.addAll(copiedButtons);
+      // Копируем только активные кнопки и добавляем их в конец списка
+      List<int> activeNumbers = [];
+      for (int i = 0; i < randomNumbers.length; i++) {
+        if (activeButtons[i] == true) {
+          activeNumbers.add(randomNumbers[i]);
+        }
+      }
+      randomNumbers.addAll(activeNumbers);
 
-      // Обновляем активные кнопки, чтобы они не были null
-      int totalButtons = randomNumbers.length * buttonsPerRow;
-      for (int i = 0; i < totalButtons; i++) {
+      // Добавляем состояние для новых кнопок как активных
+      for (int i = randomNumbers.length - activeNumbers.length; i < randomNumbers.length; i++) {
         activeButtons[i] = true;
       }
 
@@ -63,12 +68,16 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // Логика нажатия на кнопку
   void onButtonPressed(int index, int value, Function removeButton) {
     setState(() {
-      // Проверяем, если кнопка уже была нажата
+      // Проверяем, если кнопка уже была нажата (для снятия выделения при повторном клике)
       if (selectedButtons.any((element) => element['index'] == index)) {
+        selectedButtons.removeWhere((element) => element['index'] == index); // Снимаем выделение
         return;
       }
+
+      // Добавляем кнопку в список выделенных
       selectedButtons.add({'index': index, 'value': value});
 
       // Когда нажаты две кнопки
@@ -92,9 +101,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  // Добавляем сюда activeButtons
-  Map<int, bool> activeButtons = {};
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,14 +123,19 @@ class _MyHomePageState extends State<MyHomePage> {
             // Добавляем прокрутку с помощью SingleChildScrollView
             Expanded(
               child: SingleChildScrollView(
-                child: ButtonGrid(onButtonPressed: onButtonPressed, selectedButtons: selectedButtons, randomNumbers: randomNumbers, activeButtons: activeButtons),
+                child: ButtonGrid(
+                  onButtonPressed: onButtonPressed,
+                  selectedButtons: selectedButtons,
+                  randomNumbers: randomNumbers,
+                  activeButtons: activeButtons,
+                ),
               ),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addCopiesOfButtons, // Добавляем копии кнопок и увеличиваем счётчик
+        onPressed: _addCopiesOfButtons, // Копируем существующие кнопки и увеличиваем счётчик
         tooltip: 'add',
         child: const Icon(Icons.add),
       ),
@@ -135,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
 class ButtonGrid extends StatefulWidget {
   final Function(int, int, Function(int)) onButtonPressed;
   final List<Map<String, int>> selectedButtons;
-  final List<List<int>> randomNumbers;
+  final List<int> randomNumbers;
   final Map<int, bool> activeButtons;
 
   const ButtonGrid({Key? key, required this.onButtonPressed, required this.selectedButtons, required this.randomNumbers, required this.activeButtons}) : super(key: key);
@@ -147,31 +158,32 @@ class ButtonGrid extends StatefulWidget {
 class _ButtonGridState extends State<ButtonGrid> {
   @override
   Widget build(BuildContext context) {
-    // Превращаем двумерный массив в одномерный список для отображения в GridView
-    List<int> flatList = widget.randomNumbers.expand((i) => i).toList();
     return GridView.builder(
       shrinkWrap: true, // Убедимся, что GridView не занимает больше места, чем необходимо
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: buttonsPerRow, // Количество кнопок в строке
       ),
-      itemCount: flatList.length,
+      itemCount: widget.randomNumbers.length,
       itemBuilder: (context, index) {
-        int buttonNumber = flatList[index];
+        int buttonNumber = widget.randomNumbers[index];
 
-        if (widget.activeButtons[index] == false) {
-          return const SizedBox.shrink(); // Если кнопка была удалена, она исчезает
-        }
-
-        return FloatingActionButton(
-          backgroundColor: widget.selectedButtons.any((element) => element['index'] == index)
-              ? Colors.red
-              : null,
-          onPressed: () => widget.onButtonPressed(index, buttonNumber, (idx) {
-            setState(() {
-              widget.activeButtons[idx] = false;
-            });
-          }),
-          child: Text('$buttonNumber'),
+        return Opacity(
+          opacity: widget.activeButtons[index] == false ? 0.2 : 1.0, // Установим непрозрачность для удалённых кнопок
+          child: FloatingActionButton(
+            backgroundColor: widget.selectedButtons.any((element) => element['index'] == index)
+                ? Theme.of(context).colorScheme.primary // Синий цвет для активных кнопок
+                : null,
+            onPressed: () {
+              if (widget.activeButtons[index] == true) {
+                widget.onButtonPressed(index, buttonNumber, (idx) {
+                  setState(() {
+                    widget.activeButtons[idx] = false; // Убираем кнопку (становится "неактивной")
+                  });
+                });
+              }
+            },
+            child: Text('$buttonNumber'),
+          ),
         );
       },
     );
