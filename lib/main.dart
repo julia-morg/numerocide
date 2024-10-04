@@ -39,10 +39,10 @@ class _MyHomePageState extends State<MyHomePage> {
   int _score = 0;
   List<Map<String, int>> selectedButtons = []; // Список, который будет хранить индексы и значения нажатых кнопок
 
-  // Теперь _scoreCounter принимает два параметра: value1 и value2
+  // Теперь _scoreCounter принимает сумму двух значений
   void _scoreCounter(int value1, int value2) {
     setState(() {
-      _score += value1 + value2; // Добавляем значения обеих кнопок
+      _score += value1 + value2; // Добавляем сумму значений кнопок
     });
   }
 
@@ -67,11 +67,15 @@ class _MyHomePageState extends State<MyHomePage> {
         int firstButtonValue = selectedButtons[0]['value']!;
         int secondButtonValue = selectedButtons[1]['value']!;
 
-        removeButton(firstButtonIndex);
-        removeButton(secondButtonIndex);
+        // Проверяем, равны ли значения двух нажатых кнопок или их сумма равна 10
+        if (firstButtonValue == secondButtonValue || firstButtonValue + secondButtonValue == 10) {
+          // Удаляем кнопки и добавляем их значения к счету
+          removeButton(firstButtonIndex);
+          removeButton(secondButtonIndex);
+          _scoreCounter(firstButtonValue, secondButtonValue); // Добавляем значения обеих кнопок
+        }
 
-        // Передаем значения обеих кнопок
-        _scoreCounter(firstButtonValue, secondButtonValue);
+        // Очищаем список выбранных кнопок в любом случае
         selectedButtons.clear();
       }
     });
