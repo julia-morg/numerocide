@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Map<String, int>> selectedButtons = [];
   List<List<int>> randomNumbers = List.generate(4, (_) => List.generate(buttonsPerRow, (_) => Random().nextInt(9) + 1));
 
-  // Метод для добавления копий всех существующих кнопок
+  // Метод для добавления копий всех существующих кнопок и увеличения счётчика "Rows added"
   void _addCopiesOfButtons() {
     setState(() {
       // Копируем все существующие кнопки и добавляем в конец
@@ -50,6 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
       for (int i = 0; i < totalButtons; i++) {
         activeButtons[i] = true;
       }
+
+      // Увеличиваем счётчик "Rows added"
+      _counter++;
     });
   }
 
@@ -111,12 +114,17 @@ class _MyHomePageState extends State<MyHomePage> {
               'Score: $_score',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            ButtonList(onButtonPressed: onButtonPressed, selectedButtons: selectedButtons, randomNumbers: randomNumbers, activeButtons: activeButtons),
+            // Добавляем прокрутку с помощью SingleChildScrollView
+            Expanded(
+              child: SingleChildScrollView(
+                child: ButtonList(onButtonPressed: onButtonPressed, selectedButtons: selectedButtons, randomNumbers: randomNumbers, activeButtons: activeButtons),
+              ),
+            ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addCopiesOfButtons, // Добавляем копии кнопок при нажатии
+        onPressed: _addCopiesOfButtons, // Добавляем копии кнопок и увеличиваем счётчик
         tooltip: 'add',
         child: const Icon(Icons.add),
       ),
