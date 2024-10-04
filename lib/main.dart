@@ -38,9 +38,10 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   int _score = 0;
 
-  void _scoreCounter() {
+  // Теперь _scoreCounter принимает параметр
+  void _scoreCounter(int value) {
     setState(() {
-      _score += 10;
+      _score += value;
     });
   }
 
@@ -69,7 +70,8 @@ class _MyHomePageState extends State<MyHomePage> {
               'Score: $_score',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            ButtonList(),
+            // Передаем _scoreCounter в ButtonList
+            ButtonList(onButtonPressed: _scoreCounter),
           ],
         ),
       ),
@@ -77,13 +79,17 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _incrementCounter,
         tooltip: 'add',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
 
-
 class ButtonList extends StatefulWidget {
+  final Function(int) onButtonPressed;
+
+  // Конструктор, который принимает функцию onButtonPressed
+  const ButtonList({Key? key, required this.onButtonPressed}) : super(key: key);
+
   @override
   _ButtonListState createState() => _ButtonListState();
 }
@@ -91,12 +97,8 @@ class ButtonList extends StatefulWidget {
 class _ButtonListState extends State<ButtonList> {
   List<List<int>> randomNumbers = List.generate(
     numberOfRows,
-        (_) => List.generate(buttonsPerRow, (_) => Random().nextInt(10)),
+        (_) => List.generate(buttonsPerRow, (_) => Random().nextInt(9)+1),
   );
-
-  void _scoreCounter() {
-    // Логика при нажатии
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,9 +108,11 @@ class _ButtonListState extends State<ButtonList> {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: List.generate(buttonsPerRow, (buttonIndex) {
+            int buttonNumber = randomNumbers[rowIndex][buttonIndex]; // Значение кнопки
             return FloatingActionButton(
-              onPressed: _scoreCounter,
-              child: Text('${randomNumbers[rowIndex][buttonIndex]}'),
+              // Передаем значение кнопки в onButtonPressed
+              onPressed: () => widget.onButtonPressed(buttonNumber),
+              child: Text('$buttonNumber'),
             );
           }),
         );
