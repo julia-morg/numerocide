@@ -22,6 +22,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Theme.of(context).colorScheme.primary, // Фон заголовка
+          titleTextStyle: TextStyle(
+            color: Colors.white, // Белый текст заголовка
+            fontSize: 20,
+          ),
+          iconTheme: IconThemeData(
+            color: Colors.white, // Иконки белого цвета
+          ),
+        ),
       ),
       home: const MyHomePage(title: 'Numbers'),
       builder: (context, child) {
@@ -33,6 +43,7 @@ class MyApp extends StatelessWidget {
           ),
         );
       },
+
     );
   }
 }
@@ -126,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Text(
               'Batches added: $_counter',
-              style: Theme.of(context).textTheme.displaySmall,
+              style: Theme.of(context).textTheme.labelSmall,
             ),
 
             Expanded(
