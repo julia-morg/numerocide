@@ -85,6 +85,56 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  bool areButtonsInSameRow(int firstIndex, int secondIndex) {
+    return firstIndex ~/ buttonsPerRow == secondIndex ~/ buttonsPerRow;
+  }
+
+  bool areButtonsInSameColumn(int firstIndex, int secondIndex) {
+    return firstIndex % buttonsPerRow == secondIndex % buttonsPerRow;
+  }
+
+  bool areButtonsOnSameDiagonal(int firstIndex, int secondIndex) {
+    int row1 = firstIndex ~/ buttonsPerRow;
+    int col1 = firstIndex % buttonsPerRow;
+    int row2 = secondIndex ~/ buttonsPerRow;
+    int col2 = secondIndex % buttonsPerRow;
+    return (row1 - col1 == row2 - col2) || (row1 + col1 == row2 + col2);
+  }
+
+  bool areButtonsIsolated(int firstIndex, int secondIndex) {
+    if (areButtonsInSameRow(firstIndex, secondIndex)) {
+      int start = min(firstIndex, secondIndex) + 1;
+      int end = max(firstIndex, secondIndex);
+      for (int i = start; i < end; i++) {
+        if (activeButtons[i] == true) return false;
+      }
+    } else if (areButtonsInSameColumn(firstIndex, secondIndex)) {
+      int start = min(firstIndex, secondIndex);
+      int end = max(firstIndex, secondIndex);
+      for (int i = start + buttonsPerRow; i < end; i += buttonsPerRow) {
+        if (activeButtons[i] == true) return false;
+      }
+    } else if (areButtonsOnSameDiagonal(firstIndex, secondIndex)) {
+      int rowStart = firstIndex ~/ buttonsPerRow;
+      int rowEnd = secondIndex ~/ buttonsPerRow;
+      int colStart = firstIndex % buttonsPerRow;
+      int colEnd = secondIndex % buttonsPerRow;
+      int rowIncrement = rowEnd > rowStart ? 1 : -1;
+      int colIncrement = colEnd > colStart ? 1 : -1;
+
+      int i = firstIndex + (buttonsPerRow + 1) * rowIncrement;
+      while (i != secondIndex) {
+        if (activeButtons[i] == true) return false;
+        i += (buttonsPerRow + 1) * rowIncrement;
+      }
+    }
+    return true;
+  }
+
+  bool isFirstAndLastButton(int firstIndex, int secondIndex) {
+    return firstIndex == 0 && secondIndex == randomNumbers.length - 1;
+  }
+
   void onButtonPressed(int index, int value, Function removeButton) {
     setState(() {
       if (selectedButtons.isNotEmpty && selectedButtons[0]['index'] == index) {
@@ -101,7 +151,11 @@ class _MyHomePageState extends State<MyHomePage> {
         int firstButtonValue = selectedButtons[0]['value']!;
         int secondButtonValue = selectedButtons[1]['value']!;
 
-        if (firstButtonValue == secondButtonValue || firstButtonValue + secondButtonValue == 10) {
+        if ((firstButtonValue == secondButtonValue || firstButtonValue + secondButtonValue == 10) &&
+            (isFirstAndLastButton(firstButtonIndex, secondButtonIndex) ||
+                areButtonsInSameRow(firstButtonIndex, secondButtonIndex) && areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
+                areButtonsInSameColumn(firstButtonIndex, secondButtonIndex) && areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
+                areButtonsOnSameDiagonal(firstButtonIndex, secondButtonIndex) && areButtonsIsolated(firstButtonIndex, secondButtonIndex))) {
           removeButton(firstButtonIndex);
           removeButton(secondButtonIndex);
           _scoreCounter(firstButtonValue, secondButtonValue);
@@ -164,7 +218,10 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _addCopiesOfButtons,
         tooltip: 'add',
-        child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary,),
+        child: Icon(
+          Icons.add,
+          color: Theme.of(context).colorScheme.primary, // Цвет иконки "add"
+        ),
       ),
     );
   }
@@ -181,7 +238,6 @@ class ButtonGrid extends StatefulWidget {
   @override
   _ButtonGridState createState() => _ButtonGridState();
 }
-
 class _ButtonGridState extends State<ButtonGrid> {
   @override
   Widget build(BuildContext context) {
@@ -209,7 +265,7 @@ class _ButtonGridState extends State<ButtonGrid> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[200], // Пустые кнопки с приглушенным фоном
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(), // Прямоугольные границы
+                  borderRadius: BorderRadius.zero, // Прямоугольные границы
                 ),
                 padding: EdgeInsets.zero,
               ),
@@ -260,3 +316,6 @@ class _ButtonGridState extends State<ButtonGrid> {
     );
   }
 }
+
+
+//количество кноп
