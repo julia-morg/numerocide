@@ -185,7 +185,7 @@ class _ButtonGridState extends State<ButtonGrid> {
   Widget build(BuildContext context) {
     int totalRowsInView = (windowHeight / (buttonSize * buttonScaleFactor + 1)).floor(); // Количество строк, которые могут поместиться в видимой области
     int totalButtonsToShow = totalRowsInView * buttonsPerRow; // Полное количество кнопок до конца экрана
-    int additionalButtons = totalButtonsToShow - widget.randomNumbers.length; // Дополнительные пустые кнопки
+    int additionalButtons = max(totalButtonsToShow - widget.randomNumbers.length, buttonsPerRow * 2); // Добавляем минимум два ряда
 
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(), // Отключаем прокрутку GridView
