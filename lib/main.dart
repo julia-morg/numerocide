@@ -121,6 +121,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Color textColor = Colors.indigo[900]!; // Темно-синий цвет для текста
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -136,11 +138,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: <Widget>[
                   Text(
                     'Score: $_score',
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: textColor), // Темно-синий цвет для "Score"
                   ),
                   Text(
                     'Batches added: $_counter',
-                    style: Theme.of(context).textTheme.labelSmall, // Маленький шрифт для "Batches added"
+                    style: Theme.of(context).textTheme.labelSmall!.copyWith(color: textColor), // Темно-синий цвет для "Batches added"
                   ),
                 ],
               ),
