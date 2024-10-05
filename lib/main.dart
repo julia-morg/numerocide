@@ -23,13 +23,13 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
         appBarTheme: AppBarTheme(
-          backgroundColor: Theme.of(context).colorScheme.primary, // Фон заголовка
-          titleTextStyle: TextStyle(
+          backgroundColor: Theme.of(context).colorScheme.primary, // Используем основной цвет для заголовка
+          titleTextStyle: const TextStyle(
             color: Colors.white, // Белый текст заголовка
             fontSize: 20,
           ),
-          iconTheme: IconThemeData(
-            color: Colors.white, // Иконки белого цвета
+          iconTheme: const IconThemeData(
+            color: Colors.white, // Белые иконки
           ),
         ),
       ),
@@ -43,7 +43,6 @@ class MyApp extends StatelessWidget {
           ),
         );
       },
-
     );
   }
 }
@@ -124,22 +123,28 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(widget.title),
+        backgroundColor: Theme.of(context).colorScheme.primary, // Цвет заголовка, как у вас
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Score: $_score',
-              style: Theme.of(context).textTheme.headlineMedium,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    'Score: $_score',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  Text(
+                    'Batches added: $_counter',
+                    style: Theme.of(context).textTheme.labelSmall, // Маленький шрифт для "Batches added"
+                  ),
+                ],
+              ),
             ),
-            Text(
-              'Batches added: $_counter',
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-
             Expanded(
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
@@ -178,6 +183,10 @@ class ButtonGrid extends StatefulWidget {
 class _ButtonGridState extends State<ButtonGrid> {
   @override
   Widget build(BuildContext context) {
+    int totalRowsInView = (windowHeight / (buttonSize * buttonScaleFactor + 1)).floor(); // Количество строк, которые могут поместиться в видимой области
+    int totalButtonsToShow = totalRowsInView * buttonsPerRow; // Полное количество кнопок до конца экрана
+    int additionalButtons = totalButtonsToShow - widget.randomNumbers.length; // Дополнительные пустые кнопки
+
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(), // Отключаем прокрутку GridView
       shrinkWrap: true,
@@ -187,8 +196,27 @@ class _ButtonGridState extends State<ButtonGrid> {
         mainAxisSpacing: 1, // Минимальное пространство между кнопками по вертикали
         crossAxisSpacing: 1, // Минимальное пространство между кнопками по горизонтали
       ),
-      itemCount: widget.randomNumbers.length,
+      itemCount: widget.randomNumbers.length + additionalButtons, // Добавляем пустые места
       itemBuilder: (context, index) {
+        if (index >= widget.randomNumbers.length) {
+          // Пустые кнопки, без цифр
+          return SizedBox(
+            width: buttonSize * buttonScaleFactor,
+            height: buttonSize * buttonScaleFactor,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[200], // Пустые кнопки с приглушенным фоном
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero, // Прямоугольные границы
+                ),
+                padding: EdgeInsets.zero,
+              ),
+              onPressed: null, // Пустые кнопки неактивны
+              child: null,
+            ),
+          );
+        }
+
         int buttonNumber = widget.randomNumbers[index];
         bool isSelected = widget.selectedButtons.any((element) => element['index'] == index);
 
