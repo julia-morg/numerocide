@@ -164,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _addCopiesOfButtons,
         tooltip: 'add',
-        child: const Icon(Icons.add),
+        child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary,),
       ),
     );
   }
@@ -209,7 +209,7 @@ class _ButtonGridState extends State<ButtonGrid> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[200], // Пустые кнопки с приглушенным фоном
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero, // Прямоугольные границы
+                  borderRadius: BorderRadius.only(), // Прямоугольные границы
                 ),
                 padding: EdgeInsets.zero,
               ),
