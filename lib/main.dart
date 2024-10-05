@@ -98,34 +98,41 @@ class _MyHomePageState extends State<MyHomePage> {
     int col1 = firstIndex % buttonsPerRow;
     int row2 = secondIndex ~/ buttonsPerRow;
     int col2 = secondIndex % buttonsPerRow;
+
+    // Проверка обеих диагоналей: вправо (X+1, Y+1) и влево (X-1, Y+1)
     return (row1 - col1 == row2 - col2) || (row1 + col1 == row2 + col2);
   }
 
   bool areButtonsIsolated(int firstIndex, int secondIndex) {
     if (areButtonsInSameRow(firstIndex, secondIndex)) {
+      // Проверка между кнопками в строке
       int start = min(firstIndex, secondIndex) + 1;
       int end = max(firstIndex, secondIndex);
       for (int i = start; i < end; i++) {
         if (activeButtons[i] == true) return false;
       }
     } else if (areButtonsInSameColumn(firstIndex, secondIndex)) {
+      // Проверка между кнопками в колонке
       int start = min(firstIndex, secondIndex);
       int end = max(firstIndex, secondIndex);
       for (int i = start + buttonsPerRow; i < end; i += buttonsPerRow) {
         if (activeButtons[i] == true) return false;
       }
     } else if (areButtonsOnSameDiagonal(firstIndex, secondIndex)) {
+      // Проверка между кнопками по диагонали
       int rowStart = firstIndex ~/ buttonsPerRow;
       int rowEnd = secondIndex ~/ buttonsPerRow;
       int colStart = firstIndex % buttonsPerRow;
       int colEnd = secondIndex % buttonsPerRow;
+
       int rowIncrement = rowEnd > rowStart ? 1 : -1;
       int colIncrement = colEnd > colStart ? 1 : -1;
 
-      int i = firstIndex + (buttonsPerRow + 1) * rowIncrement;
+      int i = firstIndex;
       while (i != secondIndex) {
-        if (activeButtons[i] == true) return false;
-        i += (buttonsPerRow + 1) * rowIncrement;
+        i += rowIncrement * buttonsPerRow + colIncrement;
+        if (i == secondIndex) break;
+        if (activeButtons[i] == true) return false;  // Проверка, если есть активные кнопки на пути
       }
     }
     return true;
@@ -137,7 +144,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void onButtonPressed(int index, int value, Function removeButton) {
     setState(() {
+      // Если уже есть выделение и повторно кликнули на ту же кнопку — снять выделение
       if (selectedButtons.isNotEmpty && selectedButtons[0]['index'] == index) {
+        selectedButtons.clear(); // Снимаем выделение
         return;
       }
 
