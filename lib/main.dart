@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 const int buttonsPerRow = 10;
+const double buttonSize = 10;
+const double buttonScaleFactor = 0.5;
+const int initialButtonCount = 40;
+const int windowWidth = 300;
+const int windowHeight = 600;
 
 void main() {
   runApp(const MyApp());
@@ -19,6 +24,15 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Numbers'),
+      builder: (context, child) {
+        return Center(
+          child: SizedBox(
+            width: windowWidth.toDouble(),
+            height: windowHeight.toDouble(),
+            child: child,
+          ),
+        );
+      },
     );
   }
 }
@@ -36,8 +50,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   int _score = 0;
   List<Map<String, int>> selectedButtons = [];
-  List<int> randomNumbers = List.generate(40, (_) => Random().nextInt(9) + 1);
-  Map<int, bool> activeButtons = {for (var i = 0; i < 40; i++) i: true};
+  List<int> randomNumbers = List.generate(initialButtonCount, (_) => Random().nextInt(9) + 1);
+  Map<int, bool> activeButtons = {for (var i = 0; i < initialButtonCount; i++) i: true};
 
   void _addCopiesOfButtons() {
     setState(() {
@@ -116,6 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Expanded(
               child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
                 child: ButtonGrid(
                   onButtonPressed: onButtonPressed,
                   selectedButtons: selectedButtons,
@@ -152,9 +167,13 @@ class _ButtonGridState extends State<ButtonGrid> {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(), // Отключаем прокрутку GridView
       shrinkWrap: true,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: buttonsPerRow,
+        crossAxisCount: buttonsPerRow, // Возвращаем 10 кнопок в строке
+        childAspectRatio: 1, // Кнопки квадратные
+        mainAxisSpacing: 10, // Пространство между кнопками по вертикали
+        crossAxisSpacing: 10, // Пространство между кнопками по горизонтали
       ),
       itemCount: widget.randomNumbers.length,
       itemBuilder: (context, index) {
@@ -162,20 +181,27 @@ class _ButtonGridState extends State<ButtonGrid> {
 
         return Opacity(
           opacity: widget.activeButtons[index] == false ? 0.2 : 1.0,
-          child: FloatingActionButton(
-            backgroundColor: widget.selectedButtons.any((element) => element['index'] == index)
-                ? Theme.of(context).colorScheme.primary
-                : null,
-            onPressed: () {
-              if (widget.activeButtons[index] == true) {
-                widget.onButtonPressed(index, buttonNumber, (idx) {
-                  setState(() {
-                    widget.activeButtons[idx] = false;
+          child: SizedBox(
+            width: buttonSize * buttonScaleFactor,
+            height: buttonSize * buttonScaleFactor,
+            child: FloatingActionButton(
+              backgroundColor: widget.selectedButtons.any((element) => element['index'] == index)
+                  ? Theme.of(context).colorScheme.primary
+                  : null,
+              onPressed: () {
+                if (widget.activeButtons[index] == true) {
+                  widget.onButtonPressed(index, buttonNumber, (idx) {
+                    setState(() {
+                      widget.activeButtons[idx] = false;
+                    });
                   });
-                });
-              }
-            },
-            child: Text('$buttonNumber'),
+                }
+              },
+              child: Text(
+                '$buttonNumber',
+                style: const TextStyle(fontSize: 18),
+              ),
+            ),
           ),
         );
       },
