@@ -34,7 +34,7 @@ class _ButtonGridState extends State<ButtonGrid> {
     double availableHeight = screenHeight - appBarHeight;
 
     // Рассчитываем количество строк, которые могут поместиться на экран
-    int totalRowsInView = (availableHeight / (widget.buttonSize * 2 + 1)).floor(); // Учитываем размер кнопки и отступы
+    int totalRowsInView = (availableHeight / (widget.buttonSize * 2 + 1)).floor() - 1; // Учитываем размер кнопки и отступы
     int totalButtonsToShow = totalRowsInView * widget.buttonsPerRow; // Общее количество кнопок для заполнения экрана
 
     // Количество кнопок в последней строке

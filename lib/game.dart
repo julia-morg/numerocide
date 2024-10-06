@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'game/button_grid.dart';
-
-import 'package:flutter/material.dart';
-import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'game/button_grid.dart';
+import 'home.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -41,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _initializeGame() {
     setState(() {
       randomNumbers = List.generate(
-          widget.initialButtonCount, (_) => Random().nextInt(9) + 1);
+          widget.initialButtonCount, (_) => Random().nextInt(1) + 1);
       activeButtons = {
         for (var i = 0; i < widget.initialButtonCount; i++) i: true
       };
@@ -50,6 +47,17 @@ class _MyHomePageState extends State<MyHomePage> {
       selectedButtons.clear();
       _saveGameState(); // Сохраняем начальное состояние игры
     });
+  }
+
+  void _clearSavedGameState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('randomNumbers');
+    await prefs.remove('score');
+    await prefs.remove('counter');
+    // Удаляем активные кнопки
+    for (var i = 0; i < randomNumbers.length; i++) {
+      await prefs.remove('activeButton_$i');
+    }
   }
 
   // Метод для сохранения состояния игры
@@ -61,6 +69,16 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.setInt('counter', _counter);
     for (var i = 0; i < randomNumbers.length; i++) {
       await prefs.setBool('activeButton_$i', activeButtons[i] ?? true);
+    }
+  }
+
+  Future<void> _saveMaxScore() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int maxScore = prefs.getInt('maxScore') ?? 0;
+
+    if (_score > maxScore) {
+      // Сохраняем новый максимальный счёт
+      await prefs.setInt('maxScore', _score);
     }
   }
 
@@ -173,26 +191,21 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: ButtonGrid(
-                  onButtonPressed: onButtonPressed,
-                  selectedButtons: selectedButtons,
-                  randomNumbers: randomNumbers,
-                  activeButtons: activeButtons,
-                  buttonSize: widget.buttonSize,
-                  buttonsPerRow: widget.buttonsPerRow,
+              child: ScrollConfiguration(
+                behavior: ScrollBehavior().copyWith(overscroll: false, scrollbars: false), // Отключаем полосу прокрутки
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: ButtonGrid(
+                    onButtonPressed: onButtonPressed,
+                    selectedButtons: selectedButtons,
+                    randomNumbers: randomNumbers,
+                    activeButtons: activeButtons,
+                    buttonSize: widget.buttonSize,
+                    buttonsPerRow: widget.buttonsPerRow,
+                  ),
                 ),
               ),
             ),
-            if (isGameOver()) // Отображаем текст, если все кнопки удалены (конец игры)
-              Text(
-                'Game Over',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium!
-                    .copyWith(color: Colors.red),
-              ),
           ],
         ),
       ),
@@ -203,6 +216,42 @@ class _MyHomePageState extends State<MyHomePage> {
           tooltip: 'add',
           child: Icon(Icons.add, color: colorDark),
         ),
+    );
+  }
+
+  void _showGameOverDialog() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int maxScore = prefs.getInt('maxScore') ?? 0;
+
+    if (_score > maxScore) {
+      // Если текущий счёт больше максимального, обновляем maxScore
+      await prefs.setInt('maxScore', _score);
+      maxScore = _score;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Game Over'),
+          content: Text(
+            'Score: $_score\n${_score == maxScore ? "This is the max score!" : ""}',
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Закрываем диалог
+                // Возвращаемся на главную страницу
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                      (Route<dynamic> route) => false,
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -340,6 +389,11 @@ class _MyHomePageState extends State<MyHomePage> {
             setState(() {
               selectedButtons.clear();
             });
+            if (isGameOver()) {
+              _saveMaxScore(); // Сохраняем максимальный счёт
+              _clearSavedGameState();
+              _showGameOverDialog(); // Показываем всплывающее окно
+            }
           });
         } else {
           selectedButtons.clear();

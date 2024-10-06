@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
     _checkSavedGame();
   }
 
-  // Загружаем максимальный счёт из SharedPreferences
+  // Загружаем максимальный счет из SharedPreferences
   Future<void> _loadMaxScore() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -28,11 +28,11 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // Проверяем, есть ли сохранённое состояние игры
+  // Проверяем, есть ли сохраненная игра
   Future<void> _checkSavedGame() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _hasSavedGame = prefs.containsKey('randomNumbers'); // Проверяем, сохранены ли данные игры
+      _hasSavedGame = prefs.containsKey('randomNumbers'); // Проверяем наличие сохранённых данных
     });
   }
 
@@ -50,10 +50,13 @@ class _HomePageState extends State<HomePage> {
           initialButtonCount: 40,
         ),
       ),
-    );
+    ).then((_) {
+      _loadMaxScore(); // Обновляем Max Score при возвращении на главную страницу
+      _checkSavedGame(); // Проверяем сохранённую игру
+    });
   }
 
-  // Метод для продолжения сохранённой игры
+  // Метод для продолжения сохраненной игры
   void _continueGame(BuildContext context) {
     Navigator.push(
       context,
@@ -62,10 +65,13 @@ class _HomePageState extends State<HomePage> {
           title: 'Numerocide',
           buttonSize: 15.0,
           buttonsPerRow: 10,
-          initialButtonCount: 40,
+          initialButtonCount: 22,
         ),
       ),
-    );
+    ).then((_) {
+      _loadMaxScore(); // Обновляем Max Score при возвращении на главную страницу
+      _checkSavedGame(); // Проверяем сохранённую игру
+    });
   }
 
   @override
