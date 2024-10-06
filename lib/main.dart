@@ -103,6 +103,22 @@ class _MyHomePageState extends State<MyHomePage> {
     return (row1 - col1 == row2 - col2) || (row1 + col1 == row2 + col2);
   }
 
+  bool areCellsCoherent(int firstIndex, int secondIndex) {
+    // Убедимся, что индексы идут в правильном порядке
+    int start = min(firstIndex, secondIndex);
+    int end = max(firstIndex, secondIndex);
+
+    // Проходим по клеткам между первой и второй
+    for (int i = start + 1; i < end; i++) {
+      if (activeButtons[i] == true) {
+        return false; // Если есть активная клетка между ними, возвращаем false
+      }
+    }
+
+    // Если нет активных клеток между первой и второй, возвращаем true
+    return true;
+  }
+
   bool areButtonsIsolated(int firstIndex, int secondIndex) {
     if (areButtonsInSameRow(firstIndex, secondIndex)) {
       // Проверка между кнопками в строке
@@ -163,6 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
         if ((firstButtonValue == secondButtonValue || firstButtonValue + secondButtonValue == 10) &&
             (isFirstAndLastButton(firstButtonIndex, secondButtonIndex) ||
                 areButtonsInSameRow(firstButtonIndex, secondButtonIndex) && areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
+                areCellsCoherent(firstButtonIndex, secondButtonIndex) ||
                 areButtonsInSameColumn(firstButtonIndex, secondButtonIndex) && areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
                 areButtonsOnSameDiagonal(firstButtonIndex, secondButtonIndex) && areButtonsIsolated(firstButtonIndex, secondButtonIndex))) {
           removeButton(firstButtonIndex);
