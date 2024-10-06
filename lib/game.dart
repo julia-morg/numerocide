@@ -32,7 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _loadGameState(); // Загрузка сохранённого состояния
+    _loadGameState();
   }
 
   void _initializeGame() {
@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter = 0;
       _score = 0;
       selectedButtons.clear();
-      _saveGameState(); // Сохраняем начальное состояние игры
+      _saveGameState();
     });
   }
 
@@ -54,17 +54,15 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.remove('randomNumbers');
     await prefs.remove('score');
     await prefs.remove('counter');
-    // Удаляем активные кнопки
     for (var i = 0; i < randomNumbers.length; i++) {
       await prefs.remove('activeButton_$i');
     }
   }
 
-  // Метод для сохранения состояния игры
   Future<void> _saveGameState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('randomNumbers',
-        randomNumbers.map((e) => e.toString()).toList()); // Сохраняем числа
+        randomNumbers.map((e) => e.toString()).toList());
     await prefs.setInt('score', _score);
     await prefs.setInt('counter', _counter);
     for (var i = 0; i < randomNumbers.length; i++) {
@@ -77,7 +75,6 @@ class _MyHomePageState extends State<MyHomePage> {
     int maxScore = prefs.getInt('maxScore') ?? 0;
 
     if (_score > maxScore) {
-      // Сохраняем новый максимальный счёт
       await prefs.setInt('maxScore', _score);
     }
   }
@@ -97,14 +94,13 @@ class _MyHomePageState extends State<MyHomePage> {
         };
       });
     } else {
-      _initializeGame(); // Если сохранённого состояния нет, начинаем новую игру
+      _initializeGame();
     }
   }
 
-  // Метод для перезапуска игры
   void _restartGame() {
     setState(() {
-      _initializeGame(); // Новая игра
+      _initializeGame();
     });
   }
 
@@ -117,26 +113,23 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
 
-      // Добавляем копии всех активных кнопок
       randomNumbers.addAll(activeNumbers);
 
-      // Обновляем activeButtons для новых кнопок
       for (int i = randomNumbers.length - activeNumbers.length;
           i < randomNumbers.length;
           i++) {
-        activeButtons[i] = true; // Новые кнопки активные
+        activeButtons[i] = true;
       }
 
-      // Увеличиваем счётчик
       _counter++;
-      _saveGameState(); // Сохраняем состояние после добавления кнопок
+      _saveGameState();
     });
   }
 
   void _scoreCounter(int value1, int value2) {
     setState(() {
       _score += value1 + value2;
-      _saveGameState(); // Сохраняем состояние после изменения счёта
+      _saveGameState();
     });
   }
 
@@ -194,7 +187,6 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ScrollConfiguration(
                 behavior: ScrollBehavior()
                     .copyWith(overscroll: false, scrollbars: false),
-                // Отключаем полосу прокрутки
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: ButtonGrid(
@@ -212,7 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: isGameOver()
-          ? null // Кнопка "+" отключена, если игра закончена
+          ? null
           : FloatingActionButton(
               onPressed: _addCopiesOfButtons,
               tooltip: 'add',
@@ -226,7 +218,6 @@ class _MyHomePageState extends State<MyHomePage> {
     int maxScore = prefs.getInt('maxScore') ?? 0;
 
     if (_score > maxScore) {
-      // Если текущий счёт больше максимального, обновляем maxScore
       await prefs.setInt('maxScore', _score);
       maxScore = _score;
     }
@@ -270,8 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
             TextButton(
               child: const Text('Nice'),
               onPressed: () {
-                Navigator.of(context).pop(); // Закрываем диалог
-                // Возвращаемся на главную страницу
+                Navigator.of(context).pop();
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const HomePage()),
                   (Route<dynamic> route) => false,
@@ -300,36 +290,30 @@ class _MyHomePageState extends State<MyHomePage> {
     int row2 = secondIndex ~/ widget.buttonsPerRow;
     int col2 = secondIndex % widget.buttonsPerRow;
 
-    // Проверка обеих диагоналей: вправо (X+1, Y+1) и влево (X-1, Y+1)
     return (row1 - col1 == row2 - col2) || (row1 + col1 == row2 + col2);
   }
 
   bool areCellsCoherent(int firstIndex, int secondIndex) {
-    // Убедимся, что индексы идут в правильном порядке
     int start = min(firstIndex, secondIndex);
     int end = max(firstIndex, secondIndex);
 
-    // Проходим по клеткам между первой и второй
     for (int i = start + 1; i < end; i++) {
       if (activeButtons[i] == true) {
-        return false; // Если есть активная клетка между ними, возвращаем false
+        return false;
       }
     }
 
-    // Если нет активных клеток между первой и второй, возвращаем true
     return true;
   }
 
   bool areButtonsIsolated(int firstIndex, int secondIndex) {
     if (areButtonsInSameRow(firstIndex, secondIndex)) {
-      // Проверка между кнопками в строке
       int start = min(firstIndex, secondIndex) + 1;
       int end = max(firstIndex, secondIndex);
       for (int i = start; i < end; i++) {
         if (activeButtons[i] == true) return false;
       }
     } else if (areButtonsInSameColumn(firstIndex, secondIndex)) {
-      // Проверка между кнопками в колонке
       int start = min(firstIndex, secondIndex);
       int end = max(firstIndex, secondIndex);
       for (int i = start + widget.buttonsPerRow;
@@ -338,7 +322,6 @@ class _MyHomePageState extends State<MyHomePage> {
         if (activeButtons[i] == true) return false;
       }
     } else if (areButtonsOnSameDiagonal(firstIndex, secondIndex)) {
-      // Проверка между кнопками по диагонали
       int rowStart = firstIndex ~/ widget.buttonsPerRow;
       int rowEnd = secondIndex ~/ widget.buttonsPerRow;
       int colStart = firstIndex % widget.buttonsPerRow;
@@ -352,14 +335,13 @@ class _MyHomePageState extends State<MyHomePage> {
         i += rowIncrement * widget.buttonsPerRow + colIncrement;
         if (i == secondIndex) break;
         if (activeButtons[i] == true)
-          return false; // Проверка, если есть активные кнопки на пути
+          return false;
       }
     }
     return true;
   }
 
   bool isFirstAndLastButton(int firstIndex, int secondIndex) {
-    // Найдем первую активную кнопку
     int firstActiveIndex = -1;
     for (int i = 0; i < randomNumbers.length; i++) {
       if (activeButtons[i] == true) {
@@ -368,7 +350,6 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
 
-    // Найдем последнюю активную кнопку
     int lastActiveIndex = -1;
     for (int i = randomNumbers.length - 1; i >= 0; i--) {
       if (activeButtons[i] == true) {
@@ -383,9 +364,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void onButtonPressed(int index, int value, Function removeButton) {
     setState(() {
-      // Если уже есть выделение и повторно кликнули на ту же кнопку — снять выделение
       if (selectedButtons.isNotEmpty && selectedButtons[0]['index'] == index) {
-        selectedButtons.clear(); // Снимаем выделение
+        selectedButtons.clear();
         return;
       }
 
@@ -418,9 +398,9 @@ class _MyHomePageState extends State<MyHomePage> {
               selectedButtons.clear();
             });
             if (isGameOver()) {
-              _saveMaxScore(); // Сохраняем максимальный счёт
+              _saveMaxScore();
               _clearSavedGameState();
-              _showGameOverDialog(); // Показываем всплывающее окно
+              _showGameOverDialog();
             }
           });
         } else {

@@ -21,7 +21,6 @@ class _HomePageState extends State<HomePage> {
     _checkSavedGame();
   }
 
-  // Загружаем максимальный счет из SharedPreferences
   Future<void> _loadMaxScore() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -29,19 +28,17 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // Проверяем, есть ли сохраненная игра
   Future<void> _checkSavedGame() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _hasSavedGame = prefs
-          .containsKey('randomNumbers'); // Проверяем наличие сохранённых данных
+          .containsKey('randomNumbers');
     });
   }
 
-  // Метод для запуска новой игры
   void _startNewGame(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Очищаем сохранённое состояние игры
+    await prefs.clear();
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -53,12 +50,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     ).then((_) {
-      _loadMaxScore(); // Обновляем Max Score при возвращении на главную страницу
-      _checkSavedGame(); // Проверяем сохранённую игру
+      _loadMaxScore();
+      _checkSavedGame();
     });
   }
 
-  // Метод для продолжения сохраненной игры
   void _continueGame(BuildContext context) {
     Navigator.push(
       context,
@@ -71,8 +67,8 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     ).then((_) {
-      _loadMaxScore(); // Обновляем Max Score при возвращении на главную страницу
-      _checkSavedGame(); // Проверяем сохранённую игру
+      _loadMaxScore();
+      _checkSavedGame();
     });
   }
 
@@ -96,38 +92,66 @@ class _HomePageState extends State<HomePage> {
           color: colorLight,
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('BEST RESULT: $_maxScore',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall!
-                    .copyWith(color: colorDark)),
-            const SizedBox(height: 20),
-            ElevatedButton(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 50),
+          Center(
+            child: Text(
+              'BEST RESULT: $_maxScore',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineSmall!
+                  .copyWith(color: colorDark),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Center(
+            child: ElevatedButton(
               onPressed: () => _startNewGame(context),
-              child: const Text('Start new game'),
+              child: const Text(
+                'NEW GAME',
+                style: TextStyle(
+                  fontSize: 24,
+                ),
+              ),
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
+          ),
+          const SizedBox(height: 20),
+          Center(
+            child: ElevatedButton(
               onPressed: _hasSavedGame ? () => _continueGame(context) : null,
-              child: const Text('Continue game'),
+              child: const Text(
+                'CONTINUE GAME',
+                style: TextStyle(
+                  fontSize: 24,
+                ),
+              ),
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            flex: 40,
+            child: SizedBox(),
+          ),
+        ],
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _checkSavedGame();
   }
 }

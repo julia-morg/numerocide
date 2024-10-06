@@ -1,4 +1,3 @@
-// main.dart
 import 'package:flutter/material.dart';
 import 'home.dart';
 
@@ -24,8 +23,6 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return Center(
           child: SizedBox(
-            width: windowWidth.toDouble(),
-            height: windowHeight.toDouble(),
             child: child,
           ),
         );
