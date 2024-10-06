@@ -7,7 +7,6 @@ class ButtonGrid extends StatefulWidget {
   final List<int> randomNumbers;
   final Map<int, bool> activeButtons;
   final double buttonSize;
-  final int totalRowsInView;
   final int buttonsPerRow;
 
   const ButtonGrid({
@@ -17,7 +16,6 @@ class ButtonGrid extends StatefulWidget {
     required this.randomNumbers,
     required this.activeButtons,
     required this.buttonSize,
-    required this.totalRowsInView,
     required this.buttonsPerRow,
   }) : super(key: key);
 
@@ -25,52 +23,64 @@ class ButtonGrid extends StatefulWidget {
   _ButtonGridState createState() => _ButtonGridState();
 }
 
+
 class _ButtonGridState extends State<ButtonGrid> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double appBarHeight = Scaffold.of(context).appBarMaxHeight ?? kToolbarHeight;
 
-    // Вычитаем высоту AppBar, чтобы вычислить доступное пространство
+    // Вычисляем доступную высоту для кнопок
     double availableHeight = screenHeight - appBarHeight;
 
-    // Рассчитаем количество кнопок, которые могут поместиться на экран
-    int totalButtonsToShow = widget.totalRowsInView * widget.buttonsPerRow;
+    // Рассчитываем количество строк, которые могут поместиться на экран
+    int totalRowsInView = (availableHeight / (widget.buttonSize * 2 + 1)).floor(); // Учитываем размер кнопки и отступы
+    int totalButtonsToShow = totalRowsInView * widget.buttonsPerRow; // Общее количество кнопок для заполнения экрана
 
-    // Вычисляем, сколько дополнительных кнопок нужно для заполнения экрана
-    int additionalButtons = max(totalButtonsToShow - widget.randomNumbers.length, 0);
+    // Количество кнопок в последней строке
+    int buttonsInLastRow = widget.randomNumbers.length % widget.buttonsPerRow;
+
+    // Если последняя строка не завершена, добавляем пустые клетки до конца строки
+    int emptyCellsToAdd = buttonsInLastRow > 0 ? widget.buttonsPerRow - buttonsInLastRow : 0;
+
+    // Рассчитываем количество пустых клеток, чтобы заполнить экран на старте
+    int initialEmptyCells = totalButtonsToShow - widget.randomNumbers.length;
+
+    // Общее количество реальных кнопок, пустых клеток и одна дополнительная строка
+    int finalItemCount = widget.randomNumbers.length + max(emptyCellsToAdd, 0).toInt() + max(initialEmptyCells, 0).toInt() + widget.buttonsPerRow;
 
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: widget.buttonsPerRow, // Используем переданное значение кнопок в строке
+        crossAxisCount: widget.buttonsPerRow,
         childAspectRatio: 1,
         mainAxisSpacing: 1,
         crossAxisSpacing: 1,
       ),
-      itemCount: widget.randomNumbers.length + additionalButtons,
+      // Рендерим реальные кнопки и пустые клетки до конца экрана + одну дополнительную строку
+      itemCount: finalItemCount,
       itemBuilder: (context, index) {
+        // Если индекс выходит за пределы реальных кнопок, рендерим пустую клетку
         if (index >= widget.randomNumbers.length) {
-          // Пустые кнопки, которые нужны для заполнения экрана
           return SizedBox(
             width: widget.buttonSize,
             height: widget.buttonSize,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[200],
+                backgroundColor: Colors.grey[200], // Пустые клетки с приглушённым фоном
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.zero,
                 ),
                 padding: EdgeInsets.zero,
               ),
-              onPressed: null,
+              onPressed: null, // Пустые клетки не активны
               child: null,
             ),
           );
         }
 
-        // Отображение активных кнопок
+        // Отображаем реальные кнопки
         int buttonNumber = widget.randomNumbers[index];
         bool isSelected = widget.selectedButtons.any((element) => element['index'] == index);
 

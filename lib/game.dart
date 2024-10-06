@@ -7,14 +7,12 @@ class MyHomePage extends StatefulWidget {
     super.key,
     required this.title,
     required this.buttonSize,
-    required this.totalRowsInView,
     required this.buttonsPerRow,
     required this.initialButtonCount,
   });
 
   final String title;
   final double buttonSize;
-  final int totalRowsInView;
   final int buttonsPerRow;
   final int initialButtonCount;
 
@@ -26,15 +24,12 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   int _score = 0;
   List<Map<String, int>> selectedButtons = [];
-
-  // Генерация начального числа кнопок, основываясь на параметре widget.initialButtonCount
   List<int> randomNumbers = [];
   Map<int, bool> activeButtons = {};
 
   @override
   void initState() {
     super.initState();
-    // Инициализируем randomNumbers и activeButtons на основе переданного параметра widget.initialButtonCount
     randomNumbers = List.generate(widget.initialButtonCount, (_) => Random().nextInt(9) + 1);
     activeButtons = {for (var i = 0; i < widget.initialButtonCount; i++) i: true};
   }
@@ -47,10 +42,16 @@ class _MyHomePageState extends State<MyHomePage> {
           activeNumbers.add(randomNumbers[i]);
         }
       }
+
+      // Добавляем копии всех активных кнопок
       randomNumbers.addAll(activeNumbers);
+
+      // Обновляем activeButtons для новых кнопок
       for (int i = randomNumbers.length - activeNumbers.length; i < randomNumbers.length; i++) {
-        activeButtons[i] = true;
+        activeButtons[i] = true;  // Новые кнопки активные
       }
+
+      // Увеличиваем счётчик
       _counter++;
     });
   }
@@ -98,7 +99,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   randomNumbers: randomNumbers,
                   activeButtons: activeButtons,
                   buttonSize: widget.buttonSize,
-                  totalRowsInView: widget.totalRowsInView,
                   buttonsPerRow: widget.buttonsPerRow,
                 ),
               ),

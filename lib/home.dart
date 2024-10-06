@@ -8,7 +8,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Numbers Game'),
+        title: const Text('Numerocide'),
       ),
       body: Center(
         child: ElevatedButton(
@@ -18,16 +18,15 @@ class HomePage extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => const MyHomePage(
-                  title: 'Numbers',
+                  title: 'Numerocide',
                   buttonSize: 15.0,
-                  totalRowsInView: 20,
                   buttonsPerRow: 10,
                   initialButtonCount: 40,
                 ),
               ),
             );
           },
-          child: const Text('Start Game'),
+          child: const Text('Start new game'),
         ),
       ),
     );
