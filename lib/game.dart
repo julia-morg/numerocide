@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'game/button_grid.dart';
 
+import 'package:flutter/material.dart';
+import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'game/button_grid.dart';
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
     super.key,
@@ -30,19 +35,59 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _initializeGame();
+    _loadGameState(); // Загрузка сохранённого состояния
   }
 
   void _initializeGame() {
-    // Логика для генерации начальных данных
-    randomNumbers = List.generate(
-        widget.initialButtonCount, (_) => Random().nextInt(9) + 1);
-    activeButtons = {
-      for (var i = 0; i < widget.initialButtonCount; i++) i: true
-    };
-    _counter = 0;
-    _score = 0;
-    selectedButtons.clear();
+    setState(() {
+      randomNumbers = List.generate(
+          widget.initialButtonCount, (_) => Random().nextInt(9) + 1);
+      activeButtons = {
+        for (var i = 0; i < widget.initialButtonCount; i++) i: true
+      };
+      _counter = 0;
+      _score = 0;
+      selectedButtons.clear();
+      _saveGameState(); // Сохраняем начальное состояние игры
+    });
+  }
+
+  // Метод для сохранения состояния игры
+  Future<void> _saveGameState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('randomNumbers',
+        randomNumbers.map((e) => e.toString()).toList()); // Сохраняем числа
+    await prefs.setInt('score', _score);
+    await prefs.setInt('counter', _counter);
+    for (var i = 0; i < randomNumbers.length; i++) {
+      await prefs.setBool('activeButton_$i', activeButtons[i] ?? true);
+    }
+  }
+
+  Future<void> _loadGameState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey('randomNumbers')) {
+      setState(() {
+        randomNumbers = (prefs.getStringList('randomNumbers') ?? [])
+            .map((e) => int.parse(e))
+            .toList();
+        _score = prefs.getInt('score') ?? 0;
+        _counter = prefs.getInt('counter') ?? 0;
+        activeButtons = {
+          for (var i = 0; i < randomNumbers.length; i++)
+            i: prefs.getBool('activeButton_$i') ?? true
+        };
+      });
+    } else {
+      _initializeGame(); // Если сохранённого состояния нет, начинаем новую игру
+    }
+  }
+
+  // Метод для перезапуска игры
+  void _restartGame() {
+    setState(() {
+      _initializeGame(); // Новая игра
+    });
   }
 
   void _addCopiesOfButtons() {
@@ -59,19 +104,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
       // Обновляем activeButtons для новых кнопок
       for (int i = randomNumbers.length - activeNumbers.length;
-          i < randomNumbers.length;
-          i++) {
+      i < randomNumbers.length;
+      i++) {
         activeButtons[i] = true; // Новые кнопки активные
       }
 
       // Увеличиваем счётчик
       _counter++;
+      _saveGameState(); // Сохраняем состояние после добавления кнопок
     });
   }
 
   void _scoreCounter(int value1, int value2) {
     setState(() {
       _score += value1 + value2;
+      _saveGameState(); // Сохраняем состояние после изменения счёта
     });
   }
 
@@ -138,22 +185,27 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
+            if (isGameOver()) // Отображаем текст, если все кнопки удалены (конец игры)
+              Text(
+                'Game Over',
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium!
+                    .copyWith(color: Colors.red),
+              ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addCopiesOfButtons,
-        tooltip: 'add',
-        child: Icon(Icons.add, color: colorDark),
-      ),
+        floatingActionButton: isGameOver()
+            ? null  // Кнопка "+" отключена, если игра закончена
+            : FloatingActionButton(
+          onPressed: _addCopiesOfButtons,
+          tooltip: 'add',
+          child: Icon(Icons.add, color: colorDark),
+        ),
     );
   }
 
-  void _restartGame() {
-    setState(() {
-      _initializeGame();
-    });
-  }
 
   bool areButtonsInSameRow(int firstIndex, int secondIndex) {
     return firstIndex ~/ widget.buttonsPerRow ==
@@ -295,5 +347,9 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
     });
+  }
+
+  bool isGameOver() {
+    return activeButtons.values.every((isActive) => !isActive);
   }
 }
