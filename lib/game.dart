@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _initializeGame() {
     setState(() {
       randomNumbers = List.generate(
-          widget.initialButtonCount, (_) => Random().nextInt(1) + 1);
+          widget.initialButtonCount, (_) => Random().nextInt(9) + 1);
       activeButtons = {
         for (var i = 0; i < widget.initialButtonCount; i++) i: true
       };
@@ -122,8 +122,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
       // Обновляем activeButtons для новых кнопок
       for (int i = randomNumbers.length - activeNumbers.length;
-      i < randomNumbers.length;
-      i++) {
+          i < randomNumbers.length;
+          i++) {
         activeButtons[i] = true; // Новые кнопки активные
       }
 
@@ -192,7 +192,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Expanded(
               child: ScrollConfiguration(
-                behavior: ScrollBehavior().copyWith(overscroll: false, scrollbars: false), // Отключаем полосу прокрутки
+                behavior: ScrollBehavior()
+                    .copyWith(overscroll: false, scrollbars: false),
+                // Отключаем полосу прокрутки
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: ButtonGrid(
@@ -209,13 +211,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-        floatingActionButton: isGameOver()
-            ? null  // Кнопка "+" отключена, если игра закончена
-            : FloatingActionButton(
-          onPressed: _addCopiesOfButtons,
-          tooltip: 'add',
-          child: Icon(Icons.add, color: colorDark),
-        ),
+      floatingActionButton: isGameOver()
+          ? null // Кнопка "+" отключена, если игра закончена
+          : FloatingActionButton(
+              onPressed: _addCopiesOfButtons,
+              tooltip: 'add',
+              child: Icon(Icons.add, color: colorDark),
+            ),
     );
   }
 
@@ -233,19 +235,46 @@ class _MyHomePageState extends State<MyHomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Game Over'),
-          content: Text(
-            'Score: $_score\n${_score == maxScore ? "This is the max score!" : ""}',
+          title: Text(
+            'CONGRATS! YOU WON!',
+            textAlign: TextAlign.center,
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall!
+                .copyWith(color: Theme.of(context).colorScheme.primary),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              Text(
+                'Your score: $_score',
+                style: Theme.of(context)
+                    .textTheme
+                    .labelLarge!
+                    .copyWith(color: Theme.of(context).colorScheme.primary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '${_score == maxScore ? "This is your max score ever!" : ""}',
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.primary),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('OK'),
+              child: const Text('Nice'),
               onPressed: () {
                 Navigator.of(context).pop(); // Закрываем диалог
                 // Возвращаемся на главную страницу
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const HomePage()),
-                      (Route<dynamic> route) => false,
+                  (Route<dynamic> route) => false,
                 );
               },
             ),
@@ -254,7 +283,6 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
-
 
   bool areButtonsInSameRow(int firstIndex, int secondIndex) {
     return firstIndex ~/ widget.buttonsPerRow ==

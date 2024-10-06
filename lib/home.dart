@@ -12,6 +12,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _maxScore = 0;
   bool _hasSavedGame = false;
+  String _title = 'Numerocide';
 
   @override
   void initState() {
@@ -32,7 +33,8 @@ class _HomePageState extends State<HomePage> {
   Future<void> _checkSavedGame() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _hasSavedGame = prefs.containsKey('randomNumbers'); // Проверяем наличие сохранённых данных
+      _hasSavedGame = prefs
+          .containsKey('randomNumbers'); // Проверяем наличие сохранённых данных
     });
   }
 
@@ -43,8 +45,8 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const MyHomePage(
-          title: 'Numerocide',
+        builder: (context) => MyHomePage(
+          title: _title,
           buttonSize: 15.0,
           buttonsPerRow: 10,
           initialButtonCount: 40,
@@ -61,8 +63,8 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const MyHomePage(
-          title: 'Numerocide',
+        builder: (context) => MyHomePage(
+          title: _title,
           buttonSize: 15.0,
           buttonsPerRow: 10,
           initialButtonCount: 22,
@@ -81,26 +83,47 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: colorLight,
-        title: const Text('Numerocide'),
+        title: Text(
+          _title.toUpperCase(),
+        ),
         titleTextStyle: TextStyle(
-          color: colorDark,
-          fontSize: 18,
+          color: colorLight,
+          fontSize: 24,
+        ),
+        backgroundColor: colorDark,
+        toolbarHeight: MediaQuery.of(context).size.height * 0.15,
+        iconTheme: IconThemeData(
+          color: colorLight,
         ),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Max Score: $_maxScore', style: Theme.of(context).textTheme.headlineMedium),
+            Text('BEST RESULT: $_maxScore',
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall!
+                    .copyWith(color: colorDark)),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _startNewGame(context),
               child: const Text('Start new game'),
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
             ),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _hasSavedGame ? () => _continueGame(context) : null,
               child: const Text('Continue game'),
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
             ),
           ],
         ),
