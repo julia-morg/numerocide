@@ -155,7 +155,26 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   bool isFirstAndLastButton(int firstIndex, int secondIndex) {
-    return firstIndex == 0 && secondIndex == randomNumbers.length - 1;
+    // Найдем первую активную кнопку
+    int firstActiveIndex = -1;
+    for (int i = 0; i < randomNumbers.length; i++) {
+      if (activeButtons[i] == true) {
+        firstActiveIndex = i;
+        break;
+      }
+    }
+
+    // Найдем последнюю активную кнопку
+    int lastActiveIndex = -1;
+    for (int i = randomNumbers.length - 1; i >= 0; i--) {
+      if (activeButtons[i] == true) {
+        lastActiveIndex = i;
+        break;
+      }
+    }
+
+    return (firstIndex == firstActiveIndex && secondIndex == lastActiveIndex) ||
+        (firstIndex == lastActiveIndex && secondIndex == firstActiveIndex);
   }
 
   void onButtonPressed(int index, int value, Function removeButton) {
