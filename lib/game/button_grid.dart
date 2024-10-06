@@ -34,8 +34,7 @@ class _ButtonGridState extends State<ButtonGrid> {
 
     int totalRowsInView =
         (availableHeight / (widget.buttonSize * 2 + 1)).floor() - 1;
-    int totalButtonsToShow = totalRowsInView *
-        widget.buttonsPerRow;
+    int totalButtonsToShow = totalRowsInView * widget.buttonsPerRow;
 
     int buttonsInLastRow = widget.randomNumbers.length % widget.buttonsPerRow;
 
@@ -79,41 +78,37 @@ class _ButtonGridState extends State<ButtonGrid> {
         }
 
         int buttonNumber = widget.randomNumbers[index];
-        bool isSelected =
-            widget.selectedButtons.any((element) => element['index'] == index);
+        bool isSelected = widget.selectedButtons
+            .any((element) => element['index'] == index); // Определяем, выбрана ли кнопка
 
-        return Opacity(
-          opacity: widget.activeButtons[index] == false ? 0.2 : 1.0,
-          child: SizedBox(
-            width: widget.buttonSize,
-            height: widget.buttonSize,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isSelected
-                    ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
-                    : null,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-                padding: EdgeInsets.zero,
+        return SizedBox(
+          width: widget.buttonSize,
+          height: widget.buttonSize,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: widget.activeButtons[index] == true
+                  ? (isSelected
+                  ? Theme.of(context).colorScheme.primary.withOpacity(0.5) // Подсветка выбранной кнопки
+                  : null) // Оставляем стандартный цвет для остальных активных кнопок
+                  : Colors.grey[300], // Серый фон для неактивных кнопок
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
               ),
-              onPressed: () {
-                if (widget.activeButtons[index] == true) {
-                  widget.onButtonPressed(index, buttonNumber, (idx) {
-                    setState(() {
-                      widget.activeButtons[idx] = false;
-                    });
-                  });
-                }
-              },
-              child: Text(
-                '$buttonNumber',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: isSelected
-                      ? Colors.white
-                      : Theme.of(context).colorScheme.primary,
-                ),
+              padding: EdgeInsets.zero,
+            ),
+            onPressed: widget.activeButtons[index] == true
+                ? () {
+              widget.onButtonPressed(index, buttonNumber, (idx) {
+                setState(() {
+                  widget.activeButtons[idx] = false;
+                });
+              });
+            }
+                : null, // Неактивные кнопки
+            child: Text(
+              '$buttonNumber',
+              style: const TextStyle(
+                fontSize: 18,
               ),
             ),
           ),
