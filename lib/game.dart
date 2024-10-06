@@ -30,8 +30,19 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    randomNumbers = List.generate(widget.initialButtonCount, (_) => Random().nextInt(9) + 1);
-    activeButtons = {for (var i = 0; i < widget.initialButtonCount; i++) i: true};
+    _initializeGame();
+  }
+
+  void _initializeGame() {
+    // Логика для генерации начальных данных
+    randomNumbers = List.generate(
+        widget.initialButtonCount, (_) => Random().nextInt(9) + 1);
+    activeButtons = {
+      for (var i = 0; i < widget.initialButtonCount; i++) i: true
+    };
+    _counter = 0;
+    _score = 0;
+    selectedButtons.clear();
   }
 
   void _addCopiesOfButtons() {
@@ -47,8 +58,10 @@ class _MyHomePageState extends State<MyHomePage> {
       randomNumbers.addAll(activeNumbers);
 
       // Обновляем activeButtons для новых кнопок
-      for (int i = randomNumbers.length - activeNumbers.length; i < randomNumbers.length; i++) {
-        activeButtons[i] = true;  // Новые кнопки активные
+      for (int i = randomNumbers.length - activeNumbers.length;
+          i < randomNumbers.length;
+          i++) {
+        activeButtons[i] = true; // Новые кнопки активные
       }
 
       // Увеличиваем счётчик
@@ -64,12 +77,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Color textColor = Colors.indigo[900]!;
+    Color colorDark = Theme.of(context).colorScheme.primary;
+    Color colorLight = Theme.of(context).colorScheme.onSecondary;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          widget.title,
+        ),
+        titleTextStyle: TextStyle(
+          color: colorLight,
+          fontSize: 18,
+        ),
+        backgroundColor: colorDark,
+        iconTheme: IconThemeData(
+          color: colorLight,
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh, color: colorLight),
+            onPressed: _restartGame,
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -81,11 +110,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: <Widget>[
                   Text(
                     'Score: $_score',
-                    style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: textColor),
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall!
+                        .copyWith(color: colorDark),
                   ),
                   Text(
                     'Batches added: $_counter',
-                    style: Theme.of(context).textTheme.labelSmall!.copyWith(color: textColor),
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelSmall!
+                        .copyWith(color: colorDark),
                   ),
                 ],
               ),
@@ -109,20 +144,25 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _addCopiesOfButtons,
         tooltip: 'add',
-        child: Icon(
-          Icons.add,
-          color: Theme.of(context).colorScheme.primary,
-        ),
+        child: Icon(Icons.add, color: colorDark),
       ),
     );
   }
 
+  void _restartGame() {
+    setState(() {
+      _initializeGame();
+    });
+  }
+
   bool areButtonsInSameRow(int firstIndex, int secondIndex) {
-    return firstIndex ~/ widget.buttonsPerRow == secondIndex ~/ widget.buttonsPerRow;
+    return firstIndex ~/ widget.buttonsPerRow ==
+        secondIndex ~/ widget.buttonsPerRow;
   }
 
   bool areButtonsInSameColumn(int firstIndex, int secondIndex) {
-    return firstIndex % widget.buttonsPerRow == secondIndex % widget.buttonsPerRow;
+    return firstIndex % widget.buttonsPerRow ==
+        secondIndex % widget.buttonsPerRow;
   }
 
   bool areButtonsOnSameDiagonal(int firstIndex, int secondIndex) {
@@ -163,7 +203,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // Проверка между кнопками в колонке
       int start = min(firstIndex, secondIndex);
       int end = max(firstIndex, secondIndex);
-      for (int i = start + widget.buttonsPerRow; i < end; i += widget.buttonsPerRow) {
+      for (int i = start + widget.buttonsPerRow;
+          i < end;
+          i += widget.buttonsPerRow) {
         if (activeButtons[i] == true) return false;
       }
     } else if (areButtonsOnSameDiagonal(firstIndex, secondIndex)) {
@@ -180,7 +222,8 @@ class _MyHomePageState extends State<MyHomePage> {
       while (i != secondIndex) {
         i += rowIncrement * widget.buttonsPerRow + colIncrement;
         if (i == secondIndex) break;
-        if (activeButtons[i] == true) return false;  // Проверка, если есть активные кнопки на пути
+        if (activeButtons[i] == true)
+          return false; // Проверка, если есть активные кнопки на пути
       }
     }
     return true;
@@ -227,12 +270,16 @@ class _MyHomePageState extends State<MyHomePage> {
         int firstButtonValue = selectedButtons[0]['value']!;
         int secondButtonValue = selectedButtons[1]['value']!;
 
-        if ((firstButtonValue == secondButtonValue || firstButtonValue + secondButtonValue == 10) &&
+        if ((firstButtonValue == secondButtonValue ||
+                firstButtonValue + secondButtonValue == 10) &&
             (isFirstAndLastButton(firstButtonIndex, secondButtonIndex) ||
-                areButtonsInSameRow(firstButtonIndex, secondButtonIndex) && areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
+                areButtonsInSameRow(firstButtonIndex, secondButtonIndex) &&
+                    areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
                 areCellsCoherent(firstButtonIndex, secondButtonIndex) ||
-                areButtonsInSameColumn(firstButtonIndex, secondButtonIndex) && areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
-                areButtonsOnSameDiagonal(firstButtonIndex, secondButtonIndex) && areButtonsIsolated(firstButtonIndex, secondButtonIndex))) {
+                areButtonsInSameColumn(firstButtonIndex, secondButtonIndex) &&
+                    areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
+                areButtonsOnSameDiagonal(firstButtonIndex, secondButtonIndex) &&
+                    areButtonsIsolated(firstButtonIndex, secondButtonIndex))) {
           removeButton(firstButtonIndex);
           removeButton(secondButtonIndex);
           _scoreCounter(firstButtonValue, secondButtonValue);
@@ -249,6 +296,4 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
   }
-
 }
-

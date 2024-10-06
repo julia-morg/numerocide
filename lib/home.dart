@@ -6,16 +6,23 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color colorDark = Theme.of(context).colorScheme.primary;
+    Color colorLight = Theme.of(context).colorScheme.onSecondary;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: colorLight,
         title: const Text('Numerocide'),
+        titleTextStyle: TextStyle(
+          color: colorDark,
+          fontSize: 18,
+        ),
       ),
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            // Пример использования
             Navigator.push(
               context,
+
               MaterialPageRoute(
                 builder: (context) => const MyHomePage(
                   title: 'Numerocide',
