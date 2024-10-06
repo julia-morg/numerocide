@@ -13,10 +13,18 @@ class HomePage extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            // Переход на страницу игры
+            // Пример использования
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const MyHomePage(title: 'Numbers')),
+              MaterialPageRoute(
+                builder: (context) => const MyHomePage(
+                  title: 'Numbers',
+                  buttonSize: 15.0,
+                  totalRowsInView: 20,
+                  buttonsPerRow: 10,
+                  initialButtonCount: 40,
+                ),
+              ),
             );
           },
           child: const Text('Start Game'),
