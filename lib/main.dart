@@ -5,9 +5,6 @@ void main() {
   runApp(const MyApp());
 }
 
-const int windowWidth = 300;
-const int windowHeight = 600;
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

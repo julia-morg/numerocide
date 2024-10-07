@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'field.dart';
 
 class ButtonGrid extends StatefulWidget {
   final Function(int, int, Function(int)) onButtonPressed;
   final List<Map<String, int>> selectedButtons;
-  final List<int> randomNumbers;
-  final Map<int, bool> activeButtons;
+  final Map<int, Field> numbers;
   final double buttonSize;
   final int buttonsPerRow;
 
@@ -13,8 +13,7 @@ class ButtonGrid extends StatefulWidget {
     Key? key,
     required this.onButtonPressed,
     required this.selectedButtons,
-    required this.randomNumbers,
-    required this.activeButtons,
+    required this.numbers,
     required this.buttonSize,
     required this.buttonsPerRow,
   }) : super(key: key);
@@ -24,6 +23,11 @@ class ButtonGrid extends StatefulWidget {
 }
 
 class _ButtonGridState extends State<ButtonGrid> {
+  void updateGrid() {
+    setState(() {
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -36,14 +40,14 @@ class _ButtonGridState extends State<ButtonGrid> {
         (availableHeight / (widget.buttonSize * 2 + 1)).floor() - 1;
     int totalButtonsToShow = totalRowsInView * widget.buttonsPerRow;
 
-    int buttonsInLastRow = widget.randomNumbers.length % widget.buttonsPerRow;
+    int buttonsInLastRow = widget.numbers.length % widget.buttonsPerRow;
 
     int emptyCellsToAdd =
-        buttonsInLastRow > 0 ? widget.buttonsPerRow - buttonsInLastRow : 0;
+    buttonsInLastRow > 0 ? widget.buttonsPerRow - buttonsInLastRow : 0;
 
-    int initialEmptyCells = totalButtonsToShow - widget.randomNumbers.length;
+    int initialEmptyCells = totalButtonsToShow - widget.numbers.length;
 
-    int finalItemCount = widget.randomNumbers.length +
+    int finalItemCount = widget.numbers.length +
         max(emptyCellsToAdd, 0).toInt() +
         max(initialEmptyCells, 0).toInt() +
         widget.buttonsPerRow;
@@ -59,7 +63,8 @@ class _ButtonGridState extends State<ButtonGrid> {
       ),
       itemCount: finalItemCount,
       itemBuilder: (context, index) {
-        if (index >= widget.randomNumbers.length) {
+        if (index >= widget.numbers.length) {
+          // Пустые клетки, если нужно
           return SizedBox(
             width: widget.buttonSize,
             height: widget.buttonSize,
@@ -77,18 +82,23 @@ class _ButtonGridState extends State<ButtonGrid> {
           );
         }
 
-        int buttonNumber = widget.randomNumbers[index];
+        // Получаем объект Field для кнопки
+        Field buttonField = widget.numbers[index]!;
+        int buttonNumber = buttonField.number;
         bool isSelected = widget.selectedButtons
-            .any((element) => element['index'] == index); // Определяем, выбрана ли кнопка
+            .any((element) => element['index'] == index); // Проверка на выбор кнопки
 
         return SizedBox(
           width: widget.buttonSize,
           height: widget.buttonSize,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: widget.activeButtons[index] == true
+              backgroundColor: buttonField.isActive
                   ? (isSelected
-                  ? Theme.of(context).colorScheme.primary.withOpacity(0.5) // Подсветка выбранной кнопки
+                  ? Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withOpacity(0.5) // Подсветка выбранной кнопки
                   : null) // Оставляем стандартный цвет для остальных активных кнопок
                   : Colors.grey[300], // Серый фон для неактивных кнопок
               shape: RoundedRectangleBorder(
@@ -96,11 +106,11 @@ class _ButtonGridState extends State<ButtonGrid> {
               ),
               padding: EdgeInsets.zero,
             ),
-            onPressed: widget.activeButtons[index] == true
+            onPressed: buttonField.isActive
                 ? () {
               widget.onButtonPressed(index, buttonNumber, (idx) {
                 setState(() {
-                  widget.activeButtons[idx] = false;
+                  widget.numbers[idx] = Field(idx, buttonNumber, false); // Деактивация кнопки
                 });
               });
             }

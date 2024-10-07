@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MyHomePage(
+        builder: (context) => GamePage(
           title: _title,
           buttonSize: 15.0,
           buttonsPerRow: 10,
@@ -59,11 +59,11 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MyHomePage(
+        builder: (context) => GamePage(
           title: _title,
           buttonSize: 15.0,
           buttonsPerRow: 10,
-          initialButtonCount: 22,
+          initialButtonCount: 40,
         ),
       ),
     ).then((_) {
