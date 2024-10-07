@@ -31,8 +31,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _checkSavedGame() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _hasSavedGame = prefs
-          .containsKey('randomNumbers');
+      _hasSavedGame = prefs.containsKey('numbers');
     });
   }
 

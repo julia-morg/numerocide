@@ -24,8 +24,7 @@ class ButtonGrid extends StatefulWidget {
 
 class _ButtonGridState extends State<ButtonGrid> {
   void updateGrid() {
-    setState(() {
-    });
+    setState(() {});
   }
 
   @override
@@ -43,7 +42,7 @@ class _ButtonGridState extends State<ButtonGrid> {
     int buttonsInLastRow = widget.numbers.length % widget.buttonsPerRow;
 
     int emptyCellsToAdd =
-    buttonsInLastRow > 0 ? widget.buttonsPerRow - buttonsInLastRow : 0;
+        buttonsInLastRow > 0 ? widget.buttonsPerRow - buttonsInLastRow : 0;
 
     int initialEmptyCells = totalButtonsToShow - widget.numbers.length;
 
@@ -64,7 +63,6 @@ class _ButtonGridState extends State<ButtonGrid> {
       itemCount: finalItemCount,
       itemBuilder: (context, index) {
         if (index >= widget.numbers.length) {
-          // Пустые клетки, если нужно
           return SizedBox(
             width: widget.buttonSize,
             height: widget.buttonSize,
@@ -82,11 +80,10 @@ class _ButtonGridState extends State<ButtonGrid> {
           );
         }
 
-        // Получаем объект Field для кнопки
         Field buttonField = widget.numbers[index]!;
         int buttonNumber = buttonField.number;
-        bool isSelected = widget.selectedButtons
-            .any((element) => element['index'] == index); // Проверка на выбор кнопки
+        bool isSelected = widget.selectedButtons.any(
+            (element) => element['index'] == index);
 
         return SizedBox(
           width: widget.buttonSize,
@@ -95,12 +92,12 @@ class _ButtonGridState extends State<ButtonGrid> {
             style: ElevatedButton.styleFrom(
               backgroundColor: buttonField.isActive
                   ? (isSelected
-                  ? Theme.of(context)
-                  .colorScheme
-                  .primary
-                  .withOpacity(0.5) // Подсветка выбранной кнопки
-                  : null) // Оставляем стандартный цвет для остальных активных кнопок
-                  : Colors.grey[300], // Серый фон для неактивных кнопок
+                      ? Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.5)
+                      : null)
+                  : Colors.grey[300],
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero,
               ),
@@ -108,13 +105,14 @@ class _ButtonGridState extends State<ButtonGrid> {
             ),
             onPressed: buttonField.isActive
                 ? () {
-              widget.onButtonPressed(index, buttonNumber, (idx) {
-                setState(() {
-                  widget.numbers[idx] = Field(idx, buttonNumber, false); // Деактивация кнопки
-                });
-              });
-            }
-                : null, // Неактивные кнопки
+                    widget.onButtonPressed(index, buttonNumber, (idx) {
+                      setState(() {
+                        widget.numbers[idx] = Field(
+                            idx, buttonNumber, false);
+                      });
+                    });
+                  }
+                : null,
             child: Text(
               '$buttonNumber',
               style: const TextStyle(

@@ -27,7 +27,7 @@ class _GamePageState extends State<GamePage> {
   int _counter = 0;
   int _score = 0;
   List<Map<String, int>> selectedButtons = [];
-  Map <int, Field> numbers = {};
+  Map<int, Field> numbers = {};
 
   @override
   void initState() {
@@ -36,13 +36,8 @@ class _GamePageState extends State<GamePage> {
   }
 
   void _initializeGame() {
-    List<int> randomNumbers = [];
-    Map<int, bool> activeButtons = {};
-    randomNumbers = List.generate(
+    List<int> randomNumbers = List.generate(
         widget.initialButtonCount, (_) => Random().nextInt(9) + 1);
-    activeButtons = {
-      for (var i = 0; i < widget.initialButtonCount; i++) i: true
-    };
     setState(() {
       numbers = {
         for (var i = 0; i < widget.initialButtonCount; i++)
@@ -62,6 +57,7 @@ class _GamePageState extends State<GamePage> {
       await prefs.remove('field_number_$i');
       await prefs.remove('field_isActive_$i');
     }
+    await prefs.remove('numbers');
     await prefs.remove('score');
     await prefs.remove('counter');
   }
@@ -76,7 +72,7 @@ class _GamePageState extends State<GamePage> {
       await prefs.setInt('field_number_$index', field.number);
       await prefs.setBool('field_isActive_$index', field.isActive);
     }
-
+    await prefs.setBool('numbers', true);
     await prefs.setInt('score', _score);
     await prefs.setInt('counter', _counter);
   }
@@ -131,7 +127,8 @@ class _GamePageState extends State<GamePage> {
 
       int currentSize = numbers.length;
       for (int i = 0; i < activeFields.length; i++) {
-        numbers[currentSize + i] = Field(currentSize + i, activeFields[i].number, true);
+        numbers[currentSize + i] =
+            Field(currentSize + i, activeFields[i].number, true);
       }
 
       _counter++;
@@ -326,7 +323,9 @@ class _GamePageState extends State<GamePage> {
     } else if (areButtonsInSameColumn(firstIndex, secondIndex)) {
       int start = min(firstIndex, secondIndex);
       int end = max(firstIndex, secondIndex);
-      for (int i = start + widget.buttonsPerRow; i < end; i += widget.buttonsPerRow) {
+      for (int i = start + widget.buttonsPerRow;
+          i < end;
+          i += widget.buttonsPerRow) {
         if (numbers[i]?.isActive == true) return false;
       }
     } else if (areButtonsOnSameDiagonal(firstIndex, secondIndex)) {
@@ -388,7 +387,7 @@ class _GamePageState extends State<GamePage> {
 
         // Проверяем, соответствуют ли значения кнопок и их положение
         if ((firstButtonValue == secondButtonValue ||
-            firstButtonValue + secondButtonValue == 10) &&
+                firstButtonValue + secondButtonValue == 10) &&
             (isFirstAndLastButton(firstButtonIndex, secondButtonIndex) ||
                 areButtonsInSameRow(firstButtonIndex, secondButtonIndex) &&
                     areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
@@ -400,8 +399,10 @@ class _GamePageState extends State<GamePage> {
           selectedButtons.add({'index': index, 'value': value});
 
           Future.delayed(const Duration(milliseconds: 50), () {
-            numbers[firstButtonIndex] = Field(firstButtonIndex, numbers[firstButtonIndex]!.number, false);
-            numbers[secondButtonIndex] = Field(secondButtonIndex, numbers[secondButtonIndex]!.number, false);
+            numbers[firstButtonIndex] = Field(
+                firstButtonIndex, numbers[firstButtonIndex]!.number, false);
+            numbers[secondButtonIndex] = Field(
+                secondButtonIndex, numbers[secondButtonIndex]!.number, false);
 
             _scoreCounter(firstButtonValue, secondButtonValue);
 
@@ -434,7 +435,8 @@ class _GamePageState extends State<GamePage> {
     return numbers.values.every((field) => !field.isActive);
   }
 
-  void checkAndRemoveEmptyRows(Map<int, Field> numbers, int buttonsPerRow, Function updateGrid) {
+  void checkAndRemoveEmptyRows(
+      Map<int, Field> numbers, int buttonsPerRow, Function updateGrid) {
     int totalRows = (numbers.length / buttonsPerRow).floor();
 
     // Проходим по всем рядам с конца, чтобы избежать проблем с индексами при удалении
@@ -461,13 +463,16 @@ class _GamePageState extends State<GamePage> {
     recalculateFieldIndices(numbers, startIndex, buttonsPerRow);
   }
 
-  void recalculateFieldIndices(Map<int, Field> numbers, int startIndex, int buttonsPerRow) {
+  void recalculateFieldIndices(
+      Map<int, Field> numbers, int startIndex, int buttonsPerRow) {
     Map<int, Field> updatedNumbers = {};
-    int shift = buttonsPerRow; // Количество индексов для сдвига после удаления ряда
+    int shift =
+        buttonsPerRow; // Количество индексов для сдвига после удаления ряда
 
     numbers.forEach((key, field) {
       if (key >= startIndex) {
-        updatedNumbers[key - shift] = Field(key - shift, field.number, field.isActive);
+        updatedNumbers[key - shift] =
+            Field(key - shift, field.number, field.isActive);
       } else {
         updatedNumbers[key] = field;
       }
@@ -479,12 +484,13 @@ class _GamePageState extends State<GamePage> {
 
 // Функция для проверки, пуст ли ряд
   bool isRowEmpty(int rowIndex, int buttonsPerRow, Map<int, Field> numbers) {
-    for (int i = rowIndex * buttonsPerRow; i < (rowIndex + 1) * buttonsPerRow; i++) {
+    for (int i = rowIndex * buttonsPerRow;
+        i < (rowIndex + 1) * buttonsPerRow;
+        i++) {
       if (numbers[i]?.isActive == true) {
         return false; // Ряд не пуст
       }
     }
     return true; // Все кнопки в ряду неактивны
   }
-
 }
