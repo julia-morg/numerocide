@@ -23,8 +23,18 @@ class ButtonGrid extends StatefulWidget {
 }
 
 class _ButtonGridState extends State<ButtonGrid> {
-  void updateGrid() {
-    setState(() {});
+  bool isRowBeingRemoved = false;
+  List<int> crossedOutIndexes = [];
+
+  void startRemoveRowAnimation(int rowIndex) async {
+    setState(() {
+      crossedOutIndexes = List.generate(widget.buttonsPerRow, (i) => rowIndex * widget.buttonsPerRow + i);
+    });
+    await Future.delayed(const Duration(milliseconds: 500));
+    setState(() {
+      crossedOutIndexes.clear(); // Убираем зачёркивание после 500 мс
+      widget.numbers.removeWhere((key, _) => crossedOutIndexes.contains(key));
+    });
   }
 
   @override
@@ -42,7 +52,7 @@ class _ButtonGridState extends State<ButtonGrid> {
     int buttonsInLastRow = widget.numbers.length % widget.buttonsPerRow;
 
     int emptyCellsToAdd =
-        buttonsInLastRow > 0 ? widget.buttonsPerRow - buttonsInLastRow : 0;
+      buttonsInLastRow > 0 ? widget.buttonsPerRow - buttonsInLastRow : 0;
 
     int initialEmptyCells = totalButtonsToShow - widget.numbers.length;
 
@@ -82,21 +92,19 @@ class _ButtonGridState extends State<ButtonGrid> {
 
         Field buttonField = widget.numbers[index]!;
         int buttonNumber = buttonField.number;
-        bool isSelected = widget.selectedButtons.any(
-            (element) => element['index'] == index);
+        bool isSelected = widget.selectedButtons
+            .any((element) => element['index'] == index);
 
-        return SizedBox(
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 500),
           width: widget.buttonSize,
           height: widget.buttonSize,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: buttonField.isActive
                   ? (isSelected
-                      ? Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withOpacity(0.5)
-                      : null)
+                  ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+                  : null)
                   : Colors.grey[300],
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero,
@@ -105,18 +113,20 @@ class _ButtonGridState extends State<ButtonGrid> {
             ),
             onPressed: buttonField.isActive
                 ? () {
-                    widget.onButtonPressed(index, buttonNumber, (idx) {
-                      setState(() {
-                        widget.numbers[idx] = Field(
-                            idx, buttonNumber, false);
-                      });
-                    });
-                  }
+              widget.onButtonPressed(index, buttonNumber, (idx) {
+                setState(() {
+                  widget.numbers[idx] = Field(idx, buttonNumber, false);
+                });
+              });
+            }
                 : null,
             child: Text(
               '$buttonNumber',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
+                decoration: crossedOutIndexes.contains(index)
+                    ? TextDecoration.lineThrough
+                    : TextDecoration.none,
               ),
             ),
           ),
