@@ -4,6 +4,7 @@ import 'game/button_grid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home.dart';
 import 'game/field.dart';
+import 'game/hint.dart';
 
 class GamePage extends StatefulWidget {
   const GamePage({
@@ -28,6 +29,7 @@ class _GamePageState extends State<GamePage> {
   int _score = 0;
   List<Map<String, int>> selectedButtons = [];
   Map<int, Field> numbers = {};
+  Hint? currentHint;
 
   @override
   void initState() {
@@ -204,6 +206,7 @@ class _GamePageState extends State<GamePage> {
                     numbers: numbers,
                     buttonSize: widget.buttonSize,
                     buttonsPerRow: widget.buttonsPerRow,
+                    hint: currentHint,
                   ),
                 ),
               ),
@@ -213,11 +216,22 @@ class _GamePageState extends State<GamePage> {
       ),
       floatingActionButton: isGameOver()
           ? null
-          : FloatingActionButton(
-              onPressed: _addCopiesOfButtons,
-              tooltip: 'add',
-              child: Icon(Icons.add, color: colorDark),
-            ),
+          : Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: _findHint,
+            tooltip: 'Hint',
+            child: Icon(Icons.lightbulb, color: Theme.of(context).colorScheme.primary),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            onPressed: _addCopiesOfButtons,
+            tooltip: 'Add',
+            child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
+          ),
+        ],
+      ),
     );
   }
 
@@ -408,6 +422,7 @@ class _GamePageState extends State<GamePage> {
 
             setState(() {
               selectedButtons.clear();
+              currentHint = null;
             });
 
             if (isGameOver()) {
@@ -429,6 +444,33 @@ class _GamePageState extends State<GamePage> {
         }
       }
     });
+  }
+
+  void _findHint() {
+    setState(() {
+      currentHint = null; // Сброс текущей подсказки
+      for (int i = 0; i < numbers.length; i++) {
+        if (numbers[i]?.isActive == true) {
+          for (int j = i + 1; j < numbers.length; j++) {
+            if (numbers[j]?.isActive == true &&
+                (numbers[i]!.number == numbers[j]!.number ||
+                    numbers[i]!.number + numbers[j]!.number == 10)) {
+              currentHint = Hint(i, j);
+              return; // Найдена подсказка, выходим
+            }
+          }
+        }
+      }
+
+      if (currentHint == null) {
+        // Если подсказок нет, можно сделать анимацию кнопки добавления строк
+        _animateAddButton();
+      }
+    });
+  }
+
+  void _animateAddButton() {
+    // Логика для анимации кнопки добавления, если ходов нет
   }
 
   bool isGameOver() {
