@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'game.dart';
+import 'game_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _maxScore = 0;
   bool _hasSavedGame = false;
-  String _title = 'Numerocide';
+  final String _title = 'Numerocide';
 
   @override
   void initState() {
@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _checkSavedGame() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _hasSavedGame = prefs.containsKey('numbers');
+      _hasSavedGame = prefs.containsKey('field_index_0');
     });
   }
 

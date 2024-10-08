@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'field.dart';
 import 'hint.dart';
+import 'numbers.dart';
 
 class ButtonGrid extends StatefulWidget {
   final Function(int, int, Function(int)) onButtonPressed;
   final List<int> selectedButtons;
-  final Map<int, Field> numbers;
   final double buttonSize;
   final int buttonsPerRow;
   final Hint? hint;
+  final Numbers desk;
 
   const ButtonGrid({
     Key? key,
     required this.onButtonPressed,
     required this.selectedButtons,
-    required this.numbers,
+    required this.desk,
     required this.buttonSize,
     required this.buttonsPerRow,
     this.hint,
@@ -35,7 +36,7 @@ class _ButtonGridState extends State<ButtonGrid> {
     await Future.delayed(const Duration(milliseconds: 1000));
     setState(() {
       crossedOutIndexes.clear();
-      widget.numbers.removeWhere((key, _) => crossedOutIndexes.contains(key));
+      widget.desk.numbers.removeWhere((key, _) => crossedOutIndexes.contains(key));
     });
   }
 
@@ -51,13 +52,13 @@ class _ButtonGridState extends State<ButtonGrid> {
         (availableHeight / (widget.buttonSize * 2 + 1)).floor() - 1;
     int totalButtonsToShow = totalRowsInView * widget.buttonsPerRow;
 
-    int buttonsInLastRow = widget.numbers.length % widget.buttonsPerRow;
+    int buttonsInLastRow = widget.desk.numbers.length % widget.buttonsPerRow;
 
     int emptyCellsToAdd = buttonsInLastRow > 0 ? widget.buttonsPerRow - buttonsInLastRow : 0;
 
-    int initialEmptyCells = totalButtonsToShow - widget.numbers.length;
+    int initialEmptyCells = totalButtonsToShow - widget.desk.numbers.length;
 
-    int finalItemCount = widget.numbers.length+
+    int finalItemCount = widget.desk.numbers.length+
         emptyCellsToAdd +
         initialEmptyCells +
         widget.buttonsPerRow.toInt();
@@ -73,7 +74,7 @@ class _ButtonGridState extends State<ButtonGrid> {
       ),
       itemCount: finalItemCount,
       itemBuilder: (context, index) {
-        if (index >= widget.numbers.length) {
+        if (index >= widget.desk.numbers.length) {
           return SizedBox(
             width: widget.buttonSize,
             height: widget.buttonSize,
@@ -89,7 +90,7 @@ class _ButtonGridState extends State<ButtonGrid> {
           );
         }
 
-        Field buttonField = widget.numbers[index]!;
+        Field buttonField = widget.desk.numbers[index]!;
         int buttonNumber = buttonField.number;
         bool isSelected = widget.selectedButtons.contains(index);
         bool isHint = widget.hint != null &&
@@ -101,13 +102,13 @@ class _ButtonGridState extends State<ButtonGrid> {
           height: widget.buttonSize,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: isHint
-                  ? Colors.green.withOpacity(0.5)
-                  : buttonField.isActive
-                      ? (isSelected
-                          ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+              backgroundColor: buttonField.isActive
+                  ? (isSelected
+                      ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+                      : isHint
+                          ? Colors.green.withOpacity(0.5)
                           : null)
-                      : Colors.grey[300],
+                  : Colors.grey[300],
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero,),
               padding: EdgeInsets.zero,
             ),
@@ -115,7 +116,7 @@ class _ButtonGridState extends State<ButtonGrid> {
                 ? () {
               widget.onButtonPressed(index, buttonNumber, (idx) {
                 setState(() {
-                  widget.numbers[idx] = Field(idx, buttonNumber, false);
+                  widget.desk.numbers[idx] = Field(idx, buttonNumber, false);
                 });
               });
             }
