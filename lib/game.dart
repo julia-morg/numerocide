@@ -24,17 +24,27 @@ class GamePage extends StatefulWidget {
   State<GamePage> createState() => _GamePageState();
 }
 
-class _GamePageState extends State<GamePage> {
+class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin {
   int _counter = 0;
   int _score = 0;
   List<int> selectedButtons = [];
   Map<int, Field> numbers = {};
   Hint? currentHint;
+  late AnimationController _shakeController;
+  late Animation<double> _shakeAnimation;
 
   @override
   void initState() {
     super.initState();
     _loadGameState();
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    _shakeAnimation = Tween<double>(begin: 0, end: 10)
+        .chain(CurveTween(curve: Curves.elasticIn))
+        .animate(_shakeController);
   }
 
   void _initializeGame() {
@@ -66,6 +76,11 @@ class _GamePageState extends State<GamePage> {
 
   Future<void> _saveGameState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    for (String key in prefs.getKeys()) {
+      if (key.startsWith('field_index_') || key.startsWith('field_number_') || key.startsWith('field_isActive_')) {
+        await prefs.remove(key);
+      }
+    }
     for (var entry in numbers.entries) {
       int index = entry.key;
       Field field = entry.value;
@@ -140,7 +155,6 @@ class _GamePageState extends State<GamePage> {
   void _scoreCounter(int value1, int value2) {
     setState(() {
       _score += value1 + value2;
-      _saveGameState();
     });
   }
 
@@ -220,15 +234,25 @@ class _GamePageState extends State<GamePage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
+            heroTag: "hintButton", // Уникальный tag для этой кнопки
             onPressed: _findHint,
             tooltip: 'Hint',
             child: Icon(Icons.lightbulb, color: Theme.of(context).colorScheme.primary),
           ),
           const SizedBox(height: 16),
-          FloatingActionButton(
-            onPressed: _addCopiesOfButtons,
-            tooltip: 'Add',
-            child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
+          AnimatedBuilder(
+            animation: _shakeAnimation,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(_shakeAnimation.value, 0), // Анимация "подрагивания"
+                child: FloatingActionButton(
+                  heroTag: "addButton", // Уникальный tag для этой кнопки
+                  onPressed: _addCopiesOfButtons,
+                  tooltip: 'Add',
+                  child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -403,9 +427,7 @@ class _GamePageState extends State<GamePage> {
                 firstButtonIndex, numbers[firstButtonIndex]!.number, false);
             numbers[secondButtonIndex] = Field(
                 secondButtonIndex, numbers[secondButtonIndex]!.number, false);
-
             _scoreCounter(firstButtonValue, secondButtonValue);
-
             setState(() {
               selectedButtons.clear();
               currentHint = null;
@@ -419,8 +441,10 @@ class _GamePageState extends State<GamePage> {
 
             checkAndRemoveEmptyRows(numbers, widget.buttonsPerRow, () {
               setState(() {
+
               });
             });
+            _saveGameState();
           });
         } else {
           selectedButtons.clear();
@@ -476,7 +500,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   void _animateAddButton() {
-    // Логика для анимации кнопки добавления, если ходов нет
+    _shakeController.forward(from: 0);
   }
 
   bool isGameOver() {
@@ -533,5 +557,11 @@ class _GamePageState extends State<GamePage> {
       }
     }
     return true;
+  }
+
+  @override
+  void dispose() {
+    _shakeController.dispose();
+    super.dispose();
   }
 }
