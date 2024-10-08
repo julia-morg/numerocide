@@ -30,7 +30,7 @@ class _ButtonGridState extends State<ButtonGrid> {
     setState(() {
       crossedOutIndexes = List.generate(widget.buttonsPerRow, (i) => rowIndex * widget.buttonsPerRow + i);
     });
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 1000));
     setState(() {
       crossedOutIndexes.clear(); // Убираем зачёркивание после 500 мс
       widget.numbers.removeWhere((key, _) => crossedOutIndexes.contains(key));
@@ -96,7 +96,7 @@ class _ButtonGridState extends State<ButtonGrid> {
             .any((element) => element['index'] == index);
 
         return AnimatedContainer(
-          duration: const Duration(milliseconds: 500),
+          duration: const Duration(milliseconds: 30),
           width: widget.buttonSize,
           height: widget.buttonSize,
           child: ElevatedButton(
@@ -124,6 +124,9 @@ class _ButtonGridState extends State<ButtonGrid> {
               '$buttonNumber',
               style: TextStyle(
                 fontSize: 18,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : buttonField.isActive? Theme.of(context).colorScheme.primary : Colors.grey[600],
                 decoration: crossedOutIndexes.contains(index)
                     ? TextDecoration.lineThrough
                     : TextDecoration.none,

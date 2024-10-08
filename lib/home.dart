@@ -152,5 +152,6 @@ class _HomePageState extends State<HomePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _checkSavedGame();
+    _loadMaxScore();
   }
 }

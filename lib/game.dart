@@ -57,14 +57,13 @@ class _GamePageState extends State<GamePage> {
       await prefs.remove('field_number_$i');
       await prefs.remove('field_isActive_$i');
     }
-    await prefs.remove('numbers');
     await prefs.remove('score');
     await prefs.remove('counter');
+    await prefs.remove('numbers');
   }
 
   Future<void> _saveGameState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('numbers');
     for (var entry in numbers.entries) {
       int index = entry.key;
       Field field = entry.value;
@@ -224,6 +223,8 @@ class _GamePageState extends State<GamePage> {
 
   void _showGameOverDialog() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await prefs.setInt('maxScore', _score);
     int maxScore = prefs.getInt('maxScore') ?? 0;
 
     if (_score > maxScore) {
@@ -385,7 +386,6 @@ class _GamePageState extends State<GamePage> {
         int firstButtonValue = selectedButtons[0]['value']!;
         int secondButtonValue = selectedButtons[1]['value']!;
 
-        // Проверяем, соответствуют ли значения кнопок и их положение
         if ((firstButtonValue == secondButtonValue ||
                 firstButtonValue + secondButtonValue == 10) &&
             (isFirstAndLastButton(firstButtonIndex, secondButtonIndex) ||
