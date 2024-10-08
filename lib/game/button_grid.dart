@@ -4,7 +4,7 @@ import 'hint.dart';
 
 class ButtonGrid extends StatefulWidget {
   final Function(int, int, Function(int)) onButtonPressed;
-  final List<Map<String, int>> selectedButtons;
+  final List<int> selectedButtons;
   final Map<int, Field> numbers;
   final double buttonSize;
   final int buttonsPerRow;
@@ -91,8 +91,7 @@ class _ButtonGridState extends State<ButtonGrid> {
 
         Field buttonField = widget.numbers[index]!;
         int buttonNumber = buttonField.number;
-        bool isSelected = widget.selectedButtons
-            .any((element) => element['index'] == index);
+        bool isSelected = widget.selectedButtons.contains(index);
         bool isHint = widget.hint != null &&
             (index == widget.hint!.hint1 || index == widget.hint!.hint2);
 

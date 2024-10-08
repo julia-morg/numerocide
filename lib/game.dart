@@ -27,7 +27,7 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   int _counter = 0;
   int _score = 0;
-  List<Map<String, int>> selectedButtons = [];
+  List<int> selectedButtons = [];
   Map<int, Field> numbers = {};
   Hint? currentHint;
 
@@ -243,7 +243,6 @@ class _GamePageState extends State<GamePage> {
 
     if (_score > maxScore) {
       await prefs.setInt('maxScore', _score);
-      maxScore = _score;
     }
 
     showDialog(
@@ -272,7 +271,7 @@ class _GamePageState extends State<GamePage> {
               ),
               const SizedBox(height: 10),
               Text(
-                '${_score == maxScore ? "This is your max score ever!" : ""}',
+                '${_score > maxScore ? "This is your max score ever!" : ""}',
                 style: Theme.of(context)
                     .textTheme
                     .labelMedium!
@@ -385,33 +384,20 @@ class _GamePageState extends State<GamePage> {
 
   void onButtonPressed(int index, int value, Function removeButton) {
     setState(() {
-      if (selectedButtons.isNotEmpty && selectedButtons[0]['index'] == index) {
+      if (selectedButtons.isNotEmpty && selectedButtons[0] == index) {
         selectedButtons.clear();
         return;
       }
 
       if (selectedButtons.isEmpty) {
-        selectedButtons.add({'index': index, 'value': value});
+        selectedButtons.add(index);
       } else if (selectedButtons.length == 1) {
-        selectedButtons.add({'index': index, 'value': value});
-
-        int firstButtonIndex = selectedButtons[0]['index']!;
-        int secondButtonIndex = selectedButtons[1]['index']!;
-        int firstButtonValue = selectedButtons[0]['value']!;
-        int secondButtonValue = selectedButtons[1]['value']!;
-
-        if ((firstButtonValue == secondButtonValue ||
-                firstButtonValue + secondButtonValue == 10) &&
-            (isFirstAndLastButton(firstButtonIndex, secondButtonIndex) ||
-                areButtonsInSameRow(firstButtonIndex, secondButtonIndex) &&
-                    areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
-                areCellsCoherent(firstButtonIndex, secondButtonIndex) ||
-                areButtonsInSameColumn(firstButtonIndex, secondButtonIndex) &&
-                    areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
-                areButtonsOnSameDiagonal(firstButtonIndex, secondButtonIndex) &&
-                    areButtonsIsolated(firstButtonIndex, secondButtonIndex))) {
-          selectedButtons.add({'index': index, 'value': value});
-
+        selectedButtons.add(index);
+        int firstButtonIndex = selectedButtons[0];
+        int secondButtonIndex = selectedButtons[1];
+        if(isCorrectMove(firstButtonIndex, secondButtonIndex)) {
+          int firstButtonValue = numbers[firstButtonIndex]!.number;
+          int secondButtonValue = numbers[secondButtonIndex]!.number;
           Future.delayed(const Duration(milliseconds: 50), () {
             numbers[firstButtonIndex] = Field(
                 firstButtonIndex, numbers[firstButtonIndex]!.number, false);
@@ -433,37 +419,57 @@ class _GamePageState extends State<GamePage> {
 
             checkAndRemoveEmptyRows(numbers, widget.buttonsPerRow, () {
               setState(() {
-                // Обновляем сетку для перерисовки
               });
             });
           });
         } else {
-          // Если кнопки не соответствуют условиям, сбрасываем выбор
           selectedButtons.clear();
-          selectedButtons.add({'index': index, 'value': value});
+          selectedButtons.add(index);
         }
       }
     });
   }
 
+  bool isCorrectMove(int firstIndex, int secondIndex) {
+    int firstButtonIndex = numbers[firstIndex]!.i;
+    int secondButtonIndex = numbers[secondIndex]!.i;
+    int firstButtonValue = numbers[firstIndex]!.number;
+    int secondButtonValue =  numbers[secondIndex]!.number;
+
+    if ((firstButtonValue == secondButtonValue ||
+            firstButtonValue + secondButtonValue == 10) &&
+        (isFirstAndLastButton(firstButtonIndex, secondButtonIndex) ||
+            areButtonsInSameRow(firstButtonIndex, secondButtonIndex) &&
+                areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
+            areCellsCoherent(firstButtonIndex, secondButtonIndex) ||
+            areButtonsInSameColumn(firstButtonIndex, secondButtonIndex) &&
+                areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
+            areButtonsOnSameDiagonal(firstButtonIndex, secondButtonIndex) &&
+                areButtonsIsolated(firstButtonIndex, secondButtonIndex))) {
+      return true;
+    }
+    return false;
+  }
+
   void _findHint() {
     setState(() {
-      currentHint = null; // Сброс текущей подсказки
+      currentHint = null;
       for (int i = 0; i < numbers.length; i++) {
         if (numbers[i]?.isActive == true) {
           for (int j = i + 1; j < numbers.length; j++) {
             if (numbers[j]?.isActive == true &&
                 (numbers[i]!.number == numbers[j]!.number ||
                     numbers[i]!.number + numbers[j]!.number == 10)) {
-              currentHint = Hint(i, j);
-              return; // Найдена подсказка, выходим
+              if (isCorrectMove(i, j)) {
+                currentHint = Hint(i, j);
+                return;
+              }
             }
           }
         }
       }
 
       if (currentHint == null) {
-        // Если подсказок нет, можно сделать анимацию кнопки добавления строк
         _animateAddButton();
       }
     });
@@ -481,35 +487,29 @@ class _GamePageState extends State<GamePage> {
       Map<int, Field> numbers, int buttonsPerRow, Function updateGrid) {
     int totalRows = (numbers.length / buttonsPerRow).floor();
 
-    // Проходим по всем рядам с конца, чтобы избежать проблем с индексами при удалении
     for (int rowIndex = totalRows - 1; rowIndex >= 0; rowIndex--) {
       if (isRowEmpty(rowIndex, buttonsPerRow, numbers)) {
-        // Удаляем кнопки и числа, если ряд пуст
         removeRow(rowIndex, buttonsPerRow, numbers);
       }
     }
 
-    // Обновляем интерфейс
     updateGrid();
   }
 
   void removeRow(int rowIndex, int buttonsPerRow, Map<int, Field> numbers) {
     int startIndex = rowIndex * buttonsPerRow;
 
-    // Удаляем все кнопки из ряда
     for (int i = startIndex; i < startIndex + buttonsPerRow; i++) {
       numbers.remove(i);
     }
 
-    // Пересчитываем индексы оставшихся кнопок
     recalculateFieldIndices(numbers, startIndex, buttonsPerRow);
   }
 
   void recalculateFieldIndices(
       Map<int, Field> numbers, int startIndex, int buttonsPerRow) {
     Map<int, Field> updatedNumbers = {};
-    int shift =
-        buttonsPerRow; // Количество индексов для сдвига после удаления ряда
+    int shift = buttonsPerRow;
 
     numbers.forEach((key, field) {
       if (key >= startIndex) {
@@ -524,15 +524,14 @@ class _GamePageState extends State<GamePage> {
     numbers.addAll(updatedNumbers);
   }
 
-// Функция для проверки, пуст ли ряд
   bool isRowEmpty(int rowIndex, int buttonsPerRow, Map<int, Field> numbers) {
     for (int i = rowIndex * buttonsPerRow;
         i < (rowIndex + 1) * buttonsPerRow;
         i++) {
       if (numbers[i]?.isActive == true) {
-        return false; // Ряд не пуст
+        return false;
       }
     }
-    return true; // Все кнопки в ряду неактивны
+    return true;
   }
 }
