@@ -6,17 +6,17 @@ class AnimatedAddButton extends StatefulWidget {
   final Color color;
 
   const AnimatedAddButton({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.icon,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
-  _AnimatedAddButtonState createState() => _AnimatedAddButtonState();
+  State<AnimatedAddButton> createState() => AnimatedAddButtonState();
 }
 
-class _AnimatedAddButtonState extends State<AnimatedAddButton>
+class AnimatedAddButtonState extends State<AnimatedAddButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
@@ -27,16 +27,17 @@ class _AnimatedAddButtonState extends State<AnimatedAddButton>
 
     _shakeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 400),
     );
-
-    _shakeAnimation = Tween<double>(begin: 0, end: 10)
+    _shakeAnimation = Tween<double>(begin: -20, end: 20)
         .chain(CurveTween(curve: Curves.elasticIn))
         .animate(_shakeController);
   }
 
   void startShakeAnimation() {
-    _shakeController.forward(from: 0);
+    _shakeController.forward(from: -10).then((_) {
+      _shakeController.reverse();
+    });
   }
 
   @override

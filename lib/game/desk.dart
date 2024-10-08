@@ -2,13 +2,13 @@ import 'field.dart';
 import 'hint.dart';
 import 'dart:math';
 
-class Numbers {
+class Desk {
   int stage = 0;
   int score = 0;
   Map<int, Field> numbers = {};
   int rowLength = 0;
 
-  Numbers(this.stage, this.score, this.numbers, this.rowLength);
+  Desk(this.stage, this.score, this.numbers, this.rowLength);
 
   void newStage() {
     stage++;

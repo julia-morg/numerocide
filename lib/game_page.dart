@@ -5,7 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 import 'game/field.dart';
 import 'game/hint.dart';
-import 'game/numbers.dart';
+import 'game/desk.dart';
+import 'game/animated_button.dart';
 
 class GamePage extends StatefulWidget {
   const GamePage({
@@ -26,24 +27,15 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin {
-  Numbers desk = Numbers(0, 0, {}, 0);
+  Desk desk = Desk(0, 0, {}, 0);
   Hint? currentHint;
   List<int> selectedButtons = [];
-  late AnimationController _shakeController;
-  late Animation<double> _shakeAnimation;
+  late final GlobalKey<AnimatedAddButtonState> _addButtonKey = GlobalKey<AnimatedAddButtonState>();
 
   @override
   void initState() {
     super.initState();
     _loadGameState();
-    _shakeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-
-    _shakeAnimation = Tween<double>(begin: 0, end: 8)
-        .chain(CurveTween(curve: Curves.elasticOut))
-        .animate(_shakeController);
   }
 
   void _initializeGame() {
@@ -54,7 +46,7 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
         for (var i = 0; i < widget.initialButtonCount; i++)
           i: Field(i, randomNumbers[i], true)
       };
-      desk = Numbers(0, 0, numbers, widget.buttonsPerRow);
+      desk = Desk(0, 0, numbers, widget.buttonsPerRow);
       selectedButtons.clear();
       _saveGameState();
     });
@@ -62,7 +54,7 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
 
   void _clearSavedGameState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    for (int i = 0; i < desk!.numbers.length; i++) {
+    for (int i = 0; i < desk.numbers.length; i++) {
       await prefs.remove('field_index_$i');
       await prefs.remove('field_number_$i');
       await prefs.remove('field_isActive_$i');
@@ -93,36 +85,31 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int maxScore = prefs.getInt('maxScore') ?? 0;
 
-    if (desk!.score > maxScore) {
-      await prefs.setInt('maxScore', desk!.score);
+    if (desk.score > maxScore) {
+      await prefs.setInt('maxScore', desk.score);
     }
   }
 
   Future<void> _loadGameState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Проверяем, есть ли хотя бы один сохранённый элемент
     if (prefs.getKeys().any((key) => key.startsWith('field_index_'))) {
       Map<int, Field> numbers = {};
 
-      // Ищем все ключи, соответствующие шаблону 'field_index_'
       for (String key in prefs.getKeys()) {
         if (key.startsWith('field_index_')) {
-          // Извлекаем индекс из ключа
           int index = int.parse(key.replaceFirst('field_index_', ''));
           int? number = prefs.getInt('field_number_$index');
           bool? isActive = prefs.getBool('field_isActive_$index');
 
-          // Если данные валидны, добавляем в numbers
           if (number != null && isActive != null) {
             numbers[index] = Field(index, number, isActive);
           }
         }
       }
 
-      // Обновляем состояние
       setState(() {
-        desk = Numbers(
+        desk = Desk(
           prefs.getInt('stage') ?? 0,
           prefs.getInt('score') ?? 0,
           numbers,
@@ -130,7 +117,6 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
         );
       });
     } else {
-      // Если нет данных, начинаем новую игру
       _initializeGame();
     }
   }
@@ -175,14 +161,14 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    'Score: ${desk!.score}',
+                    'Score: ${desk.score}',
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall!
                         .copyWith(color: colorDark),
                   ),
                   Text(
-                    'Batches added: ${desk!.stage}',
+                    'Batches added: ${desk.stage}',
                     style: Theme.of(context)
                         .textTheme
                         .labelSmall!
@@ -200,7 +186,7 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
                   child: ButtonGrid(
                     onButtonPressed: onButtonPressed,
                     selectedButtons: selectedButtons,
-                    desk: desk!,
+                    desk: desk,
                     buttonSize: widget.buttonSize,
                     buttonsPerRow: widget.buttonsPerRow,
                     hint: currentHint,
@@ -211,7 +197,7 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
           ],
         ),
       ),
-      floatingActionButton: desk!.isGameOver()
+      floatingActionButton: desk.isGameOver()
           ? null
           : Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -223,20 +209,12 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
             child: Icon(Icons.lightbulb, color: Theme.of(context).colorScheme.primary),
           ),
           const SizedBox(height: 16),
-          AnimatedBuilder(
-            animation: _shakeAnimation,
-            builder: (context, child) {
-              return Transform.translate(
-                offset: Offset(_shakeAnimation.value, 0),
-                child: FloatingActionButton(
-                  heroTag: "addButton",
-                  onPressed: _onAddButtonPressed,
-                  tooltip: 'Add',
-                  child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
-                ),
-              );
-            },
-          ),
+        AnimatedAddButton(
+          key: _addButtonKey,
+          onPressed: _onAddButtonPressed,
+          icon: Icons.add,
+          color: colorDark,
+        ),
         ],
       ),
     );
@@ -252,11 +230,11 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
   void _showGameOverDialog() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    await prefs.setInt('maxScore', desk!.score);
+    await prefs.setInt('maxScore', desk.score);
     int maxScore = prefs.getInt('maxScore') ?? 0;
 
-    if (desk!.score > maxScore) {
-      await prefs.setInt('maxScore', desk!.score);
+    if (desk.score > maxScore) {
+      await prefs.setInt('maxScore', desk.score);
     }
 
     showDialog(
@@ -276,7 +254,7 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
             children: [
               const SizedBox(height: 10),
               Text(
-                'Your score: ${desk!.score}',
+                'Your score: ${desk.score}',
                 style: Theme.of(context)
                     .textTheme
                     .labelLarge!
@@ -285,7 +263,7 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
               ),
               const SizedBox(height: 10),
               Text(
-                desk!.score > maxScore ? "This is your max score ever!" : "",
+                desk.score > maxScore ? "This is your max score ever!" : "",
                 style: Theme.of(context)
                     .textTheme
                     .labelMedium!
@@ -324,9 +302,9 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
         selectedButtons.add(index);
         int firstButtonIndex = selectedButtons[0];
         int secondButtonIndex = selectedButtons[1];
-        if(desk!.isCorrectMove(firstButtonIndex, secondButtonIndex)) {
+        if(desk.isCorrectMove(firstButtonIndex, secondButtonIndex)) {
           Future.delayed(const Duration(milliseconds: 50), () {
-            desk!.move(firstButtonIndex, secondButtonIndex);
+            desk.move(firstButtonIndex, secondButtonIndex);
             setState(() {
               selectedButtons.clear();
               currentHint = null;
@@ -334,7 +312,7 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
 
             _saveGameState();
 
-            if (desk!.isGameOver()) {
+            if (desk.isGameOver()) {
               _saveMaxScore();
               _clearSavedGameState();
               _showGameOverDialog();
@@ -350,22 +328,11 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
 
   void _onShowHintPressed() {
     setState(() {
-      currentHint = desk!.findHint();
-      if (currentHint == null) {
-        _animateAddButton();
-      }
+      currentHint = desk.findHint();
+      //if (currentHint == null) {
+        _addButtonKey.currentState?.startShakeAnimation();
+     // }
     });
   }
 
-  void _animateAddButton() {
-    _shakeController.forward(from: 0).then((_) {
-      _shakeController.reverse();
-    });
-  }
-
-  @override
-  void dispose() {
-    _shakeController.dispose();
-    super.dispose();
-  }
 }

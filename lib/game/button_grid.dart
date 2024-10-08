@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'field.dart';
 import 'hint.dart';
-import 'numbers.dart';
+import 'desk.dart';
+import 'dart:math';
 
 class ButtonGrid extends StatefulWidget {
   final Function(int, int, Function(int)) onButtonPressed;
@@ -9,7 +10,7 @@ class ButtonGrid extends StatefulWidget {
   final double buttonSize;
   final int buttonsPerRow;
   final Hint? hint;
-  final Numbers desk;
+  final Desk desk;
 
   const ButtonGrid({
     Key? key,
@@ -56,15 +57,14 @@ class _ButtonGridState extends State<ButtonGrid> {
 
     int emptyCellsToAdd = buttonsInLastRow > 0 ? widget.buttonsPerRow - buttonsInLastRow : 0;
 
-    int initialEmptyCells = totalButtonsToShow - widget.desk.numbers.length;
+    int initialEmptyCells = max(totalButtonsToShow - widget.desk.numbers.length, 0).toInt();
 
-    int finalItemCount = widget.desk.numbers.length+
+    int finalItemCount = widget.desk.numbers.length +
         emptyCellsToAdd +
         initialEmptyCells +
         widget.buttonsPerRow.toInt();
-
     return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const PageScrollPhysics(),
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: widget.buttonsPerRow,
@@ -95,7 +95,6 @@ class _ButtonGridState extends State<ButtonGrid> {
         bool isSelected = widget.selectedButtons.contains(index);
         bool isHint = widget.hint != null &&
             (index == widget.hint!.hint1 || index == widget.hint!.hint2);
-
         return AnimatedContainer(
           duration: const Duration(milliseconds: 30),
           width: widget.buttonSize,
