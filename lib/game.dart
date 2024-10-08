@@ -42,8 +42,8 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
       duration: const Duration(milliseconds: 500),
     );
 
-    _shakeAnimation = Tween<double>(begin: 0, end: 10)
-        .chain(CurveTween(curve: Curves.elasticIn))
+    _shakeAnimation = Tween<double>(begin: 0, end: 8) // небольшая амплитуда
+        .chain(CurveTween(curve: Curves.elasticOut)) // плавное возвращение
         .animate(_shakeController);
   }
 
@@ -81,7 +81,8 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
         await prefs.remove(key);
       }
     }
-    for (var entry in numbers.entries) {
+    Map<int, Field> numbersCopy = Map.from(numbers);
+    for (var entry in numbersCopy.entries) {
       int index = entry.key;
       Field field = entry.value;
       await prefs.setInt('field_index_$index', field.i);
@@ -234,7 +235,7 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            heroTag: "hintButton", // Уникальный tag для этой кнопки
+            heroTag: "hintButton",
             onPressed: _findHint,
             tooltip: 'Hint',
             child: Icon(Icons.lightbulb, color: Theme.of(context).colorScheme.primary),
@@ -244,9 +245,9 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
             animation: _shakeAnimation,
             builder: (context, child) {
               return Transform.translate(
-                offset: Offset(_shakeAnimation.value, 0), // Анимация "подрагивания"
+                offset: Offset(_shakeAnimation.value, 0), // Колебания влево-вправо
                 child: FloatingActionButton(
-                  heroTag: "addButton", // Уникальный tag для этой кнопки
+                  heroTag: "addButton",
                   onPressed: _addCopiesOfButtons,
                   tooltip: 'Add',
                   child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
@@ -500,7 +501,9 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
   }
 
   void _animateAddButton() {
-    _shakeController.forward(from: 0);
+    _shakeController.forward(from: 0).then((_) {
+      _shakeController.reverse(); // Возвращаемся в исходную позицию
+    });
   }
 
   bool isGameOver() {
