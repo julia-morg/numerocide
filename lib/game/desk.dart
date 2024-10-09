@@ -3,7 +3,7 @@ import 'hint.dart';
 import 'dart:math';
 
 class Desk {
-  static const DEFAULT_HINTS_COUNT = 5;
+  static const DEFAULT_HINTS_COUNT = 3;
   int stage = 0;
   int score = 0;
   int remainingAddClicks = DEFAULT_HINTS_COUNT;

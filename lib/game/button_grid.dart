@@ -44,25 +44,24 @@ class _ButtonGridState extends State<ButtonGrid> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    double appBarHeight =
-        Scaffold.of(context).appBarMaxHeight ?? kToolbarHeight;
-
+    double appBarHeight = Scaffold.of(context).appBarMaxHeight ?? kToolbarHeight;
     double availableHeight = screenHeight - appBarHeight;
-
-    int totalRowsInView =
-        (availableHeight / (widget.buttonSize * 2 + 1)).floor() - 1;
+    int totalRowsInView = (availableHeight / (widget.buttonSize * 2 + 1)).floor() - 1;
     int totalButtonsToShow = totalRowsInView * widget.buttonsPerRow;
-
     int buttonsInLastRow = widget.desk.numbers.length % widget.buttonsPerRow;
-
     int emptyCellsToAdd = buttonsInLastRow > 0 ? widget.buttonsPerRow - buttonsInLastRow : 0;
-
     int initialEmptyCells = max(totalButtonsToShow - widget.desk.numbers.length, 0).toInt();
-
     int finalItemCount = widget.desk.numbers.length +
         emptyCellsToAdd +
         initialEmptyCells +
         widget.buttonsPerRow.toInt();
+    Color backgroundColor = Colors.blueGrey[50]!;
+    Color highlightColor = Theme.of(context).colorScheme.primary.withOpacity(0.5);
+    Color hintColor = Colors.green.withOpacity(0.5);
+    Color inactiveTextColor = Colors.grey[400]!;
+    Color activeTextColor = Theme.of(context).colorScheme.primary;
+    Color highlightTextColor = Theme.of(context).colorScheme.onPrimary;
+
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
@@ -80,7 +79,7 @@ class _ButtonGridState extends State<ButtonGrid> {
             height: widget.buttonSize,
             child: TextButton(
               style: TextButton.styleFrom(
-                backgroundColor: Colors.grey[300], // Единый цвет для пустых ячеек
+                backgroundColor: backgroundColor, // Единый цвет для пустых ячеек
                 shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 padding: EdgeInsets.zero,
               ),
@@ -100,11 +99,11 @@ class _ButtonGridState extends State<ButtonGrid> {
           style: TextButton.styleFrom(
             backgroundColor: buttonField.isActive
                 ? (isSelected
-                ? Theme.of(context).colorScheme.primary.withOpacity(0.5) // Цвет для выделенной кнопки
-                : isHint
-                ? Colors.green.withOpacity(0.5) // Подсветка для хинта
-                : Colors.grey[300]) // Цвет для активной кнопки (тот же фон, что и для пустых ячеек)
-                : Colors.grey[300], // Цвет для неактивной кнопки (тот же фон, что и для пустых ячеек)
+                    ? highlightColor
+                    : isHint
+                        ? hintColor
+                        : backgroundColor)
+                : backgroundColor,
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             padding: EdgeInsets.zero,
           ),
@@ -122,10 +121,10 @@ class _ButtonGridState extends State<ButtonGrid> {
             style: TextStyle(
               fontSize: 18,
               color: isSelected
-                  ? Theme.of(context).colorScheme.onPrimary // Цвет текста для выделенной кнопки
+                  ? highlightTextColor // Цвет текста для выделенной кнопки
                   : buttonField.isActive
-                  ? Theme.of(context).colorScheme.primary // Цвет текста для активной кнопки
-                  : Colors.grey[400], // Цвет текста для неактивной кнопки
+                      ? activeTextColor // Цвет текста для активной кнопки
+                      : inactiveTextColor, // Цвет текста для неактивной кнопки
               decoration: crossedOutIndexes.contains(index)
                   ? TextDecoration.lineThrough
                   : TextDecoration.none,
