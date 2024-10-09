@@ -29,14 +29,14 @@ class AnimatedAddButtonState extends State<AnimatedAddButton>
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-    _shakeAnimation = Tween<double>(begin: -20, end: 20)
-        .chain(CurveTween(curve: Curves.elasticIn))
+    _shakeAnimation = Tween<double>(begin: 5, end: -5)
+        .chain(CurveTween(curve: Curves.elasticInOut))
         .animate(_shakeController);
   }
 
   void startShakeAnimation() {
-    _shakeController.forward(from: -10).then((_) {
-      _shakeController.reverse();
+    _shakeController.forward(from: 0).then((_) {
+      _shakeController.reverse(from:-5);
     });
   }
 
@@ -52,7 +52,7 @@ class AnimatedAddButtonState extends State<AnimatedAddButton>
       animation: _shakeAnimation,
       builder: (context, child) {
         return Transform.translate(
-          offset: Offset(_shakeAnimation.value, 0),
+          offset: Offset(0, _shakeAnimation.value),
           child: FloatingActionButton(
             onPressed: widget.onPressed,
             tooltip: 'Add',

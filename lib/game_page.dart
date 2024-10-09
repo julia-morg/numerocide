@@ -26,11 +26,13 @@ class GamePage extends StatefulWidget {
   State<GamePage> createState() => _GamePageState();
 }
 
-class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin {
+class _GamePageState extends State<GamePage>
+    with SingleTickerProviderStateMixin {
   Desk desk = Desk(0, 0, {}, 0);
   Hint? currentHint;
   List<int> selectedButtons = [];
-  late final GlobalKey<AnimatedAddButtonState> _addButtonKey = GlobalKey<AnimatedAddButtonState>();
+  late final GlobalKey<AnimatedAddButtonState> _addButtonKey =
+      GlobalKey<AnimatedAddButtonState>();
 
   @override
   void initState() {
@@ -66,7 +68,9 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
   Future<void> _saveGameState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     for (String key in prefs.getKeys()) {
-      if (key.startsWith('field_index_') || key.startsWith('field_number_') || key.startsWith('field_isActive_')) {
+      if (key.startsWith('field_index_') ||
+          key.startsWith('field_number_') ||
+          key.startsWith('field_isActive_')) {
         await prefs.remove(key);
       }
     }
@@ -200,23 +204,28 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
       floatingActionButton: desk.isGameOver()
           ? null
           : Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            heroTag: "hintButton",
-            onPressed: _onShowHintPressed,
-            tooltip: 'Hint',
-            child: Icon(Icons.lightbulb, color: Theme.of(context).colorScheme.primary),
-          ),
-          const SizedBox(height: 16),
-        AnimatedAddButton(
-          key: _addButtonKey,
-          onPressed: _onAddButtonPressed,
-          icon: Icons.add,
-          color: colorDark,
-        ),
-        ],
-      ),
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: AnimatedAddButton(
+                    onPressed: _onShowHintPressed,
+                    icon: Icons.lightbulb,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: AnimatedAddButton(
+                    key: _addButtonKey,
+                    onPressed: _onAddButtonPressed,
+                    icon: Icons.add,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
     );
   }
 
@@ -302,7 +311,7 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
         selectedButtons.add(index);
         int firstButtonIndex = selectedButtons[0];
         int secondButtonIndex = selectedButtons[1];
-        if(desk.isCorrectMove(firstButtonIndex, secondButtonIndex)) {
+        if (desk.isCorrectMove(firstButtonIndex, secondButtonIndex)) {
           Future.delayed(const Duration(milliseconds: 50), () {
             desk.move(firstButtonIndex, secondButtonIndex);
             setState(() {
@@ -329,10 +338,9 @@ class _GamePageState extends State<GamePage> with SingleTickerProviderStateMixin
   void _onShowHintPressed() {
     setState(() {
       currentHint = desk.findHint();
-      //if (currentHint == null) {
+      if (currentHint == null) {
         _addButtonKey.currentState?.startShakeAnimation();
-     // }
+      }
     });
   }
-
 }
