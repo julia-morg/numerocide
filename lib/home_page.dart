@@ -30,6 +30,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _checkSavedGame() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    debugPrint('23456754e3wdebugPrint(prefs.getKeys().toString());');
+    debugPrint(prefs.getKeys().toString());
     setState(() {
       _hasSavedGame = prefs.containsKey('field_index_0');
     });

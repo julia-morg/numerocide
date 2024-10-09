@@ -5,13 +5,15 @@ import 'dart:math';
 class Desk {
   int stage = 0;
   int score = 0;
+  int remainingAddClicks = 2;
   Map<int, Field> numbers = {};
   int rowLength = 0;
 
-  Desk(this.stage, this.score, this.numbers, this.rowLength);
+  Desk(this.stage, this.score, this.remainingAddClicks, this.numbers, this.rowLength);
 
-  void newStage() {
-    stage++;
+  void addFields() {
+    if (remainingAddClicks == 0) return;
+    remainingAddClicks--;
     List<Field> activeFields = [];
     for (var entry in numbers.entries) {
       if (entry.value.isActive) {
@@ -26,14 +28,58 @@ class Desk {
     }
   }
 
+  void newStage(int count) {
+    stage++;
+    remainingAddClicks = 5;
+    numbers.clear();
+    List<int> randomNumbers = List.generate(count, (_) => Random().nextInt(9) + 1);
+
+    for (int i = 0; i < randomNumbers.length; i++) {
+      numbers[i] = Field(i, randomNumbers[i], true);
+    }
+  }
+
+  bool addExtraStage() {
+    if (remainingAddClicks > 0) {
+      remainingAddClicks--;
+      List<Field> activeFields = [];
+      for (var entry in numbers.entries) {
+        if (entry.value.isActive) {
+          activeFields.add(entry.value);
+        }
+      }
+
+      int currentSize = numbers.length;
+      for (int i = 0; i < activeFields.length; i++) {
+        numbers[currentSize + i] =
+            Field(currentSize + i, activeFields[i].number, true);
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool? checkGameStatus() {
+    if (isVictory()) {
+      return true;
+    } else if (remainingAddClicks == 0 && findHint() == null) {
+      return false;
+    }
+    return null;
+  }
+
   void move(int firstIndex, int secondIndex) {
     if (isCorrectMove(firstIndex, secondIndex)) {
       numbers[firstIndex]!.isActive = false;
       numbers[secondIndex]!.isActive = false;
-      score = score + numbers[firstIndex]!.number + numbers[secondIndex]!.number;
+      score += numbers[firstIndex]!.number + numbers[secondIndex]!.number;
       checkAndRemoveEmptyRows();
-
     }
+  }
+
+  bool isVictory() {
+    return numbers.values.every((field) => !field.isActive);
   }
 
   bool areButtonsInSameRow(int firstIndex, int secondIndex) {
@@ -153,10 +199,6 @@ class Desk {
       }
     }
     return null;
-  }
-
-  bool isGameOver() {
-    return numbers.values.every((field) => !field.isActive);
   }
 
   bool checkAndRemoveEmptyRows() {

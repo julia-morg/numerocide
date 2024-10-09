@@ -30,7 +30,7 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage>
     with SingleTickerProviderStateMixin {
-  Desk desk = Desk(0, 0, {}, 0);
+  Desk desk = Desk(0, 0, 0, {}, 0);
   Hint? currentHint;
   List<int> selectedButtons = [];
   late final GlobalKey<AnimatedButtonState> _addButtonKey =
@@ -50,7 +50,7 @@ class _GamePageState extends State<GamePage>
         for (var i = 0; i < widget.initialButtonCount; i++)
           i: Field(i, randomNumbers[i], true)
       };
-      desk = Desk(0, 0, numbers, widget.buttonsPerRow);
+      desk = Desk(1, 0, 5, numbers, widget.buttonsPerRow);
       selectedButtons.clear();
       _saveGameState();
     });
@@ -63,11 +63,13 @@ class _GamePageState extends State<GamePage>
           key.startsWith('field_number_') ||
           key.startsWith('field_isActive_')) {
         await prefs.remove(key);
-
       }
     }
+    debugPrint('1234521prefs.getKeys().toString()');
+    debugPrint(prefs.getKeys().toString());
     await prefs.remove('score');
     await prefs.remove('stage');
+    await prefs.remove('remainingAddClicks');
   }
 
   Future<void> _saveGameState() async {
@@ -77,7 +79,6 @@ class _GamePageState extends State<GamePage>
           key.startsWith('field_number_') ||
           key.startsWith('field_isActive_')) {
         await prefs.remove(key);
-
       }
     }
     Map<int, Field> numbersCopy = Map.from(desk.numbers);
@@ -90,6 +91,7 @@ class _GamePageState extends State<GamePage>
     }
     await prefs.setInt('score', desk.score);
     await prefs.setInt('stage', desk.stage);
+    await prefs.setInt('remainingAddClicks', desk.remainingAddClicks);
   }
 
   Future<void> _saveMaxScore() async {
@@ -121,8 +123,9 @@ class _GamePageState extends State<GamePage>
 
       setState(() {
         desk = Desk(
-          prefs.getInt('stage') ?? 0,
+          prefs.getInt('stage') ?? 1,
           prefs.getInt('score') ?? 0,
+          prefs.getInt('remainingAddClicks') ?? 0,
           numbers,
           widget.buttonsPerRow,
         );
@@ -142,7 +145,6 @@ class _GamePageState extends State<GamePage>
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
     Color colorLight = Theme.of(context).colorScheme.onSecondary;
-    String bestIcon = Icons.star.toString();
 
     return Scaffold(
       appBar: AppBar(
@@ -218,7 +220,7 @@ class _GamePageState extends State<GamePage>
           ],
         ),
       ),
-      floatingActionButton: desk.isGameOver()
+      floatingActionButton: desk.isVictory()
           ? null
           : Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -231,6 +233,7 @@ class _GamePageState extends State<GamePage>
                     icon: Icons.lightbulb,
                     color: Theme.of(context).colorScheme.primary,
                     heroTag: 'hintButton',
+                    active: true,
                   ),
                 ),
                 Padding(
@@ -241,6 +244,8 @@ class _GamePageState extends State<GamePage>
                     icon: Icons.add,
                     color: Theme.of(context).colorScheme.primary,
                     heroTag: 'addButton',
+                    active: desk.remainingAddClicks > 0,
+                    labelCount: desk.remainingAddClicks,
                   ),
                 ),
               ],
@@ -250,27 +255,21 @@ class _GamePageState extends State<GamePage>
 
   void _onAddButtonPressed() {
     setState(() {
-      desk.newStage();
+      desk.addFields();
       _saveGameState();
     });
   }
 
   void _showGameOverDialog() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    await prefs.setInt('maxScore', desk.score);
     int maxScore = prefs.getInt('maxScore') ?? 0;
-
-    if (desk.score > maxScore) {
-      await prefs.setInt('maxScore', desk.score);
-    }
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            'CONGRATS! YOU WON!',
+            'GAME OVER',
             textAlign: TextAlign.center,
             style: Theme.of(context)
                 .textTheme
@@ -291,7 +290,7 @@ class _GamePageState extends State<GamePage>
               ),
               const SizedBox(height: 10),
               Text(
-                desk.score > maxScore ? "This is your max score ever!" : "",
+                desk.score >= maxScore ? "This is your max score ever!" : "",
                 style: Theme.of(context)
                     .textTheme
                     .labelMedium!
@@ -302,7 +301,7 @@ class _GamePageState extends State<GamePage>
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Nice'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushAndRemoveUntil(
@@ -338,12 +337,16 @@ class _GamePageState extends State<GamePage>
               currentHint = null;
             });
 
-            _saveGameState();
-
-            if (desk.isGameOver()) {
-              _saveMaxScore();
+            _saveMaxScore();
+            bool? state = desk.checkGameStatus();
+            if (state == null) {
+              _saveGameState();
+            } else if (state == false) {
               _clearSavedGameState();
               _showGameOverDialog();
+            } else {
+              desk.newStage(widget.initialButtonCount);
+              _saveGameState();
             }
           });
         } else {
@@ -357,7 +360,7 @@ class _GamePageState extends State<GamePage>
   void _onShowHintPressed() {
     setState(() {
       currentHint = desk.findHint();
-      if (currentHint == null) {
+      if (currentHint == null && desk.remainingAddClicks > 0) {
         _addButtonKey.currentState?.startShakeAnimation();
       }
     });

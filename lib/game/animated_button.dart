@@ -5,6 +5,8 @@ class AnimatedButton extends StatefulWidget {
   final IconData icon;
   final Color color;
   final String heroTag;
+  final bool active;
+  final int? labelCount;
 
   const AnimatedButton({
     super.key,
@@ -12,6 +14,8 @@ class AnimatedButton extends StatefulWidget {
     required this.icon,
     required this.color,
     required this.heroTag,
+    required this.active,
+    this.labelCount,
   });
 
   @override
@@ -38,7 +42,7 @@ class AnimatedButtonState extends State<AnimatedButton>
 
   void startShakeAnimation() {
     _shakeController.forward(from: 0).then((_) {
-      _shakeController.reverse(from:-5);
+      _shakeController.reverse(from: -5);
     });
   }
 
@@ -50,16 +54,47 @@ class AnimatedButtonState extends State<AnimatedButton>
 
   @override
   Widget build(BuildContext context) {
+    Color inactiveColor = Colors.grey;
+    Color activeColor = widget.color;
+    Color lightColor = Colors.white;
+    Color lightInactiveColor = Colors.grey[200]!;
+
     return AnimatedBuilder(
       animation: _shakeAnimation,
       builder: (context, child) {
         return Transform.translate(
-          offset: Offset(0, _shakeAnimation.value),
-          child: FloatingActionButton(
-            onPressed: widget.onPressed,
-            tooltip: 'Add',
-            child: Icon(widget.icon, color: widget.color),
-            heroTag: widget.heroTag,
+          offset: Offset(0, _shakeAnimation.value), // Анимация сдвига кнопки
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              FloatingActionButton(
+                onPressed: widget.active ? widget.onPressed : null,
+                tooltip: 'Add',
+                child: Icon(widget.icon,
+                    color: widget.active ? activeColor : inactiveColor),
+                heroTag: widget.heroTag,
+              ),
+              if (widget.labelCount != null)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: widget.active ? activeColor : inactiveColor,
+                    ),
+                    child: Text(
+                      '${widget.labelCount}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: widget.active ? lightColor : lightInactiveColor,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         );
       },

@@ -21,7 +21,7 @@ void main() {
     });
 
     test('newStage увеличивает количество стадий и добавляет активные клетки', () {
-      desk.newStage();
+      desk.addFields();
       expect(desk.stage, 1);
       expect(desk.numbers.length, 12); // Увеличено на активные клетки
     });
@@ -71,13 +71,13 @@ void main() {
       desk.numbers[4]!.isActive = false;
       desk.numbers[5]!.isActive = false;
 
-      expect(desk.isGameOver(), isTrue);
+      expect(desk.isVictory(), isTrue);
     });
 
     test('isGameOver возвращает false, если хотя бы одна клетка активна', () {
       desk.numbers[0]!.isActive = false;
       desk.numbers[1]!.isActive = false;
-      expect(desk.isGameOver(), isFalse);
+      expect(desk.isVictory(), isFalse);
     });
 
     test('checkAndRemoveEmptyRows удаляет пустые ряды', () {
