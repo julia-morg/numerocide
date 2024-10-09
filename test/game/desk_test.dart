@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:numberocide/game/desk.dart';
-import 'package:numberocide/game/field.dart';
-import 'package:numberocide/game/hint.dart';
+import 'package:numerocide/game/desk.dart';
+import 'package:numerocide/game/field.dart';
+import 'package:numerocide/game/hint.dart';
 
 void main() {
   group('Desk', () {

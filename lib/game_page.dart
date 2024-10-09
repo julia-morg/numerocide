@@ -15,12 +15,14 @@ class GamePage extends StatefulWidget {
     required this.buttonSize,
     required this.buttonsPerRow,
     required this.initialButtonCount,
+    required this.maxScore,
   });
 
   final String title;
   final double buttonSize;
   final int buttonsPerRow;
   final int initialButtonCount;
+  final int maxScore;
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -31,8 +33,8 @@ class _GamePageState extends State<GamePage>
   Desk desk = Desk(0, 0, {}, 0);
   Hint? currentHint;
   List<int> selectedButtons = [];
-  late final GlobalKey<AnimatedAddButtonState> _addButtonKey =
-      GlobalKey<AnimatedAddButtonState>();
+  late final GlobalKey<AnimatedButtonState> _addButtonKey =
+      GlobalKey<AnimatedButtonState>();
 
   @override
   void initState() {
@@ -56,10 +58,13 @@ class _GamePageState extends State<GamePage>
 
   void _clearSavedGameState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    for (int i = 0; i < desk.numbers.length; i++) {
-      await prefs.remove('field_index_$i');
-      await prefs.remove('field_number_$i');
-      await prefs.remove('field_isActive_$i');
+    for (String key in prefs.getKeys()) {
+      if (key.startsWith('field_index_') ||
+          key.startsWith('field_number_') ||
+          key.startsWith('field_isActive_')) {
+        await prefs.remove(key);
+
+      }
     }
     await prefs.remove('score');
     await prefs.remove('stage');
@@ -72,9 +77,11 @@ class _GamePageState extends State<GamePage>
           key.startsWith('field_number_') ||
           key.startsWith('field_isActive_')) {
         await prefs.remove(key);
+
       }
     }
-    for (var entry in desk.numbers.entries) {
+    Map<int, Field> numbersCopy = Map.from(desk.numbers);
+    for (var entry in numbersCopy.entries) {
       int index = entry.key;
       Field field = entry.value;
       await prefs.setInt('field_index_$index', field.i);
@@ -135,6 +142,7 @@ class _GamePageState extends State<GamePage>
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
     Color colorLight = Theme.of(context).colorScheme.onSecondary;
+    String bestIcon = Icons.star.toString();
 
     return Scaffold(
       appBar: AppBar(
@@ -165,14 +173,23 @@ class _GamePageState extends State<GamePage>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    'Score: ${desk.score}',
+                    'Best\n${widget.maxScore}',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelSmall!
+                        .copyWith(color: colorDark),
+                  ),
+                  Text(
+                    '${desk.score}',
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall!
                         .copyWith(color: colorDark),
                   ),
                   Text(
-                    'Batches added: ${desk.stage}',
+                    'Stage\n${desk.stage}',
+                    textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
                         .labelSmall!
@@ -209,19 +226,21 @@ class _GamePageState extends State<GamePage>
               children: [
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
-                  child: AnimatedAddButton(
+                  child: AnimatedButton(
                     onPressed: _onShowHintPressed,
                     icon: Icons.lightbulb,
                     color: Theme.of(context).colorScheme.primary,
+                    heroTag: 'hintButton',
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
-                  child: AnimatedAddButton(
+                  child: AnimatedButton(
                     key: _addButtonKey,
                     onPressed: _onAddButtonPressed,
                     icon: Icons.add,
                     color: Theme.of(context).colorScheme.primary,
+                    heroTag: 'addButton',
                   ),
                 ),
               ],

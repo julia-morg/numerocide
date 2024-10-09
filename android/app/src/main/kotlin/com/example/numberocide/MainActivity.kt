@@ -1,4 +1,4 @@
-package com.example.numberocide
+package com.example.numerocide
 
 import io.flutter.embedding.android.FlutterActivity
 

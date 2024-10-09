@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 
-class AnimatedAddButton extends StatefulWidget {
+class AnimatedButton extends StatefulWidget {
   final VoidCallback onPressed;
   final IconData icon;
   final Color color;
+  final String heroTag;
 
-  const AnimatedAddButton({
+  const AnimatedButton({
     super.key,
     required this.onPressed,
     required this.icon,
     required this.color,
+    required this.heroTag,
   });
 
   @override
-  State<AnimatedAddButton> createState() => AnimatedAddButtonState();
+  State<AnimatedButton> createState() => AnimatedButtonState();
 }
 
-class AnimatedAddButtonState extends State<AnimatedAddButton>
+class AnimatedButtonState extends State<AnimatedButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
@@ -57,6 +59,7 @@ class AnimatedAddButtonState extends State<AnimatedAddButton>
             onPressed: widget.onPressed,
             tooltip: 'Add',
             child: Icon(widget.icon, color: widget.color),
+            heroTag: widget.heroTag,
           ),
         );
       },

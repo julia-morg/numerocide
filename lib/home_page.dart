@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage> {
           buttonSize: 15.0,
           buttonsPerRow: 10,
           initialButtonCount: 40,
+          maxScore: _maxScore,
         ),
       ),
     ).then((_) {
@@ -63,6 +64,7 @@ class _HomePageState extends State<HomePage> {
           buttonSize: 15.0,
           buttonsPerRow: 10,
           initialButtonCount: 40,
+          maxScore: _maxScore,
         ),
       ),
     ).then((_) {
