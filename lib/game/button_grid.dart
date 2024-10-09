@@ -64,7 +64,7 @@ class _ButtonGridState extends State<ButtonGrid> {
         initialEmptyCells +
         widget.buttonsPerRow.toInt();
     return GridView.builder(
-      physics: const PageScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: widget.buttonsPerRow,
@@ -78,14 +78,14 @@ class _ButtonGridState extends State<ButtonGrid> {
           return SizedBox(
             width: widget.buttonSize,
             height: widget.buttonSize,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[200],
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero,),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.grey[300], // Единый цвет для пустых ячеек
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 padding: EdgeInsets.zero,
               ),
               onPressed: null,
-              child: null,
+              child: const Text(''),
             ),
           );
         }
@@ -95,44 +95,40 @@ class _ButtonGridState extends State<ButtonGrid> {
         bool isSelected = widget.selectedButtons.contains(index);
         bool isHint = widget.hint != null &&
             (index == widget.hint!.hint1 || index == widget.hint!.hint2);
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 30),
-          width: widget.buttonSize,
-          height: widget.buttonSize,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: buttonField.isActive
-                  ? (isSelected
-                      ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
-                      : isHint
-                          ? Colors.green.withOpacity(0.5)
-                          : null)
-                  : Colors.grey[300],
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero,),
-              padding: EdgeInsets.zero,
-            ),
-            onPressed: buttonField.isActive
-                ? () {
-              widget.onButtonPressed(index, buttonNumber, (idx) {
-                setState(() {
-                  widget.desk.numbers[idx] = Field(idx, buttonNumber, false);
-                });
+
+        return TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: buttonField.isActive
+                ? (isSelected
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.5) // Цвет для выделенной кнопки
+                : isHint
+                ? Colors.green.withOpacity(0.5) // Подсветка для хинта
+                : Colors.grey[300]) // Цвет для активной кнопки (тот же фон, что и для пустых ячеек)
+                : Colors.grey[300], // Цвет для неактивной кнопки (тот же фон, что и для пустых ячеек)
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            padding: EdgeInsets.zero,
+          ),
+          onPressed: buttonField.isActive
+              ? () {
+            widget.onButtonPressed(index, buttonNumber, (idx) {
+              setState(() {
+                widget.desk.numbers[idx] = Field(idx, buttonNumber, false);
               });
-            }
-                : null,
-            child: Text(
-              '$buttonNumber',
-              style: TextStyle(
-                fontSize: 18,
-                color: isSelected
-                    ? Theme.of(context).colorScheme.onPrimary
-                    : buttonField.isActive
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.grey[600],
-                decoration: crossedOutIndexes.contains(index)
-                    ? TextDecoration.lineThrough
-                    : TextDecoration.none,
-              ),
+            });
+          }
+              : null,
+          child: Text(
+            '$buttonNumber',
+            style: TextStyle(
+              fontSize: 18,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.onPrimary // Цвет текста для выделенной кнопки
+                  : buttonField.isActive
+                  ? Theme.of(context).colorScheme.primary // Цвет текста для активной кнопки
+                  : Colors.grey[400], // Цвет текста для неактивной кнопки
+              decoration: crossedOutIndexes.contains(index)
+                  ? TextDecoration.lineThrough
+                  : TextDecoration.none,
             ),
           ),
         );

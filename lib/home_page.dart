@@ -30,16 +30,12 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _checkSavedGame() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    debugPrint('23456754e3wdebugPrint(prefs.getKeys().toString());');
-    debugPrint(prefs.getKeys().toString());
     setState(() {
       _hasSavedGame = prefs.containsKey('field_index_0');
     });
   }
 
   void _startNewGame(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -49,6 +45,7 @@ class _HomePageState extends State<HomePage> {
           buttonsPerRow: 10,
           initialButtonCount: 40,
           maxScore: _maxScore,
+          mode: true,
         ),
       ),
     ).then((_) {
@@ -67,6 +64,7 @@ class _HomePageState extends State<HomePage> {
           buttonsPerRow: 10,
           initialButtonCount: 40,
           maxScore: _maxScore,
+          mode: false,
         ),
       ),
     ).then((_) {

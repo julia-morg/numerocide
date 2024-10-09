@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import 'game/button_grid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
@@ -16,6 +15,7 @@ class GamePage extends StatefulWidget {
     required this.buttonsPerRow,
     required this.initialButtonCount,
     required this.maxScore,
+    required this.mode,
   });
 
   final String title;
@@ -23,6 +23,7 @@ class GamePage extends StatefulWidget {
   final int buttonsPerRow;
   final int initialButtonCount;
   final int maxScore;
+  final bool mode;
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -39,18 +40,16 @@ class _GamePageState extends State<GamePage>
   @override
   void initState() {
     super.initState();
-    _loadGameState();
+    if(widget.mode) {
+      _initializeGame();
+    } else {
+      _loadGameState();
+    }
   }
 
   void _initializeGame() {
-    List<int> randomNumbers = List.generate(
-        widget.initialButtonCount, (_) => Random().nextInt(9) + 1);
     setState(() {
-      Map<int, Field> numbers = {
-        for (var i = 0; i < widget.initialButtonCount; i++)
-          i: Field(i, randomNumbers[i], true)
-      };
-      desk = Desk(1, 0, 5, numbers, widget.buttonsPerRow);
+      desk = Desk(1, 0, Desk.DEFAULT_HINTS_COUNT, Desk.generateRandomNumbers(widget.initialButtonCount), widget.buttonsPerRow);
       selectedButtons.clear();
       _saveGameState();
     });
@@ -65,8 +64,6 @@ class _GamePageState extends State<GamePage>
         await prefs.remove(key);
       }
     }
-    debugPrint('1234521prefs.getKeys().toString()');
-    debugPrint(prefs.getKeys().toString());
     await prefs.remove('score');
     await prefs.remove('stage');
     await prefs.remove('remainingAddClicks');

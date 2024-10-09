@@ -3,9 +3,10 @@ import 'hint.dart';
 import 'dart:math';
 
 class Desk {
+  static const DEFAULT_HINTS_COUNT = 5;
   int stage = 0;
   int score = 0;
-  int remainingAddClicks = 2;
+  int remainingAddClicks = DEFAULT_HINTS_COUNT;
   Map<int, Field> numbers = {};
   int rowLength = 0;
 
@@ -28,15 +29,17 @@ class Desk {
     }
   }
 
+  static Map<int, Field> generateRandomNumbers(int count) {
+    return List.generate(count, (_) => Random().nextInt(9) + 1)
+        .asMap()
+        .map((index, number) => MapEntry(index, Field(index, number, true)));
+  }
+
   void newStage(int count) {
     stage++;
     remainingAddClicks = 5;
     numbers.clear();
-    List<int> randomNumbers = List.generate(count, (_) => Random().nextInt(9) + 1);
-
-    for (int i = 0; i < randomNumbers.length; i++) {
-      numbers[i] = Field(i, randomNumbers[i], true);
-    }
+    numbers = generateRandomNumbers(count);
   }
 
   bool addExtraStage() {
