@@ -29,7 +29,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
-    Color colorLight = Theme.of(context).colorScheme.onSecondary;
+    Color colorLight = Theme.of(context).colorScheme.surface;
     TextStyle labelStyle = TextStyle(
       fontSize: 20,
       fontWeight: FontWeight.bold,
@@ -48,9 +48,9 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+        iconTheme: IconThemeData(
+          color: colorLight,
+          size: 40.0,
         ),
         titleTextStyle: TextStyle(
           color: colorLight,
@@ -58,9 +58,6 @@ class _SettingsPageState extends State<SettingsPage> {
           fontWeight: FontWeight.w600,
         ),
         backgroundColor: colorDark,
-        iconTheme: IconThemeData(
-          color: colorLight,
-        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -103,7 +100,7 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 16),
             Text('Theme', style: labelStyle),
             Column(
-              children: Settings.availableThemes().map((themeName) {
+              children: Settings.allThemes.map((themeName) {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
@@ -116,7 +113,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: settings.theme == themeName
-                          ? Colors.grey[300]
+                          ? Theme.of(context).colorScheme.secondaryContainer
                           : Colors.transparent, // Подсвечиваем выбранную тему
                     ),
                     child: Row(
@@ -133,8 +130,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         Row(
                           children: Settings.getThemeColors(themeName).map((color) {
                             return Container(
-                              width: 20,
-                              height: 20,
+                              width: 30,
+                              height: 30,
                               color: color,
                             );
                           }).toList(),

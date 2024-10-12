@@ -55,12 +55,12 @@ class _ButtonGridState extends State<ButtonGrid> {
         emptyCellsToAdd +
         initialEmptyCells +
         widget.buttonsPerRow.toInt();
-    Color backgroundColor = Colors.blueGrey[50]!;
+    Color backgroundColor = Theme.of(context).colorScheme.secondary;
     Color highlightColor = Theme.of(context).colorScheme.primary.withOpacity(0.5);
-    Color hintColor = Colors.green.withOpacity(0.5);
-    Color inactiveTextColor = Colors.grey[400]!;
+    Color hintColor = Theme.of(context).colorScheme.outline;
+    Color inactiveTextColor = Theme.of(context).colorScheme.onSecondary;
     Color activeTextColor = Theme.of(context).colorScheme.primary;
-    Color highlightTextColor = Theme.of(context).colorScheme.onPrimary;
+    Color highlightTextColor = Theme.of(context).colorScheme.surface;
 
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),

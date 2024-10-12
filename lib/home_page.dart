@@ -77,7 +77,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
-    Color colorLight = Theme.of(context).colorScheme.onSecondary;
+    Color colorLight = Theme.of(context).colorScheme.surface;
+    Color colorStar =  Colors.amberAccent;
 
     return Scaffold(
       appBar: AppBar(
@@ -86,12 +87,14 @@ class _HomePageState extends State<HomePage> {
         ),
         titleTextStyle: TextStyle(
           color: colorLight,
-          fontSize: 24,
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
         ),
         backgroundColor: colorDark,
         toolbarHeight: MediaQuery.of(context).size.height * 0.15,
         iconTheme: IconThemeData(
           color: colorLight,
+          size: 40.0,
         ),
         actions: [
           IconButton(
@@ -111,27 +114,44 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 50),
+          const SizedBox(height: 60),
           Center(
-            child: Text(
-              'BEST RESULT: $_maxScore',
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall!
-                  .copyWith(color: colorDark),
+            child: Column(
+              children: [
+                Text(
+                  'BEST RESULT',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall!
+                      .copyWith(color: colorDark, fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min, // Чтобы Row занял только необходимую ширину
+                  children: [
+                    Icon(Icons.star, color: colorStar, size: 30), // Иконка звезды
+                    const SizedBox(width: 5), // Расстояние между иконкой и числом
+                    Text(
+                      '$_maxScore',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall!
+                          .copyWith(color: colorDark, fontWeight: FontWeight.bold, fontSize: 30),
+                    ),
+                    const SizedBox(width: 5),
+                    Icon(Icons.star, color: colorStar, size: 30), // Иконка звезды
+                  ],
+
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 60),
           Center(
             child: ElevatedButton(
               onPressed: () => _startNewGame(context),
-              child: const Text(
-                'NEW GAME',
-                style: TextStyle(
-                  fontSize: 24,
-                ),
-              ),
+              child: const Text( 'NEW GAME', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, ),),
               style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -142,13 +162,9 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: ElevatedButton(
               onPressed: _hasSavedGame ? () => _continueGame(context) : null,
-              child: const Text(
-                'CONTINUE GAME',
-                style: TextStyle(
-                  fontSize: 24,
-                ),
-              ),
+              child: const Text('CONTINUE GAME', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, )),
               style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

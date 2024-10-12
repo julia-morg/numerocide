@@ -144,21 +144,20 @@ class _GamePageState extends State<GamePage>
   @override
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
-    Color colorLight = Theme.of(context).colorScheme.onSecondary;
+    Color colorLight = Theme.of(context).colorScheme.surface;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.title,
-        ),
+        title: Text(widget.title),
         titleTextStyle: TextStyle(
           color: colorLight,
-          fontSize: 22,
+          fontSize: 24,
           fontWeight: FontWeight.w600,
         ),
         backgroundColor: colorDark,
         iconTheme: IconThemeData(
           color: colorLight,
+          size: 40.0,
         ),
         actions: [
           IconButton(

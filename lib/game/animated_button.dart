@@ -71,29 +71,31 @@ class AnimatedButtonState extends State<AnimatedButton>
 
   @override
   Widget build(BuildContext context) {
-    Color inactiveColor = Colors.grey;
+    Color inactiveColor = Theme.of(context).colorScheme.onSecondary;
     Color activeColor = widget.color;
-    Color lightColor = Colors.white;
-    Color lightInactiveColor = Colors.grey[200]!;
+    Color lightColor = Theme.of(context).colorScheme.surface;
+    Color lightInactiveColor = Theme.of(context).colorScheme.secondaryContainer;
 
     return AnimatedBuilder(
       animation: _shakeAnimation,
       builder: (context, child) {
         return Transform.translate(
-          offset: Offset(_shakeAnimation.value, 0), // Анимация сдвига кнопки
+          offset: Offset(_shakeAnimation.value, 0),
           child: Stack(
             alignment: Alignment.center,
             children: [
               SizedBox(
-                  width: 60,  // Ширина кнопки
-                  height: 60,  // Высота кнопки
-                  child: FloatingActionButton(
-                onPressed: widget.active ? widget.onPressed : null,
-                child: Icon(widget.icon,
-                    color: widget.active ? activeColor : inactiveColor, size: 32),
-                heroTag: widget.heroTag,
-                mini: false,
-                  ),
+                width: 60,
+                height: 60,
+                child: FloatingActionButton(
+                  onPressed: widget.active ? widget.onPressed : null,
+                  child: Icon(widget.icon,
+                      color: widget.active ? activeColor : inactiveColor,
+                      size: 32),
+                  heroTag: widget.heroTag,
+                  mini: false,
+                  backgroundColor: widget.active ? lightColor : lightInactiveColor,
+                ),
               ),
               if (widget.labelCount != null)
                 Positioned(

@@ -1,3 +1,4 @@
+import 'package:numerocide/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
@@ -5,10 +6,15 @@ class Settings {
   bool sound;
   bool vibro;
   String theme;
+  static const String navy = 'navy';
+  static const String brown = 'brown';
+  static const String grey = 'grey';
+  static const String green = 'green';
+  static const String red = 'red';
+  static List<String> get allThemes => [navy, brown, grey, green, red];
 
   Settings({required this.sound, required this.vibro, required this.theme});
 
-  // Метод для сохранения настроек
   Future<void> saveSettings() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('sound', sound);
@@ -16,99 +22,87 @@ class Settings {
     await prefs.setString('theme', theme);
   }
 
-  // Метод для загрузки настроек
   static Future<Settings> loadSettings() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool sound = prefs.getBool('sound') ?? false; // false по умолчанию
-    bool vibro = prefs.getBool('vibro') ?? true;  // true по умолчанию
-    String theme = prefs.getString('theme') ?? 'blue'; // 'blue' по умолчанию
+    bool sound = prefs.getBool('sound') ?? false;
+    bool vibro = prefs.getBool('vibro') ?? true;
+    String theme = prefs.getString('theme') ?? navy;
 
     return Settings(sound: sound, vibro: vibro, theme: theme);
   }
-
-  // Список доступных тем
-  static List<String> availableThemes() {
-    return ['blue', 'brown', 'grey', 'green', 'red'];
-  }
-
-  // Отображаемое название для каждой темы
+  
   static String themeDisplayName(String theme) {
-    switch (theme) {
-      case 'blue':
-        return 'Blue';
-      case 'brown':
-        return 'Brown';
-      case 'grey':
-        return 'Grey';
-      case 'green':
-        return 'Green';
-      case 'red':
-        return 'Red';
-      default:
-        return 'Unknown';
-    }
+    return theme.capitalize();
   }
-  // Метод для получения цветовой схемы в зависимости от темы
+
   static ThemeData getThemeData(String theme) {
     switch (theme) {
-      case 'brown':
+      case brown:
         return ThemeData(
-          colorScheme: ColorScheme.light(
-            primary: Colors.brown,
-            onPrimary: Colors.white,
-            secondary: Colors.brown[300]!,
-            onSecondary: Colors.white,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink).copyWith(
+            onSecondary: Colors.grey[400],
+            onSecondaryContainer: Colors.grey[200]!,
+            secondary: Colors.blueGrey[50]!,
+            outline: Colors.green.withOpacity(0.5),
           ),
+          useMaterial3: true,
         );
-      case 'grey':
+      case grey:
         return ThemeData(
-          colorScheme: ColorScheme.light(
-            primary: Colors.grey,
-            onPrimary: Colors.white,
-            secondary: Colors.grey[700]!,
-            onSecondary: Colors.white,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey, dynamicSchemeVariant: DynamicSchemeVariant.neutral,).copyWith(
+            onSecondary: Colors.grey[400],
+            onSecondaryContainer: Colors.grey[200]!,
+            secondary: Colors.blueGrey[50]!,
+            outline: Colors.green.withOpacity(0.5),
           ),
+          useMaterial3: true,
         );
-      case 'green':
+      case green:
         return ThemeData(
-          colorScheme: const ColorScheme.light(
-            primary: Colors.green,
-            onPrimary: Colors.white,
-            secondary: Colors.greenAccent,
-            onSecondary: Colors.white,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green).copyWith(
+            onSecondary: Colors.grey[400],
+            onSecondaryContainer: Colors.grey[200]!,
+            secondary: Colors.blueGrey[50]!,
+            outline: Colors.green.withOpacity(0.5),
           ),
+          useMaterial3: true,
         );
-      case 'red':
+      case red:
         return ThemeData(
-          colorScheme: const ColorScheme.light(
-            primary: Colors.red,
-            onPrimary: Colors.white,
-            secondary: Colors.redAccent,
-            onSecondary: Colors.white,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.red, dynamicSchemeVariant: DynamicSchemeVariant.vibrant,).copyWith(
+            onSecondary: Colors.grey[400],
+            onSecondaryContainer: Colors.grey[200]!,
+            secondary: Colors.blueGrey[50]!,
+            outline: Colors.green.withOpacity(0.5),
           ),
+          useMaterial3: true,
         );
-      case 'blue':
+      case navy:
       default:
-        return ThemeData(
-          colorScheme: const ColorScheme.light(
-            primary: Colors.blue,
-            onPrimary: Colors.white,
-            secondary: Colors.blueAccent,
-            onSecondary: Colors.white,
+        ThemeData theme = ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent).copyWith(
+            onSecondary: Colors.grey[400],
+            onSecondaryContainer: Colors.grey[200]!,
+            secondary: Colors.blueGrey[50]!,
+            outline: Colors.green.withOpacity(0.5),
           ),
+          useMaterial3: true,
         );
+       // theme. = Colors.white;
+        return theme;
     }
   }
 
-  // Получение основных цветов для палитры
   static List<Color> getThemeColors(String theme) {
     ThemeData themeData = getThemeData(theme);
     return [
-      themeData.primaryColor,
-      themeData.secondaryHeaderColor,
-      themeData.primaryColorLight,
-      themeData.scaffoldBackgroundColor,
       themeData.colorScheme.primary,
+      themeData.colorScheme.secondaryContainer,
+      themeData.colorScheme.secondary,
+      themeData.colorScheme.onSecondary,
+      themeData.colorScheme.onSecondaryContainer,
+      themeData.colorScheme.surface,
+      themeData.colorScheme.primary.withOpacity(0.5),
     ];
   }
 }
