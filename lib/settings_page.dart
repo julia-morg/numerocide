@@ -3,6 +3,8 @@ import 'game/settings.dart';
 import 'main.dart';
 
 class SettingsPage extends StatefulWidget {
+  const SettingsPage({Key? key}) : super(key: key);
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
@@ -28,9 +30,15 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
     Color colorLight = Theme.of(context).colorScheme.onSecondary;
-    TextStyle labelStyle = const TextStyle(
+    TextStyle labelStyle = TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      color: Theme.of(context).colorScheme.primary,
+    );
+    TextStyle themeLabelStyle = TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.bold,
+      color: Theme.of(context).colorScheme.primary,
     );
 
     if (isLoading) {
@@ -76,7 +84,6 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
             const SizedBox(height: 8),
-
             // Vibration настройки
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -94,35 +101,50 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
             const SizedBox(height: 16),
-
+            Text('Theme', style: labelStyle),
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Theme',
-                    style: labelStyle
-                ),
-                const SizedBox(height: 10),
-                Column(
-                  children: Settings.availableThemes().map((theme) {
-                    return RadioListTile<String>(
-                      title: Text(Settings.themeDisplayName(theme)),
-                      value: theme,
-                      groupValue: settings.theme,
-                      onChanged: (String? value) {
-                        setState(() {
-                          settings.theme = value!;
-                        });
-                        settings.saveSettings().then((_) {
-                          MyApp.of(context)?.updateTheme(Settings.getThemeData(settings.theme));
-                        });
-                      },
-                      controlAffinity: ListTileControlAffinity.leading,
-                    );
-                  }).toList(),
-                ),
-              ],
-            )
+              children: Settings.availableThemes().map((themeName) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      settings.theme = themeName;
+                    });
+                    settings.saveSettings();
+                    // Применяем тему
+                    MyApp.of(context)?.updateTheme(Settings.getThemeData(settings.theme));
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: settings.theme == themeName
+                          ? Colors.grey[300]
+                          : Colors.transparent, // Подсвечиваем выбранную тему
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              Settings.themeDisplayName(themeName),
+                              style: themeLabelStyle,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: Settings.getThemeColors(themeName).map((color) {
+                            return Container(
+                              width: 20,
+                              height: 20,
+                              color: color,
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
           ],
         ),
       ),

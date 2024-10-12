@@ -100,4 +100,15 @@ class Settings {
     }
   }
 
+  // Получение основных цветов для палитры
+  static List<Color> getThemeColors(String theme) {
+    ThemeData themeData = getThemeData(theme);
+    return [
+      themeData.primaryColor,
+      themeData.secondaryHeaderColor,
+      themeData.primaryColorLight,
+      themeData.scaffoldBackgroundColor,
+      themeData.colorScheme.primary,
+    ];
+  }
 }

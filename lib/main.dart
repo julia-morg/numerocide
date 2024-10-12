@@ -36,7 +36,6 @@ class _MyAppState extends State<MyApp> {
   void updateTheme(ThemeData newTheme) {
     setState(() {
       _themeData = newTheme;
-      debugPrint(newTheme.colorScheme.primary.toString());
     });
   }
 
