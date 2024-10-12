@@ -17,16 +17,16 @@ class Settings {
 
   Future<void> saveSettings() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('sound', sound);
-    await prefs.setBool('vibro', vibro);
-    await prefs.setString('theme', theme);
+    await prefs.setBool('settings_sound', sound);
+    await prefs.setBool('settings_vibro', vibro);
+    await prefs.setString('settings_theme', theme);
   }
 
   static Future<Settings> loadSettings() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool sound = prefs.getBool('sound') ?? false;
-    bool vibro = prefs.getBool('vibro') ?? true;
-    String theme = prefs.getString('theme') ?? navy;
+    bool sound = prefs.getBool('settings_sound') ?? false;
+    bool vibro = prefs.getBool('settings_vibro') ?? true;
+    String theme = prefs.getString('settings_theme') ?? navy;
 
     return Settings(sound: sound, vibro: vibro, theme: theme);
   }

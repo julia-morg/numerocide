@@ -72,13 +72,14 @@ class Desk {
     return null;
   }
 
-  void move(int firstIndex, int secondIndex) {
+  bool move(int firstIndex, int secondIndex) {
     if (isCorrectMove(firstIndex, secondIndex)) {
       numbers[firstIndex]!.isActive = false;
       numbers[secondIndex]!.isActive = false;
       score += stage;
-      checkAndRemoveEmptyRows();
+      return checkAndRemoveEmptyRows();
     }
+    return false;
   }
 
   bool isVictory() {

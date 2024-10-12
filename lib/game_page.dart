@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'game/button_grid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
+import 'package:vibration/vibration.dart';
 import 'home_page.dart';
 import 'settings_page.dart';
+import 'game/button_grid.dart';
 import 'game/field.dart';
 import 'game/hint.dart';
 import 'game/desk.dart';
 import 'game/animated_button.dart';
+import 'game/settings.dart';
 
 class GamePage extends StatefulWidget {
   const GamePage({
@@ -37,15 +40,21 @@ class _GamePageState extends State<GamePage>
   List<int> selectedButtons = [];
   late final GlobalKey<AnimatedButtonState> _addButtonKey =
       GlobalKey<AnimatedButtonState>();
+  Settings settings = Settings(sound: false, vibro: false, theme: '');
 
   @override
   void initState() {
     super.initState();
+    _loadSettings();
     if(widget.mode) {
       _initializeGame();
     } else {
       _loadGameState();
     }
+  }
+
+  Future<void> _loadSettings() async {
+    settings = await Settings.loadSettings();
   }
 
   void _initializeGame() {
@@ -328,6 +337,7 @@ class _GamePageState extends State<GamePage>
   }
 
   void onButtonPressed(int index, int value, Function removeButton) {
+
     setState(() {
       if (selectedButtons.isNotEmpty && selectedButtons[0] == index) {
         selectedButtons.clear();
@@ -342,7 +352,13 @@ class _GamePageState extends State<GamePage>
         int secondButtonIndex = selectedButtons[1];
         if (desk.isCorrectMove(firstButtonIndex, secondButtonIndex)) {
           Future.delayed(const Duration(milliseconds: 50), () {
-            desk.move(firstButtonIndex, secondButtonIndex);
+            bool rowRemoved = desk.move(firstButtonIndex, secondButtonIndex);
+            if (settings.vibro && Vibration.hasVibrator() != null) {
+              rowRemoved
+                  ? HapticFeedback.mediumImpact()
+                  : HapticFeedback.lightImpact();
+            }
+
             setState(() {
               selectedButtons.clear();
               currentHint = null;
@@ -364,12 +380,17 @@ class _GamePageState extends State<GamePage>
     bool? state = desk.checkGameStatus();
     if (state == null) {
       _saveGameState();
-    } else if (state == false) {
+      return;
+    }
+    if (state == false) {
       _clearSavedGameState();
       _showGameOverDialog();
     } else {
       desk.newStage(widget.initialButtonCount);
       _saveGameState();
+    }
+    if (settings.vibro && Vibration.hasVibrator() != null) {
+      HapticFeedback.vibrate();
     }
   }
 
@@ -378,6 +399,8 @@ class _GamePageState extends State<GamePage>
       currentHint = desk.findHint();
       if (currentHint == null && desk.remainingAddClicks > 0) {
         _addButtonKey.currentState?.startShakeAnimation();
+      }else if (settings.vibro && Vibration.hasVibrator() != null) {
+        HapticFeedback.lightImpact();
       }
     });
   }
