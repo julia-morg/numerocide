@@ -42,8 +42,8 @@ class _HomePageState extends State<HomePage> {
         builder: (context) => GamePage(
           title: _title,
           buttonSize: 15.0,
-          buttonsPerRow: 10,
-          initialButtonCount: 40,
+          buttonsPerRow: 9,
+          initialButtonCount: 36,
           maxScore: _maxScore,
           mode: true,
         ),
@@ -61,8 +61,8 @@ class _HomePageState extends State<HomePage> {
         builder: (context) => GamePage(
           title: _title,
           buttonSize: 15.0,
-          buttonsPerRow: 10,
-          initialButtonCount: 40,
+          buttonsPerRow: 9,
+          initialButtonCount: 36,
           maxScore: _maxScore,
           mode: false,
         ),

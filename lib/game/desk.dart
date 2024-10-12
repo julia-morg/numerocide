@@ -37,7 +37,7 @@ class Desk {
 
   void newStage(int count) {
     stage++;
-    remainingAddClicks = 5;
+    remainingAddClicks = Desk.DEFAULT_HINTS_COUNT;
     numbers.clear();
     numbers = generateRandomNumbers(count);
   }
@@ -76,7 +76,7 @@ class Desk {
     if (isCorrectMove(firstIndex, secondIndex)) {
       numbers[firstIndex]!.isActive = false;
       numbers[secondIndex]!.isActive = false;
-      score += numbers[firstIndex]!.number + numbers[secondIndex]!.number;
+      score += stage;
       checkAndRemoveEmptyRows();
     }
   }

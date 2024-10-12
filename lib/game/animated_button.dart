@@ -33,17 +33,34 @@ class AnimatedButtonState extends State<AnimatedButton>
 
     _shakeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 300),
     );
-    _shakeAnimation = Tween<double>(begin: 5, end: -5)
-        .chain(CurveTween(curve: Curves.elasticInOut))
-        .animate(_shakeController);
+    _shakeAnimation = TweenSequence([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: -3.0).chain(CurveTween(curve: Curves.easeInOut)), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -3.0, end: 0.0).chain(CurveTween(curve: Curves.easeInOut)), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 3.0).chain(CurveTween(curve: Curves.easeInOut)), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 3.0, end: 0.0).chain(CurveTween(curve: Curves.easeInOut)), weight: 1),
+    ]).animate(_shakeController);
   }
 
   void startShakeAnimation() {
-    _shakeController.forward(from: 0).then((_) {
-      _shakeController.reverse(from: -5);
+    int shakeCount = 0;
+    const int maxShakes = 1;
+
+    _shakeController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _shakeController.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        shakeCount++;
+        if (shakeCount < maxShakes) {
+          _shakeController.forward();
+        } else {
+          _shakeController.stop();
+        }
+      }
     });
+
+    _shakeController.forward(from: 0);
   }
 
   @override
@@ -63,16 +80,20 @@ class AnimatedButtonState extends State<AnimatedButton>
       animation: _shakeAnimation,
       builder: (context, child) {
         return Transform.translate(
-          offset: Offset(0, _shakeAnimation.value), // Анимация сдвига кнопки
+          offset: Offset(_shakeAnimation.value, 0), // Анимация сдвига кнопки
           child: Stack(
             alignment: Alignment.center,
             children: [
-              FloatingActionButton(
+              SizedBox(
+                  width: 60,  // Ширина кнопки
+                  height: 60,  // Высота кнопки
+                  child: FloatingActionButton(
                 onPressed: widget.active ? widget.onPressed : null,
-                tooltip: 'Add',
                 child: Icon(widget.icon,
-                    color: widget.active ? activeColor : inactiveColor),
+                    color: widget.active ? activeColor : inactiveColor, size: 32),
                 heroTag: widget.heroTag,
+                mini: false,
+                  ),
               ),
               if (widget.labelCount != null)
                 Positioned(

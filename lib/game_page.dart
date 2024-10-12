@@ -53,6 +53,7 @@ class _GamePageState extends State<GamePage>
       selectedButtons.clear();
       _saveGameState();
     });
+    _checkGameState();
   }
 
   void _clearSavedGameState() async {
@@ -130,6 +131,7 @@ class _GamePageState extends State<GamePage>
     } else {
       _initializeGame();
     }
+    _checkGameState();
   }
 
   void _restartGame() {
@@ -150,7 +152,8 @@ class _GamePageState extends State<GamePage>
         ),
         titleTextStyle: TextStyle(
           color: colorLight,
-          fontSize: 18,
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
         ),
         backgroundColor: colorDark,
         iconTheme: IconThemeData(
@@ -176,23 +179,23 @@ class _GamePageState extends State<GamePage>
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
-                        .labelSmall!
-                        .copyWith(color: colorDark),
+                        .labelMedium!
+                        .copyWith(color: colorDark,  fontWeight: FontWeight.w600,),
                   ),
                   Text(
                     '${desk.score}',
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall!
-                        .copyWith(color: colorDark),
+                        .copyWith(color: colorDark, fontWeight: FontWeight.w600,),
                   ),
                   Text(
                     'Stage\n${desk.stage}',
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
-                        .labelSmall!
-                        .copyWith(color: colorDark),
+                        .labelMedium!
+                        .copyWith(color: colorDark, fontWeight: FontWeight.w600,),
                   ),
                 ],
               ),
@@ -335,16 +338,8 @@ class _GamePageState extends State<GamePage>
             });
 
             _saveMaxScore();
-            bool? state = desk.checkGameStatus();
-            if (state == null) {
-              _saveGameState();
-            } else if (state == false) {
-              _clearSavedGameState();
-              _showGameOverDialog();
-            } else {
-              desk.newStage(widget.initialButtonCount);
-              _saveGameState();
-            }
+            _checkGameState();
+
           });
         } else {
           selectedButtons.clear();
@@ -352,6 +347,19 @@ class _GamePageState extends State<GamePage>
         }
       }
     });
+  }
+
+  void _checkGameState() {
+    bool? state = desk.checkGameStatus();
+    if (state == null) {
+      _saveGameState();
+    } else if (state == false) {
+      _clearSavedGameState();
+      _showGameOverDialog();
+    } else {
+      desk.newStage(widget.initialButtonCount);
+      _saveGameState();
+    }
   }
 
   void _onShowHintPressed() {

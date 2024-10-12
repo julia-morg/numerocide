@@ -119,7 +119,8 @@ class _ButtonGridState extends State<ButtonGrid> {
           child: Text(
             '$buttonNumber',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 26,
+              fontWeight: FontWeight.w600,
               color: isSelected
                   ? highlightTextColor // Цвет текста для выделенной кнопки
                   : buttonField.isActive
