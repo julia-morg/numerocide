@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'game/button_grid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
+import 'settings_page.dart';
 import 'game/field.dart';
 import 'game/hint.dart';
 import 'game/desk.dart';
@@ -164,6 +165,17 @@ class _GamePageState extends State<GamePage>
             icon: Icon(Icons.refresh, color: colorLight),
             onPressed: _restartGame,
           ),
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettingsPage(),
+                  ),
+                );
+              },
+            ),
         ],
       ),
       body: Center(
