@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
 
 class Settings {
   bool sound;
@@ -47,4 +48,56 @@ class Settings {
         return 'Unknown';
     }
   }
+  // Метод для получения цветовой схемы в зависимости от темы
+  static ThemeData getThemeData(String theme) {
+    switch (theme) {
+      case 'brown':
+        return ThemeData(
+          colorScheme: ColorScheme.light(
+            primary: Colors.brown,
+            onPrimary: Colors.white,
+            secondary: Colors.brown[300]!,
+            onSecondary: Colors.white,
+          ),
+        );
+      case 'grey':
+        return ThemeData(
+          colorScheme: ColorScheme.light(
+            primary: Colors.grey,
+            onPrimary: Colors.white,
+            secondary: Colors.grey[700]!,
+            onSecondary: Colors.white,
+          ),
+        );
+      case 'green':
+        return ThemeData(
+          colorScheme: const ColorScheme.light(
+            primary: Colors.green,
+            onPrimary: Colors.white,
+            secondary: Colors.greenAccent,
+            onSecondary: Colors.white,
+          ),
+        );
+      case 'red':
+        return ThemeData(
+          colorScheme: const ColorScheme.light(
+            primary: Colors.red,
+            onPrimary: Colors.white,
+            secondary: Colors.redAccent,
+            onSecondary: Colors.white,
+          ),
+        );
+      case 'blue':
+      default:
+        return ThemeData(
+          colorScheme: const ColorScheme.light(
+            primary: Colors.blue,
+            onPrimary: Colors.white,
+            secondary: Colors.blueAccent,
+            onSecondary: Colors.white,
+          ),
+        );
+    }
+  }
+
 }

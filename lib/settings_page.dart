@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'game/settings.dart';
+import 'main.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -112,7 +113,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         setState(() {
                           settings.theme = value!;
                         });
-                        settings.saveSettings();
+                        settings.saveSettings().then((_) {
+                          MyApp.of(context)?.updateTheme(Settings.getThemeData(settings.theme));
+                        });
                       },
                       controlAffinity: ListTileControlAffinity.leading,
                     );
