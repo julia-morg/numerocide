@@ -102,13 +102,12 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     return Scaffold(
       appBar: AppBar(
         title: Center(
-          child:
-          Text(widget.title),
+          child: Text(widget.title),
         ),
         titleTextStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
-          color: colorLight,
-          fontSize: 24,
-        ),
+              color: colorLight,
+              fontSize: 24,
+            ),
         backgroundColor: colorDark,
         iconTheme: IconThemeData(
           color: colorLight,
@@ -119,17 +118,19 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
             icon: Icon(Icons.refresh, color: colorLight),
             onPressed: _restartGame,
           ),
-            IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SettingsPage(settings: widget.settings,),
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SettingsPage(
+                    settings: widget.settings,
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: Center(

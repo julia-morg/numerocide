@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'game_page.dart';
 import 'settings_page.dart';
+import 'tutorial_page.dart';
 import 'game/settings.dart';
 import 'game/save.dart';
 
@@ -60,11 +61,20 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _showTutorial() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TutorialPage(settings: widget.settings,),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
     Color colorLight = Theme.of(context).colorScheme.surface;
-    Color colorStar =  Colors.amberAccent;
+    Color colorStar = Colors.amberAccent;
 
     return Scaffold(
       appBar: AppBar(
@@ -72,8 +82,8 @@ class _HomePageState extends State<HomePage> {
           _title.toUpperCase(),
         ),
         titleTextStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
-          color: colorLight,
-        ),
+              color: colorLight,
+            ),
         backgroundColor: colorDark,
         toolbarHeight: MediaQuery.of(context).size.height * 0.15,
         iconTheme: IconThemeData(
@@ -87,7 +97,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SettingsPage(settings:widget.settings),
+                  builder: (context) => SettingsPage(settings: widget.settings),
                 ),
               );
             },
@@ -97,7 +107,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 60),
           Center(
@@ -167,32 +177,23 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const SizedBox(height: 50),
-      Transform.scale(
-        scale: 0.8,
-        child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Text("Rules"),
+          Center(
+            child: ElevatedButton(
+              onPressed: _hasSavedGame ? () => _showTutorial() : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(height: 0),
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Transform.scale(
-                    scale: 1,
-                    child: Image.asset('assets/pic/example.png'),
-                  ),
-                ),
-          ],
-        ),
-      ),
-    ),
-          const Expanded(
-            flex: 40,
-            child: SizedBox(),
+              ),
+              child: const Text('Rules',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  )),
+            ),
           ),
+
         ],
       ),
     );
