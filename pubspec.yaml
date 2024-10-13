@@ -36,6 +36,8 @@ flutter:
     - assets/sounds/desk_cleared.wav
     - assets/sounds/hint.wav
     - assets/sounds/tap.aiff
+    - assets/pic/example.png
+
 
 flutter_icons:
   android: true

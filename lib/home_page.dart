@@ -97,6 +97,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 60),
           Center(
@@ -110,7 +111,8 @@ class _HomePageState extends State<HomePage> {
                       .copyWith(color: colorDark, fontSize: 15),
                 ),
                 Row(
-                  mainAxisSize: MainAxisSize.min, // Чтобы Row занял только необходимую ширину
+                  mainAxisSize: MainAxisSize.min,
+                  // Чтобы Row занял только необходимую ширину
                   children: [
                     Icon(Icons.star, color: colorStar, size: 30),
                     const SizedBox(width: 5),
@@ -124,20 +126,25 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(width: 5),
                     Icon(Icons.star, color: colorStar, size: 30),
                   ],
-
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 60),
+          const SizedBox(height: 40),
           Center(
             child: ElevatedButton(
               onPressed: () => _goToGame(context, true),
-              child: const Text( 'NEW GAME', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, ),),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text(
+                'NEW GAME',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -146,16 +153,43 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: ElevatedButton(
               onPressed: _hasSavedGame ? () => _goToGame(context, false) : null,
-              child: const Text('CONTINUE GAME', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, )),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
+              child: const Text('CONTINUE GAME',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  )),
             ),
           ),
-          Expanded(
+          const SizedBox(height: 50),
+      Transform.scale(
+        scale: 0.8,
+        child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text("Rules"),
+                ),
+                const SizedBox(height: 0),
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Transform.scale(
+                    scale: 1,
+                    child: Image.asset('assets/pic/example.png'),
+                  ),
+                ),
+          ],
+        ),
+      ),
+    ),
+          const Expanded(
             flex: 40,
             child: SizedBox(),
           ),
