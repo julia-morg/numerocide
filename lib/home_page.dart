@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'game_page.dart';
 import 'settings_page.dart';
 import 'game/settings.dart';
+import 'game/save.dart';
 
 class HomePage extends StatefulWidget {
   final Settings settings;
@@ -16,6 +16,7 @@ class _HomePageState extends State<HomePage> {
   int _maxScore = 0;
   bool _hasSavedGame = false;
   final String _title = 'Numerocide';
+  Save save = Save();
 
   @override
   void initState() {
@@ -25,20 +26,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadMaxScore() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _maxScore = prefs.getInt('maxScore') ?? 0;
+    save.loadMaxScore().then((value) {
+      setState(() {
+        _maxScore = value;
+      });
     });
   }
 
   Future<void> _checkSavedGame() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _hasSavedGame = prefs.containsKey('field_index_0');
+    save.hasSavedGame().then((value) {
+      setState(() {
+        _hasSavedGame = value;
+      });
     });
   }
 
-  void _startNewGame(BuildContext context) async {
+  void _goToGame(BuildContext context, bool mode) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -46,30 +49,9 @@ class _HomePageState extends State<HomePage> {
           title: _title,
           buttonSize: 15.0,
           buttonsPerRow: 9,
-          initialButtonCount: 36,
           maxScore: _maxScore,
           settings: widget.settings,
-          mode: true,
-        ),
-      ),
-    ).then((_) {
-      _loadMaxScore();
-      _checkSavedGame();
-    });
-  }
-
-  void _continueGame(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GamePage(
-          title: _title,
-          buttonSize: 15.0,
-          buttonsPerRow: 9,
-          initialButtonCount: 36,
-          maxScore: _maxScore,
-          settings: widget.settings,
-          mode: false,
+          mode: mode,
         ),
       ),
     ).then((_) {
@@ -150,7 +132,7 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 60),
           Center(
             child: ElevatedButton(
-              onPressed: () => _startNewGame(context),
+              onPressed: () => _goToGame(context, true),
               child: const Text( 'NEW GAME', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, ),),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.surface,
@@ -163,7 +145,7 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 20),
           Center(
             child: ElevatedButton(
-              onPressed: _hasSavedGame ? () => _continueGame(context) : null,
+              onPressed: _hasSavedGame ? () => _goToGame(context, false) : null,
               child: const Text('CONTINUE GAME', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, )),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.surface,

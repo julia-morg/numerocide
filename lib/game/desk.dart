@@ -3,22 +3,27 @@ import 'hint.dart';
 import 'dart:math';
 
 class Desk {
-  static const DEFAULT_HINTS_COUNT = 3;
+  static const defaultAddsCount = 3;
+  static const initialButtonsCount = 36;
   int stage = 0;
   int score = 0;
-  int remainingAddClicks = DEFAULT_HINTS_COUNT;
+  int remainingAddClicks = defaultAddsCount;
   Map<int, Field> numbers = {};
-  int rowLength = 0;
+  int rowLength = 9;
 
-  Desk(this.stage, this.score, this.remainingAddClicks, this.numbers, this.rowLength);
+  Desk(this.stage, this.score, this.remainingAddClicks, this.numbers);
+
+  static Desk newGame() {
+    return Desk(1, 0, defaultAddsCount, generateRandomNumbers(initialButtonsCount));
+  }
 
   void addFields() {
     if (remainingAddClicks == 0) return;
     remainingAddClicks--;
     List<Field> activeFields = [];
-    for (var entry in numbers.entries) {
-      if (entry.value.isActive) {
-        activeFields.add(entry.value);
+    for(int i = 0; i < numbers.length; i++) {
+      if (numbers[i]?.isActive == true) {
+        activeFields.add(numbers[i]!);
       }
     }
 
@@ -37,30 +42,9 @@ class Desk {
 
   void newStage(int count) {
     stage++;
-    remainingAddClicks = Desk.DEFAULT_HINTS_COUNT;
+    remainingAddClicks = Desk.defaultAddsCount;
     numbers.clear();
     numbers = generateRandomNumbers(count);
-  }
-
-  bool addExtraStage() {
-    if (remainingAddClicks > 0) {
-      remainingAddClicks--;
-      List<Field> activeFields = [];
-      for (var entry in numbers.entries) {
-        if (entry.value.isActive) {
-          activeFields.add(entry.value);
-        }
-      }
-
-      int currentSize = numbers.length;
-      for (int i = 0; i < activeFields.length; i++) {
-        numbers[currentSize + i] =
-            Field(currentSize + i, activeFields[i].number, true);
-      }
-      return true;
-    } else {
-      return false;
-    }
   }
 
   bool? checkGameStatus() {
@@ -72,101 +56,6 @@ class Desk {
     return null;
   }
 
-  bool move(int firstIndex, int secondIndex) {
-    if (isCorrectMove(firstIndex, secondIndex)) {
-      numbers[firstIndex]!.isActive = false;
-      numbers[secondIndex]!.isActive = false;
-      score += stage;
-      return checkAndRemoveEmptyRows();
-    }
-    return false;
-  }
-
-  bool isVictory() {
-    return numbers.values.every((field) => !field.isActive);
-  }
-
-  bool areButtonsInSameRow(int firstIndex, int secondIndex) {
-    return firstIndex ~/ rowLength == secondIndex ~/ rowLength;
-  }
-
-  bool areButtonsInSameColumn(int firstIndex, int secondIndex) {
-    return firstIndex % rowLength == secondIndex % rowLength;
-  }
-
-  bool areButtonsOnSameDiagonal(int firstIndex, int secondIndex) {
-    int row1 = firstIndex ~/ rowLength;
-    int col1 = firstIndex % rowLength;
-    int row2 = secondIndex ~/ rowLength;
-    int col2 = secondIndex % rowLength;
-
-    return (row1 - col1 == row2 - col2) || (row1 + col1 == row2 + col2);
-  }
-
-  bool areCellsCoherent(int firstIndex, int secondIndex) {
-    int start = min(firstIndex, secondIndex).toInt();
-    int end = max(firstIndex, secondIndex);
-    for (int i = start + 1; i < end; i++) {
-      if (numbers[i]?.isActive == true) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  bool areButtonsIsolated(int firstIndex, int secondIndex) {
-    if (areButtonsInSameRow(firstIndex, secondIndex)) {
-      int start = min(firstIndex, secondIndex) + 1;
-      int end = max(firstIndex, secondIndex);
-      for (int i = start; i < end; i++) {
-        if (numbers[i]?.isActive == true) return false;
-      }
-    } else if (areButtonsInSameColumn(firstIndex, secondIndex)) {
-      int start = min(firstIndex, secondIndex);
-      int end = max(firstIndex, secondIndex);
-      for (int i = start + rowLength; i < end; i += rowLength) {
-        if (numbers[i]?.isActive == true) return false;
-      }
-    } else if (areButtonsOnSameDiagonal(firstIndex, secondIndex)) {
-      int rowStart = firstIndex ~/ rowLength;
-      int rowEnd = secondIndex ~/ rowLength;
-      int colStart = firstIndex % rowLength;
-      int colEnd = secondIndex % rowLength;
-
-      int rowIncrement = rowEnd > rowStart ? 1 : -1;
-      int colIncrement = colEnd > colStart ? 1 : -1;
-
-      int i = firstIndex;
-      while (i != secondIndex) {
-        i += rowIncrement * rowLength + colIncrement;
-        if (i == secondIndex) break;
-        if (numbers[i]?.isActive == true) return false;
-      }
-    }
-    return true;
-  }
-
-  bool isFirstAndLastButton(int firstIndex, int secondIndex) {
-    int firstActiveIndex = -1;
-    for (int i = 0; i < numbers.length; i++) {
-      if (numbers[i]?.isActive == true) {
-        firstActiveIndex = i;
-        break;
-      }
-    }
-
-    int lastActiveIndex = -1;
-    for (int i = numbers.length - 1; i >= 0; i--) {
-      if (numbers[i]?.isActive == true) {
-        lastActiveIndex = i;
-        break;
-      }
-    }
-
-    return (firstIndex == firstActiveIndex && secondIndex == lastActiveIndex) ||
-        (firstIndex == lastActiveIndex && secondIndex == firstActiveIndex);
-  }
-
   bool isCorrectMove(int firstIndex, int secondIndex) {
     int firstButtonIndex = numbers[firstIndex]!.i;
     int secondButtonIndex = numbers[secondIndex]!.i;
@@ -174,15 +63,15 @@ class Desk {
     int secondButtonValue = numbers[secondIndex]!.number;
 
     if ((firstButtonValue == secondButtonValue ||
-            firstButtonValue + secondButtonValue == 10) &&
-        (isFirstAndLastButton(firstButtonIndex, secondButtonIndex) ||
-            areButtonsInSameRow(firstButtonIndex, secondButtonIndex) &&
-                areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
-            areCellsCoherent(firstButtonIndex, secondButtonIndex) ||
-            areButtonsInSameColumn(firstButtonIndex, secondButtonIndex) &&
-                areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
-            areButtonsOnSameDiagonal(firstButtonIndex, secondButtonIndex) &&
-                areButtonsIsolated(firstButtonIndex, secondButtonIndex))) {
+        firstButtonValue + secondButtonValue == 10) &&
+        (_isFirstAndLastButton(firstButtonIndex, secondButtonIndex) ||
+            _areButtonsInSameRow(firstButtonIndex, secondButtonIndex) &&
+                _areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
+            _areCellsCoherent(firstButtonIndex, secondButtonIndex) ||
+            _areButtonsInSameColumn(firstButtonIndex, secondButtonIndex) &&
+                _areButtonsIsolated(firstButtonIndex, secondButtonIndex) ||
+            _areButtonsOnSameDiagonal(firstButtonIndex, secondButtonIndex) &&
+                _areButtonsIsolated(firstButtonIndex, secondButtonIndex))) {
       return true;
     }
     return false;
@@ -205,29 +94,124 @@ class Desk {
     return null;
   }
 
-  bool checkAndRemoveEmptyRows() {
+  bool move(int firstIndex, int secondIndex) {
+    if (isCorrectMove(firstIndex, secondIndex)) {
+      numbers[firstIndex]!.isActive = false;
+      numbers[secondIndex]!.isActive = false;
+      score += 2*stage;
+      return _checkAndRemoveEmptyRows();
+    }
+    return false;
+  }
+
+  bool isVictory() {
+    return numbers.values.every((field) => !field.isActive);
+  }
+
+  bool _areButtonsInSameRow(int firstIndex, int secondIndex) {
+    return firstIndex ~/ rowLength == secondIndex ~/ rowLength;
+  }
+
+  bool _areButtonsInSameColumn(int firstIndex, int secondIndex) {
+    return firstIndex % rowLength == secondIndex % rowLength;
+  }
+
+  bool _areButtonsOnSameDiagonal(int firstIndex, int secondIndex) {
+    int row1 = firstIndex ~/ rowLength;
+    int col1 = firstIndex % rowLength;
+    int row2 = secondIndex ~/ rowLength;
+    int col2 = secondIndex % rowLength;
+
+    return (row1 - col1 == row2 - col2) || (row1 + col1 == row2 + col2);
+  }
+
+  bool _areCellsCoherent(int firstIndex, int secondIndex) {
+    int start = min(firstIndex, secondIndex).toInt();
+    int end = max(firstIndex, secondIndex);
+    for (int i = start + 1; i < end; i++) {
+      if (numbers[i]?.isActive == true) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool _areButtonsIsolated(int firstIndex, int secondIndex) {
+    if (_areButtonsInSameRow(firstIndex, secondIndex)) {
+      int start = min(firstIndex, secondIndex) + 1;
+      int end = max(firstIndex, secondIndex);
+      for (int i = start; i < end; i++) {
+        if (numbers[i]?.isActive == true) return false;
+      }
+    } else if (_areButtonsInSameColumn(firstIndex, secondIndex)) {
+      int start = min(firstIndex, secondIndex);
+      int end = max(firstIndex, secondIndex);
+      for (int i = start + rowLength; i < end; i += rowLength) {
+        if (numbers[i]?.isActive == true) return false;
+      }
+    } else if (_areButtonsOnSameDiagonal(firstIndex, secondIndex)) {
+      int rowStart = firstIndex ~/ rowLength;
+      int rowEnd = secondIndex ~/ rowLength;
+      int colStart = firstIndex % rowLength;
+      int colEnd = secondIndex % rowLength;
+
+      int rowIncrement = rowEnd > rowStart ? 1 : -1;
+      int colIncrement = colEnd > colStart ? 1 : -1;
+
+      int i = firstIndex;
+      while (i != secondIndex) {
+        i += rowIncrement * rowLength + colIncrement;
+        if (i == secondIndex) break;
+        if (numbers[i]?.isActive == true) return false;
+      }
+    }
+    return true;
+  }
+
+  bool _isFirstAndLastButton(int firstIndex, int secondIndex) {
+    int firstActiveIndex = -1;
+    for (int i = 0; i < numbers.length; i++) {
+      if (numbers[i]?.isActive == true) {
+        firstActiveIndex = i;
+        break;
+      }
+    }
+
+    int lastActiveIndex = -1;
+    for (int i = numbers.length - 1; i >= 0; i--) {
+      if (numbers[i]?.isActive == true) {
+        lastActiveIndex = i;
+        break;
+      }
+    }
+
+    return (firstIndex == firstActiveIndex && secondIndex == lastActiveIndex) ||
+        (firstIndex == lastActiveIndex && secondIndex == firstActiveIndex);
+  }
+
+  bool _checkAndRemoveEmptyRows() {
     int totalRows = (numbers.length / rowLength).floor();
     bool removed = false;
     for (int rowIndex = totalRows - 1; rowIndex >= 0; rowIndex--) {
-      if (isRowEmpty(rowIndex)) {
-        removeRow(rowIndex);
+      if (_isRowEmpty(rowIndex)) {
+        _removeRow(rowIndex);
         removed = true;
       }
     }
     return removed;
   }
 
-  void removeRow(int rowIndex) {
+  void _removeRow(int rowIndex) {
     int startIndex = rowIndex * rowLength;
 
     for (int i = startIndex; i < startIndex + rowLength; i++) {
       numbers.remove(i);
     }
 
-    recalculateFieldIndices(numbers, startIndex, rowLength);
+    _recalculateFieldIndices(numbers, startIndex, rowLength);
   }
 
-  void recalculateFieldIndices(
+  void _recalculateFieldIndices(
       Map<int, Field> numbers, int startIndex, int rowLength) {
     Map<int, Field> updatedNumbers = {};
     int shift = rowLength;
@@ -245,7 +229,7 @@ class Desk {
     numbers.addAll(updatedNumbers);
   }
 
-  bool isRowEmpty(int rowIndex) {
+  bool _isRowEmpty(int rowIndex) {
     for (int i = rowIndex * rowLength; i < (rowIndex + 1) * rowLength; i++) {
       if (numbers[i]?.isActive == true) {
         return false;

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 import 'settings_page.dart';
 import 'game/button_grid.dart';
@@ -10,6 +9,7 @@ import 'game/animated_button.dart';
 import 'game/settings.dart';
 import 'game/sounds.dart';
 import 'game/vibro.dart';
+import 'game/save.dart';
 
 class GamePage extends StatefulWidget {
   GamePage({
@@ -17,7 +17,6 @@ class GamePage extends StatefulWidget {
     required this.title,
     required this.buttonSize,
     required this.buttonsPerRow,
-    required this.initialButtonCount,
     required this.maxScore,
     required this.mode,
     required this.settings,
@@ -26,7 +25,6 @@ class GamePage extends StatefulWidget {
   final String title;
   final double buttonSize;
   final int buttonsPerRow;
-  final int initialButtonCount;
   int maxScore;
   final bool mode;
   final Settings settings;
@@ -36,11 +34,13 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixin {
-  Desk desk = Desk(0, 0, 0, {}, 0);
+  Desk desk = Desk(0, 0, 0, {});
   Hint? currentHint;
   List<int> selectedButtons = [];
   late Sounds sounds;
   late Vibro vibro;
+  Save save = Save();
+  late int _maxScore = 0;
   late final GlobalKey<AnimatedButtonState> _addButtonKey =
       GlobalKey<AnimatedButtonState>();
 
@@ -50,100 +50,43 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     super.initState();
     sounds = Sounds(settings: widget.settings);
     vibro = Vibro(settings: widget.settings);
-    if(widget.mode) {
-      _initializeGame();
-    } else {
-      _loadGameState();
-    }
+    _loadMaxScore();
+    widget.mode ? _initializeGame() : _loadGameState();
   }
 
   void _initializeGame() {
+
     setState(() {
-      desk = Desk(1, 0, Desk.DEFAULT_HINTS_COUNT, Desk.generateRandomNumbers(widget.initialButtonCount), widget.buttonsPerRow);
+      desk = Desk.newGame();
       selectedButtons.clear();
       _saveGameState();
     });
-    _checkGameState(false);
   }
 
   void _clearSavedGameState() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    for (String key in prefs.getKeys()) {
-      if (key.startsWith('field_index_') ||
-          key.startsWith('field_number_') ||
-          key.startsWith('field_isActive_')) {
-        await prefs.remove(key);
-      }
-    }
-    await prefs.remove('score');
-    await prefs.remove('stage');
-    await prefs.remove('remainingAddClicks');
+    save.removeGame();
   }
 
   Future<void> _saveGameState() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    for (String key in prefs.getKeys()) {
-      if (key.startsWith('field_index_') ||
-          key.startsWith('field_number_') ||
-          key.startsWith('field_isActive_')) {
-        await prefs.remove(key);
-      }
-    }
-    Map<int, Field> numbersCopy = Map.from(desk.numbers);
-    for (var entry in numbersCopy.entries) {
-      int index = entry.key;
-      Field field = entry.value;
-      await prefs.setInt('field_index_$index', field.i);
-      await prefs.setInt('field_number_$index', field.number);
-      await prefs.setBool('field_isActive_$index', field.isActive);
-    }
-    await prefs.setInt('score', desk.score);
-    await prefs.setInt('stage', desk.stage);
-    await prefs.setInt('remainingAddClicks', desk.remainingAddClicks);
+    save.saveGame(desk);
   }
 
   Future<bool> _saveMaxScore() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int maxScore = prefs.getInt('maxScore') ?? 0;
-
-    if (desk.score > maxScore) {
-      await prefs.setInt('maxScore', desk.score);
-      return true;
-    }
-    return false;
+    return save.saveMaxScore(desk.score);
   }
 
   Future<void> _loadGameState() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Desk savedGame = await save.loadGame();
+    setState(() {
+      desk = savedGame;
+    });
+  }
 
-    if (prefs.getKeys().any((key) => key.startsWith('field_index_'))) {
-      Map<int, Field> numbers = {};
-
-      for (String key in prefs.getKeys()) {
-        if (key.startsWith('field_index_')) {
-          int index = int.parse(key.replaceFirst('field_index_', ''));
-          int? number = prefs.getInt('field_number_$index');
-          bool? isActive = prefs.getBool('field_isActive_$index');
-
-          if (number != null && isActive != null) {
-            numbers[index] = Field(index, number, isActive);
-          }
-        }
-      }
-
-      setState(() {
-        desk = Desk(
-          prefs.getInt('stage') ?? 1,
-          prefs.getInt('score') ?? 0,
-          prefs.getInt('remainingAddClicks') ?? 0,
-          numbers,
-          widget.buttonsPerRow,
-        );
-      });
-    } else {
-      _initializeGame();
-    }
-    _checkGameState(false);
+  Future<void> _loadMaxScore() async {
+    int maxScore = await save.loadMaxScore();
+    setState(() {
+      _maxScore = maxScore;
+    });
   }
 
   void _restartGame() {
@@ -159,11 +102,13 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-        titleTextStyle: TextStyle(
+        title: Center(
+          child:
+          Text(widget.title),
+        ),
+        titleTextStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
           color: colorLight,
           fontSize: 24,
-          fontWeight: FontWeight.w600,
         ),
         backgroundColor: colorDark,
         iconTheme: IconThemeData(
@@ -197,7 +142,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    'Best\n${widget.maxScore}',
+                    'Best\n${_maxScore}',
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
@@ -229,7 +174,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: ButtonGrid(
-                    onButtonPressed: onButtonPressed,
+                    onButtonPressed: _onButtonPressed,
                     selectedButtons: selectedButtons,
                     desk: desk,
                     buttonSize: widget.buttonSize,
@@ -309,7 +254,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
             children: [
               const SizedBox(height: 10),
               Text(
-                'Your score: ${desk.score}',
+                'SCORE: ${desk.score}',
                 style: Theme.of(context)
                     .textTheme
                     .labelLarge!
@@ -358,7 +303,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     );
   }
 
-  void onButtonPressed(int index, int value, Function removeButton) {
+  void _onButtonPressed(int index, int value, Function removeButton) {
 
     setState(() {
       if (selectedButtons.isNotEmpty && selectedButtons[0] == index) {
@@ -402,17 +347,16 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     }
     if (state == false) {
       bool isVictory = false;
-      if (desk.score > widget.maxScore) {
-        widget.maxScore = desk.score;
+      if (desk.score > _maxScore) {
+        _maxScore = desk.score;
         isVictory = true;
-        _saveMaxScore();
       }
-
       isVictory ? sounds.playGameOverWinSound() : sounds.playGameOverLoseSound();
       _clearSavedGameState();
       _showGameOverDialog(isVictory);
+      _saveMaxScore();
     } else {
-      desk.newStage(widget.initialButtonCount);
+      desk.newStage(Desk.initialButtonsCount);
       _saveGameState();
       sounds.playDeskClearedSound();
     }
@@ -429,6 +373,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
       }
       currentHint == null ? sounds.playNoHintsSound() : sounds.playHintSound();
     });
+    _checkGameState(false);
   }
 
 }

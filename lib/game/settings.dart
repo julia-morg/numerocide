@@ -107,7 +107,6 @@ class Settings {
           textTheme: textTheme,
           useMaterial3: true,
         );
-       // theme. = Colors.white;
         return theme;
     }
   }
@@ -121,7 +120,7 @@ class Settings {
       themeData.colorScheme.onSecondary,
       themeData.colorScheme.onSecondaryContainer,
       themeData.colorScheme.surface,
-      themeData.colorScheme.primary.withOpacity(0.5),
+      themeData.colorScheme.primary.withOpacity(0.7),
     ];
   }
 }

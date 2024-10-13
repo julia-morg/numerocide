@@ -56,7 +56,7 @@ class _ButtonGridState extends State<ButtonGrid> {
         initialEmptyCells +
         widget.buttonsPerRow.toInt();
     Color backgroundColor = Theme.of(context).colorScheme.secondary;
-    Color highlightColor = Theme.of(context).colorScheme.primary.withOpacity(0.5);
+    Color highlightColor = Theme.of(context).colorScheme.primary.withOpacity(0.7);
     Color hintColor = Theme.of(context).colorScheme.outline;
     Color inactiveTextColor = Theme.of(context).colorScheme.onSecondary;
     Color activeTextColor = Theme.of(context).colorScheme.primary;
@@ -79,7 +79,7 @@ class _ButtonGridState extends State<ButtonGrid> {
             height: widget.buttonSize,
             child: TextButton(
               style: TextButton.styleFrom(
-                backgroundColor: backgroundColor, // Единый цвет для пустых ячеек
+                backgroundColor: backgroundColor,
                 shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 padding: EdgeInsets.zero,
               ),
@@ -122,10 +122,10 @@ class _ButtonGridState extends State<ButtonGrid> {
               fontSize: 26,
               fontWeight: FontWeight.w600,
               color: isSelected
-                  ? highlightTextColor // Цвет текста для выделенной кнопки
+                  ? highlightTextColor
                   : buttonField.isActive
-                      ? activeTextColor // Цвет текста для активной кнопки
-                      : inactiveTextColor, // Цвет текста для неактивной кнопки
+                      ? activeTextColor
+                      : inactiveTextColor,
               decoration: crossedOutIndexes.contains(index)
                   ? TextDecoration.lineThrough
                   : TextDecoration.none,
