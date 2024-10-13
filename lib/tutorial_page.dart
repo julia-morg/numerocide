@@ -71,7 +71,15 @@ class _TutorialPageState extends State<TutorialPage> {
         3: Field(3, 5, true),
         4: Field(4, 8, true),
         5: Field(4, 4, true),
-      }, Hint(1, 4)),
+      }, Hint(1, 4)),      Stage('Click on number 3 and then 7 to remove them both', 4, {
+        0: Field(0, 4, true),
+        1: Field(1, 2, true),
+        2: Field(2, 1, true),
+        3: Field(3, 5, true),
+        4: Field(4, 8, true),
+        5: Field(4, 5, true),
+        6: Field(6, 4, true),
+      }, Hint(0, 6)),
     ];
 
     _applyStage(stages[0]);
@@ -80,6 +88,7 @@ class _TutorialPageState extends State<TutorialPage> {
   void _applyStage(Stage stage) {
     setState(() {
       desk = Desk(0, 0, stage.buttonsPerRow, stage.numbers);
+      desk.rowLength = stage.buttonsPerRow;
       hintText = stage.text;
       hint = stage.hint;
       rowLength = stage.buttonsPerRow;
@@ -163,7 +172,8 @@ class _TutorialPageState extends State<TutorialPage> {
     );
   }
   void _onButtonPressed(int index, int value, Function removeButton) {
-
+    sounds.playTapSound();
+    vibro.vibrateLight();
     setState(() {
       if (selectedButtons.isNotEmpty && selectedButtons[0] == index) {
         selectedButtons.clear();
@@ -172,7 +182,6 @@ class _TutorialPageState extends State<TutorialPage> {
 
       if (selectedButtons.isEmpty) {
         selectedButtons.add(index);
-        sounds.playTapSound();
       } else if (selectedButtons.length == 1) {
         selectedButtons.add(index);
         int firstButtonIndex = selectedButtons[0];
@@ -186,6 +195,10 @@ class _TutorialPageState extends State<TutorialPage> {
             });
             _nextStep();
           });
+        }
+        else {
+          selectedButtons.clear();
+          selectedButtons.add(index);
         }
       }
     });

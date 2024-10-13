@@ -332,6 +332,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
           selectedButtons.clear();
           selectedButtons.add(index);
           sounds.playTapSound();
+          vibro.vibrateLight();
         }
       }
     });
