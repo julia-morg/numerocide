@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'game_page.dart';
 import 'settings_page.dart';
+import 'game/settings.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Settings settings;
+  const HomePage({super.key, required this.settings});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -46,6 +48,7 @@ class _HomePageState extends State<HomePage> {
           buttonsPerRow: 9,
           initialButtonCount: 36,
           maxScore: _maxScore,
+          settings: widget.settings,
           mode: true,
         ),
       ),
@@ -65,6 +68,7 @@ class _HomePageState extends State<HomePage> {
           buttonsPerRow: 9,
           initialButtonCount: 36,
           maxScore: _maxScore,
+          settings: widget.settings,
           mode: false,
         ),
       ),
@@ -103,7 +107,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SettingsPage(),
+                  builder: (context) => SettingsPage(settings:widget.settings),
                 ),
               );
             },

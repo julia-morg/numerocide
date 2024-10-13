@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/services.dart';
-import 'package:vibration/vibration.dart';
 import 'home_page.dart';
 import 'settings_page.dart';
 import 'game/button_grid.dart';
@@ -10,9 +8,11 @@ import 'game/hint.dart';
 import 'game/desk.dart';
 import 'game/animated_button.dart';
 import 'game/settings.dart';
+import 'game/sounds.dart';
+import 'game/vibro.dart';
 
 class GamePage extends StatefulWidget {
-  const GamePage({
+  GamePage({
     super.key,
     required this.title,
     required this.buttonSize,
@@ -20,41 +20,41 @@ class GamePage extends StatefulWidget {
     required this.initialButtonCount,
     required this.maxScore,
     required this.mode,
+    required this.settings,
   });
 
   final String title;
   final double buttonSize;
   final int buttonsPerRow;
   final int initialButtonCount;
-  final int maxScore;
+  int maxScore;
   final bool mode;
+  final Settings settings;
 
   @override
   State<GamePage> createState() => _GamePageState();
 }
 
-class _GamePageState extends State<GamePage>
-    with SingleTickerProviderStateMixin {
+class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixin {
   Desk desk = Desk(0, 0, 0, {}, 0);
   Hint? currentHint;
   List<int> selectedButtons = [];
+  late Sounds sounds;
+  late Vibro vibro;
   late final GlobalKey<AnimatedButtonState> _addButtonKey =
       GlobalKey<AnimatedButtonState>();
-  Settings settings = Settings(sound: false, vibro: false, theme: '');
+
 
   @override
   void initState() {
     super.initState();
-    _loadSettings();
+    sounds = Sounds(settings: widget.settings);
+    vibro = Vibro(settings: widget.settings);
     if(widget.mode) {
       _initializeGame();
     } else {
       _loadGameState();
     }
-  }
-
-  Future<void> _loadSettings() async {
-    settings = await Settings.loadSettings();
   }
 
   void _initializeGame() {
@@ -63,7 +63,7 @@ class _GamePageState extends State<GamePage>
       selectedButtons.clear();
       _saveGameState();
     });
-    _checkGameState();
+    _checkGameState(false);
   }
 
   void _clearSavedGameState() async {
@@ -102,13 +102,15 @@ class _GamePageState extends State<GamePage>
     await prefs.setInt('remainingAddClicks', desk.remainingAddClicks);
   }
 
-  Future<void> _saveMaxScore() async {
+  Future<bool> _saveMaxScore() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int maxScore = prefs.getInt('maxScore') ?? 0;
 
     if (desk.score > maxScore) {
       await prefs.setInt('maxScore', desk.score);
+      return true;
     }
+    return false;
   }
 
   Future<void> _loadGameState() async {
@@ -141,7 +143,7 @@ class _GamePageState extends State<GamePage>
     } else {
       _initializeGame();
     }
-    _checkGameState();
+    _checkGameState(false);
   }
 
   void _restartGame() {
@@ -179,7 +181,7 @@ class _GamePageState extends State<GamePage>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SettingsPage(),
+                    builder: (context) => SettingsPage(settings: widget.settings,),
                   ),
                 );
               },
@@ -274,16 +276,15 @@ class _GamePageState extends State<GamePage>
   }
 
   void _onAddButtonPressed() {
+    sounds.playAddRowSound();
+    vibro.vibrateMedium();
     setState(() {
       desk.addFields();
       _saveGameState();
     });
   }
 
-  void _showGameOverDialog() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int maxScore = prefs.getInt('maxScore') ?? 0;
-
+  void _showGameOverDialog(bool isVictory) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -310,7 +311,7 @@ class _GamePageState extends State<GamePage>
               ),
               const SizedBox(height: 10),
               Text(
-                desk.score >= maxScore ? "This is your max score ever!" : "",
+                isVictory ? "This is your max score ever!" : "",
                 style: Theme.of(context)
                     .textTheme
                     .labelMedium!
@@ -325,7 +326,7 @@ class _GamePageState extends State<GamePage>
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  MaterialPageRoute(builder: (context) =>  HomePage(settings: widget.settings,)),
                   (Route<dynamic> route) => false,
                 );
               },
@@ -346,6 +347,7 @@ class _GamePageState extends State<GamePage>
 
       if (selectedButtons.isEmpty) {
         selectedButtons.add(index);
+        sounds.playTapSound();
       } else if (selectedButtons.length == 1) {
         selectedButtons.add(index);
         int firstButtonIndex = selectedButtons[0];
@@ -353,55 +355,59 @@ class _GamePageState extends State<GamePage>
         if (desk.isCorrectMove(firstButtonIndex, secondButtonIndex)) {
           Future.delayed(const Duration(milliseconds: 50), () {
             bool rowRemoved = desk.move(firstButtonIndex, secondButtonIndex);
-            if (settings.vibro && Vibration.hasVibrator() != null) {
-              rowRemoved
-                  ? HapticFeedback.mediumImpact()
-                  : HapticFeedback.lightImpact();
-            }
-
             setState(() {
               selectedButtons.clear();
               currentHint = null;
             });
-
-            _saveMaxScore();
-            _checkGameState();
+            _checkGameState(rowRemoved);
 
           });
         } else {
           selectedButtons.clear();
           selectedButtons.add(index);
+          sounds.playTapSound();
         }
       }
     });
   }
 
-  void _checkGameState() {
+  void _checkGameState(bool isRowRemoved) {
     bool? state = desk.checkGameStatus();
     if (state == null) {
+      isRowRemoved ? sounds.playRemoveRowSound() : sounds.playRemoveNumbersSound();
+      isRowRemoved ? vibro.vibrateHeavy() : vibro.vibrateLight();
       _saveGameState();
       return;
     }
     if (state == false) {
+      bool isVictory = false;
+      if (desk.score > widget.maxScore) {
+        widget.maxScore = desk.score;
+        isVictory = true;
+        _saveMaxScore();
+      }
+
+      isVictory ? sounds.playGameOverWinSound() : sounds.playGameOverLoseSound();
       _clearSavedGameState();
-      _showGameOverDialog();
+      _showGameOverDialog(isVictory);
     } else {
       desk.newStage(widget.initialButtonCount);
       _saveGameState();
+      sounds.playDeskClearedSound();
     }
-    if (settings.vibro && Vibration.hasVibrator() != null) {
-      HapticFeedback.vibrate();
-    }
+    vibro.vibrateHeavy();
+
   }
 
   void _onShowHintPressed() {
+    vibro.vibrateLight();
     setState(() {
       currentHint = desk.findHint();
       if (currentHint == null && desk.remainingAddClicks > 0) {
         _addButtonKey.currentState?.startShakeAnimation();
-      }else if (settings.vibro && Vibration.hasVibrator() != null) {
-        HapticFeedback.lightImpact();
       }
+      currentHint == null ? sounds.playNoHintsSound() : sounds.playHintSound();
     });
   }
+
 }

@@ -16,12 +16,9 @@ class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 
-  // Метод для доступа к состоянию приложения
   static _MyAppState? of(BuildContext context) {
     return context.findAncestorStateOfType<_MyAppState>();
   }
-
-
 }
 
 class _MyAppState extends State<MyApp> {
@@ -44,11 +41,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Numerocide',
       theme: _themeData,
-      // theme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
-      //   useMaterial3: true,
-      // ),
-      home: const HomePage(),
+      home: HomePage(settings: widget.settings,),
       builder: (context, child) {
         return Center(
           child: SizedBox(

@@ -3,27 +3,18 @@ import 'game/settings.dart';
 import 'main.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  Settings settings;
+  SettingsPage({Key? key,  required this.settings}) : super(key: key);
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  late Settings settings;
-  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadSettings();
-  }
-
-  Future<void> _loadSettings() async {
-    settings = await Settings.loadSettings();
-    setState(() {
-      isLoading = false;
-    });
   }
 
   @override
@@ -40,10 +31,6 @@ class _SettingsPageState extends State<SettingsPage> {
       fontWeight: FontWeight.bold,
       color: Theme.of(context).colorScheme.primary,
     );
-
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -70,12 +57,12 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 Text('Sound', style: labelStyle),
                 Switch(
-                  value: settings.sound,
+                  value: widget.settings.sound,
                   onChanged: (bool value) {
                     setState(() {
-                      settings.sound = value;
+                      widget.settings.sound = value;
                     });
-                    settings.saveSettings();
+                    widget.settings.saveSettings();
                   },
                 ),
               ],
@@ -87,12 +74,12 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 Text('Vibration', style: labelStyle),
                 Switch(
-                  value: settings.vibro,
+                  value: widget.settings.vibro,
                   onChanged: (bool value) {
                     setState(() {
-                      settings.vibro = value;
+                      widget.settings.vibro = value;
                     });
-                    settings.saveSettings();
+                    widget.settings.saveSettings();
                   },
                 ),
               ],
@@ -104,15 +91,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      settings.theme = themeName;
+                      widget.settings.theme = themeName;
                     });
-                    settings.saveSettings();
+                    widget.settings.saveSettings();
                     // Применяем тему
-                    MyApp.of(context)?.updateTheme(Settings.getThemeData(settings.theme));
+                    MyApp.of(context)?.updateTheme(Settings.getThemeData(widget.settings.theme));
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: settings.theme == themeName
+                      color: widget.settings.theme == themeName
                           ? Theme.of(context).colorScheme.secondaryContainer
                           : Colors.transparent, // Подсвечиваем выбранную тему
                     ),
