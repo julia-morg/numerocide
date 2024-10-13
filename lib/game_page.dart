@@ -288,7 +288,14 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return GestureDetector(
+          onTap: _handleGameOver,
+            child: WillPopScope(
+            onWillPop: () async {
+              _handleGameOver();
+          return false;
+        },
+          child: AlertDialog(
           title: Text(
             'GAME OVER',
             textAlign: TextAlign.center,
@@ -321,19 +328,33 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
             ],
           ),
           actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) =>  HomePage(settings: widget.settings,)),
-                  (Route<dynamic> route) => false,
-                );
-              },
+            Center(
+              child: ElevatedButton(
+                child: const Text('RETURN'),
+                onPressed: _handleGameOver,
+                style: ElevatedButton.styleFrom(
+                  elevation: 5,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Отступы
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10), // Закругленные углы
+                  ),
+                ),
+              ),
             ),
+
           ],
+        )
+            ),
         );
       },
+    );
+  }
+
+  void _handleGameOver(){
+    Navigator.of(context).pop();
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => HomePage(settings: widget.settings)),
+          (Route<dynamic> route) => false,
     );
   }
 

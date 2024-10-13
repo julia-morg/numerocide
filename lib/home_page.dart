@@ -89,10 +89,8 @@ class _HomePageState extends State<HomePage> {
         title: Text(
           _title.toUpperCase(),
         ),
-        titleTextStyle: TextStyle(
+        titleTextStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
           color: colorLight,
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
         ),
         backgroundColor: colorDark,
         toolbarHeight: MediaQuery.of(context).size.height * 0.15,
@@ -127,22 +125,22 @@ class _HomePageState extends State<HomePage> {
                   style: Theme.of(context)
                       .textTheme
                       .headlineSmall!
-                      .copyWith(color: colorDark, fontWeight: FontWeight.bold, fontSize: 15),
+                      .copyWith(color: colorDark, fontSize: 15),
                 ),
                 Row(
                   mainAxisSize: MainAxisSize.min, // Чтобы Row занял только необходимую ширину
                   children: [
-                    Icon(Icons.star, color: colorStar, size: 30), // Иконка звезды
-                    const SizedBox(width: 5), // Расстояние между иконкой и числом
+                    Icon(Icons.star, color: colorStar, size: 30),
+                    const SizedBox(width: 5),
                     Text(
                       '$_maxScore',
                       style: Theme.of(context)
                           .textTheme
                           .headlineSmall!
-                          .copyWith(color: colorDark, fontWeight: FontWeight.bold, fontSize: 30),
+                          .copyWith(color: colorDark, fontSize: 30),
                     ),
                     const SizedBox(width: 5),
-                    Icon(Icons.star, color: colorStar, size: 30), // Иконка звезды
+                    Icon(Icons.star, color: colorStar, size: 30),
                   ],
 
                 ),

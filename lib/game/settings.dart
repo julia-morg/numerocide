@@ -36,6 +36,20 @@ class Settings {
   }
 
   static ThemeData getThemeData(String theme) {
+    TextTheme textTheme = const TextTheme(
+      headlineLarge: TextStyle(fontWeight: FontWeight.bold),
+      headlineMedium: TextStyle(fontWeight: FontWeight.bold),
+      headlineSmall: TextStyle(fontWeight: FontWeight.bold),
+      titleLarge: TextStyle(fontWeight: FontWeight.bold),
+      titleMedium: TextStyle(fontWeight: FontWeight.bold),
+      titleSmall: TextStyle(fontWeight: FontWeight.bold),
+      bodyLarge: TextStyle(fontWeight: FontWeight.bold),
+      bodyMedium: TextStyle(fontWeight: FontWeight.bold),
+      bodySmall: TextStyle(fontWeight: FontWeight.bold),
+      labelLarge: TextStyle(fontWeight: FontWeight.bold),
+      labelMedium: TextStyle(fontWeight: FontWeight.bold),
+      labelSmall: TextStyle(fontWeight: FontWeight.bold),
+    );
     switch (theme) {
       case brown:
         return ThemeData(
@@ -45,6 +59,7 @@ class Settings {
             secondary: Colors.blueGrey[50]!,
             outline: Colors.green.withOpacity(0.5),
           ),
+          textTheme: textTheme,
           useMaterial3: true,
         );
       case grey:
@@ -55,6 +70,7 @@ class Settings {
             secondary: Colors.blueGrey[50]!,
             outline: Colors.green.withOpacity(0.5),
           ),
+          textTheme: textTheme,
           useMaterial3: true,
         );
       case green:
@@ -65,6 +81,7 @@ class Settings {
             secondary: Colors.blueGrey[50]!,
             outline: Colors.green.withOpacity(0.5),
           ),
+          textTheme: textTheme,
           useMaterial3: true,
         );
       case red:
@@ -75,6 +92,7 @@ class Settings {
             secondary: Colors.blueGrey[50]!,
             outline: Colors.green.withOpacity(0.5),
           ),
+          textTheme: textTheme,
           useMaterial3: true,
         );
       case navy:
@@ -86,6 +104,7 @@ class Settings {
             secondary: Colors.blueGrey[50]!,
             outline: Colors.green.withOpacity(0.5),
           ),
+          textTheme: textTheme,
           useMaterial3: true,
         );
        // theme. = Colors.white;

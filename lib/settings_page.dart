@@ -39,10 +39,9 @@ class _SettingsPageState extends State<SettingsPage> {
           color: colorLight,
           size: 40.0,
         ),
-        titleTextStyle: TextStyle(
+        titleTextStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
           color: colorLight,
           fontSize: 22,
-          fontWeight: FontWeight.w600,
         ),
         backgroundColor: colorDark,
       ),
