@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'settings_page.dart';
 import 'game/button_grid.dart';
-import 'game/field.dart';
 import 'game/hint.dart';
 import 'game/desk.dart';
 import 'game/animated_button.dart';

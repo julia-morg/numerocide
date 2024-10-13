@@ -190,7 +190,7 @@ class Desk {
   }
 
   bool _checkAndRemoveEmptyRows() {
-    int totalRows = (numbers.length / rowLength).floor();
+    int totalRows = (numbers.length / rowLength).ceil();
     bool removed = false;
     for (int rowIndex = totalRows - 1; rowIndex >= 0; rowIndex--) {
       if (_isRowEmpty(rowIndex)) {
