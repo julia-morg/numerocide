@@ -11,20 +11,23 @@ import 'game/vibro.dart';
 class Stage {
   final String text;
   final int buttonsPerRow;
-  final Map<int, Field> numbers;
+  final List<int> numbers;
   final Hint hint;
+  final List<int> inactiveNumbers;
 
-
-  Stage(this.text, this.buttonsPerRow, this.numbers, this.hint);
+  Stage(this.text, this.buttonsPerRow, this.numbers, this.hint,
+      [this.inactiveNumbers = const []]);
 }
 
 class TutorialPage extends StatefulWidget {
   @override
   _TutorialPageState createState() => _TutorialPageState();
+
   TutorialPage({
     super.key,
     required this.settings,
   });
+
   final Settings settings;
 }
 
@@ -38,6 +41,7 @@ class _TutorialPageState extends State<TutorialPage> {
   late Hint? hint;
   late int rowLength;
   int step = 0;
+  bool stageCompleted = false;
 
   @override
   void initState() {
@@ -49,37 +53,48 @@ class _TutorialPageState extends State<TutorialPage> {
 
   void _initializeTutorial() {
     stages = [
-      Stage('Click on number 1 and then 9 to remove them both', 4, {
-        0: Field(0, 1, true),
-        1: Field(1, 9, true),
-        2: Field(2, 4, true),
-        3: Field(3, 5, true),
-        4: Field(4, 3, true),
-        5: Field(5, 8, true),
-      }, Hint(0, 1)),
-      Stage('Click on number 3 and then 7 to remove them both', 4, {
-        0: Field(0, 3, true),
-        1: Field(1, 9, true),
-        2: Field(2, 2, true),
-        3: Field(3, 5, true),
-        4: Field(4, 7, true),
-      }, Hint(0, 4)),
-      Stage('Click on number 3 and then 7 to remove them both', 4, {
-        0: Field(0, 3, true),
-        1: Field(1, 2, true),
-        2: Field(2, 1, true),
-        3: Field(3, 5, true),
-        4: Field(4, 8, true),
-        5: Field(4, 4, true),
-      }, Hint(1, 4)),      Stage('Click on number 3 and then 7 to remove them both', 4, {
-        0: Field(0, 4, true),
-        1: Field(1, 2, true),
-        2: Field(2, 1, true),
-        3: Field(3, 5, true),
-        4: Field(4, 8, true),
-        5: Field(4, 5, true),
-        6: Field(6, 4, true),
-      }, Hint(0, 6)),
+      Stage(
+          'You can remove cells with numbers that are equal or add up to 10 if they are adjacent to each other',
+          6,
+          [1, 9, 4, 5, 3, 8],
+          Hint(0, 1)),
+      Stage('… or are located one above the other',
+          6,
+          [3, 9, 2, 5, 8, 4, 7, 5],
+          Hint(0, 6)),
+      Stage(
+          'Even if there was a line break between the cells, but they are adjacent, you can still remove them',
+          6,
+          [3, 2, 1, 5, 8, 4, 6, 5],
+          Hint(5, 6)),
+      Stage(
+          'If the cells are diagonal to each other, you can also remove them',
+          6,
+          [4, 2, 1, 5, 7, 9, 1, 5, 3, 2],
+          Hint(5, 6)),
+      Stage('The direction of the diagonal doesn’t matter',
+          6,
+          [2, 4, 1, 5, 7, 9, 5, 8, 3, 8],
+          Hint(0, 7)),
+      Stage(
+          'This is true for any diagonals, as long as there are no active cells on them',
+          6,
+          [2, 4, 1, 5, 7, 9, 5, 8, 3, 4, 8, 5, 1, 8, 9],
+          Hint(2, 12),
+          [7]),
+      Stage('You can also remove the first and last cells on a desk', 6,
+          [3, 5, 2, 5, 7, 4, 9, 6, 1, 4, 2, 5, 3, 8, 7], Hint(0, 14)),
+      Stage(''
+          'If you remove all the cells in a row, the row is destroyed',
+          6,
+          [3, 4, 2, 1, 5, 4, 9, 6, 1, 4, 2, 5, 6, 5, 7],
+          Hint(3, 8),
+          [6,7,9,10,11,]),
+      Stage(
+          'If you clear the entire board, you advance to the next level',
+          6,
+          [3, 5, 5, 7, 4, 9, 6, 7, 4, 2, 4, 1, 8, 7],
+          Hint(-10, -14)),
     ];
 
     _applyStage(stages[0]);
@@ -87,16 +102,22 @@ class _TutorialPageState extends State<TutorialPage> {
 
   void _applyStage(Stage stage) {
     setState(() {
-      desk = Desk(0, 0, stage.buttonsPerRow, stage.numbers);
+      Map<int, Field> numbers = stage.numbers.asMap().map((index, number) =>
+          MapEntry(index,
+              Field(index, number, !stage.inactiveNumbers.contains(index))));
+      desk = Desk(0, 0, stage.buttonsPerRow, numbers);
       desk.rowLength = stage.buttonsPerRow;
       hintText = stage.text;
       hint = stage.hint;
       rowLength = stage.buttonsPerRow;
+      stageCompleted = false;
+      selectedButtons.clear();
     });
   }
 
   void _nextStep() {
-    if(!isNextStepAvailable()) {
+    if (!isNextStepAvailable()) {
+      Navigator.pop(context);
       return;
     }
     setState(() {
@@ -120,9 +141,9 @@ class _TutorialPageState extends State<TutorialPage> {
       appBar: AppBar(
         title: const Text('Tutorial'),
         titleTextStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
-          color: colorLight,
-          fontSize: 24,
-        ),
+              color: colorLight,
+              fontSize: 22,
+            ),
         backgroundColor: colorDark,
         iconTheme: IconThemeData(
           color: colorLight,
@@ -130,7 +151,7 @@ class _TutorialPageState extends State<TutorialPage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
                 context,
@@ -146,20 +167,27 @@ class _TutorialPageState extends State<TutorialPage> {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Text(
+              'Step ${step+1}: $hintText',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineSmall!
+                  .copyWith(color: colorDark, fontSize: 24),
+            ),
+          ),
           Expanded(
             child: ButtonGrid(
               onButtonPressed: _onButtonPressed,
               selectedButtons: selectedButtons,
               desk: desk,
-              buttonSize: 30.0,
-              buttonsPerRow: rowLength,
               hint: hint,
             ),
           ),
-          Text('Step $step: $hintText'),
           ElevatedButton(
-            onPressed: isNextStepAvailable() ? _nextStep : null,
-            child: Text(isNextStepAvailable() ? 'Next Step': 'Finished'),
+            onPressed: stageCompleted ? _nextStep : null,
+            child: Text(isNextStepAvailable() ? 'Next Step' : 'Got it! To Main Menu'),
           ),
           Transform.scale(
             scale: 0.8,
@@ -171,6 +199,7 @@ class _TutorialPageState extends State<TutorialPage> {
       ),
     );
   }
+
   void _onButtonPressed(int index, int value, Function removeButton) {
     sounds.playTapSound();
     vibro.vibrateLight();
@@ -193,15 +222,13 @@ class _TutorialPageState extends State<TutorialPage> {
               selectedButtons.clear();
               hint = null;
             });
-            _nextStep();
+            stageCompleted = true;
           });
-        }
-        else {
+        } else {
           selectedButtons.clear();
           selectedButtons.add(index);
         }
       }
     });
   }
-
 }

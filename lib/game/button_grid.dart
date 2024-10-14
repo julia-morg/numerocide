@@ -7,8 +7,6 @@ import 'dart:math';
 class ButtonGrid extends StatefulWidget {
   final Function(int, int, Function(int)) onButtonPressed;
   final List<int> selectedButtons;
-  final double buttonSize;
-  final int buttonsPerRow;
   final Hint? hint;
   final Desk desk;
 
@@ -17,8 +15,6 @@ class ButtonGrid extends StatefulWidget {
     required this.onButtonPressed,
     required this.selectedButtons,
     required this.desk,
-    required this.buttonSize,
-    required this.buttonsPerRow,
     this.hint,
   }) : super(key: key);
 
@@ -32,7 +28,7 @@ class _ButtonGridState extends State<ButtonGrid> {
 
   void startRemoveRowAnimation(int rowIndex) async {
     setState(() {
-      crossedOutIndexes = List.generate(widget.buttonsPerRow, (i) => rowIndex * widget.buttonsPerRow + i);
+      crossedOutIndexes = List.generate(widget.desk.rowLength, (i) => rowIndex * widget.desk.rowLength + i);
     });
     await Future.delayed(const Duration(milliseconds: 1000));
     setState(() {
@@ -43,18 +39,19 @@ class _ButtonGridState extends State<ButtonGrid> {
 
   @override
   Widget build(BuildContext context) {
+    double buttonSize = (MediaQuery.of(context).size.width / widget.desk.rowLength).ceil().toDouble();
     double screenHeight = MediaQuery.of(context).size.height;
     double appBarHeight = Scaffold.of(context).appBarMaxHeight ?? kToolbarHeight;
     double availableHeight = screenHeight - appBarHeight;
-    int totalRowsInView = (availableHeight / (widget.buttonSize * 2 + 1)).floor() - 1;
-    int totalButtonsToShow = totalRowsInView * widget.buttonsPerRow;
-    int buttonsInLastRow = widget.desk.numbers.length % widget.buttonsPerRow;
-    int emptyCellsToAdd = buttonsInLastRow > 0 ? widget.buttonsPerRow - buttonsInLastRow : 0;
+    int totalRowsInView = (availableHeight / (buttonSize + 1)).floor() - 1;
+    int totalButtonsToShow = totalRowsInView * widget.desk.rowLength;
+    int buttonsInLastRow = widget.desk.numbers.length % widget.desk.rowLength;
+    int emptyCellsToAdd = buttonsInLastRow > 0 ? widget.desk.rowLength - buttonsInLastRow : 0;
     int initialEmptyCells = max(totalButtonsToShow - widget.desk.numbers.length, 0).toInt();
     int finalItemCount = widget.desk.numbers.length +
         emptyCellsToAdd +
         initialEmptyCells +
-        widget.buttonsPerRow.toInt();
+        widget.desk.rowLength.toInt();
     Color backgroundColor = Theme.of(context).colorScheme.secondary;
     Color highlightColor = Theme.of(context).colorScheme.primary.withOpacity(0.7);
     Color hintColor = Theme.of(context).colorScheme.outline;
@@ -66,7 +63,7 @@ class _ButtonGridState extends State<ButtonGrid> {
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: widget.buttonsPerRow,
+        crossAxisCount: widget.desk.rowLength,
         childAspectRatio: 1,
         mainAxisSpacing: 1,
         crossAxisSpacing: 1,
@@ -75,8 +72,6 @@ class _ButtonGridState extends State<ButtonGrid> {
       itemBuilder: (context, index) {
         if (index >= widget.desk.numbers.length) {
           return SizedBox(
-            width: widget.buttonSize,
-            height: widget.buttonSize,
             child: TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: backgroundColor,

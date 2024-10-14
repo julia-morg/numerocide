@@ -10,8 +10,7 @@ class Settings {
   static const String brown = 'brown';
   static const String grey = 'grey';
   static const String green = 'green';
-  static const String red = 'red';
-  static List<String> get allThemes => [navy, brown, grey, green, red];
+  static List<String> get allThemes => [navy, brown, grey, green];
 
   Settings({required this.sound, required this.vibro, required this.theme});
 
@@ -76,17 +75,6 @@ class Settings {
       case green:
         return ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green).copyWith(
-            onSecondary: Colors.grey[400],
-            onSecondaryContainer: Colors.grey[200]!,
-            secondary: Colors.blueGrey[50]!,
-            outline: Colors.green.withOpacity(0.5),
-          ),
-          textTheme: textTheme,
-          useMaterial3: true,
-        );
-      case red:
-        return ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.red, dynamicSchemeVariant: DynamicSchemeVariant.vibrant,).copyWith(
             onSecondary: Colors.grey[400],
             onSecondaryContainer: Colors.grey[200]!,
             secondary: Colors.blueGrey[50]!,

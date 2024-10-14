@@ -14,16 +14,12 @@ class GamePage extends StatefulWidget {
   GamePage({
     super.key,
     required this.title,
-    required this.buttonSize,
-    required this.buttonsPerRow,
     required this.maxScore,
     required this.mode,
     required this.settings,
   });
 
   final String title;
-  final double buttonSize;
-  final int buttonsPerRow;
   int maxScore;
   final bool mode;
   final Settings settings;
@@ -177,8 +173,6 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
                     onButtonPressed: _onButtonPressed,
                     selectedButtons: selectedButtons,
                     desk: desk,
-                    buttonSize: widget.buttonSize,
-                    buttonsPerRow: widget.buttonsPerRow,
                     hint: currentHint,
                   ),
                 ),

@@ -48,8 +48,6 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(
         builder: (context) => GamePage(
           title: _title,
-          buttonSize: 15.0,
-          buttonsPerRow: 9,
           maxScore: _maxScore,
           settings: widget.settings,
           mode: mode,
