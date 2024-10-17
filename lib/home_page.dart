@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'donate_page.dart';
 import 'game_page.dart';
 import 'settings_page.dart';
 import 'tutorial_page.dart';
@@ -174,23 +176,7 @@ class _HomePageState extends State<HomePage> {
                   )),
             ),
           ),
-          const SizedBox(height: 50),
-          Center(
-            child: ElevatedButton(
-              onPressed: _hasSavedGame ? () => _showTutorial() : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.surface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text('Rules',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  )),
-            ),
-          ),
+          const Spacer(),
 
         ],
       ),

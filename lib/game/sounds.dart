@@ -63,6 +63,7 @@ class Sounds {
     }
     await player.stop();
     double deviceVolume = await VolumeControl.volume;
+    debugPrint(filename);
     player.play(
       AssetSource('sounds/${filename}'),
       volume: deviceVolume,

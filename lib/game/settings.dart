@@ -7,7 +7,7 @@ class Settings {
   bool vibro;
   String theme;
   static const String navy = 'navy';
-  static const String brown = 'brown';
+  static const String brown = 'cocoa';
   static const String grey = 'grey';
   static const String green = 'green';
   static List<String> get allThemes => [navy, brown, grey, green];

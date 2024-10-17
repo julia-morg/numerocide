@@ -87,7 +87,7 @@ class _TutorialPageState extends State<TutorialPage> {
       Stage(''
           'If you remove all the cells in a row, the row is destroyed',
           6,
-          [3, 4, 2, 1, 5, 4, 9, 6, 1, 4, 2, 5, 6, 5, 7],
+          [3, 8, 3, 1, 5, 3, 9, 6, 1, 4, 2, 5, 4, 5, 4],
           Hint(3, 8),
           [6,7,9,10,11,]),
       Stage(
@@ -170,7 +170,7 @@ class _TutorialPageState extends State<TutorialPage> {
           Padding(
             padding: const EdgeInsets.all(10),
             child: Text(
-              'Step ${step+1}: $hintText',
+              '${step+1}. $hintText',
               style: Theme.of(context)
                   .textTheme
                   .headlineSmall!
@@ -223,6 +223,7 @@ class _TutorialPageState extends State<TutorialPage> {
               hint = null;
             });
             stageCompleted = true;
+            debugPrint(desk.findHint().toString());
           });
         } else {
           selectedButtons.clear();

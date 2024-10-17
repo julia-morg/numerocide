@@ -368,7 +368,5 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
       }
       currentHint == null ? sounds.playNoHintsSound() : sounds.playHintSound();
     });
-    _checkGameState(false);
   }
-
 }
