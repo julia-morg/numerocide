@@ -1,108 +1,103 @@
-// import 'package:flutter_test/flutter_test.dart';
-// import 'package:numerocide/game/desk.dart';
-// import 'package:numerocide/game/field.dart';
-// import 'package:numerocide/game/hint.dart';
-//
-// void main() {
-//   group('Desk', () {
-//     late Desk desk;
-//
-//     setUp(() {
-//       // Начальные данные для игры
-//       Map<int, Field> numbers = {
-//         0: Field(0, 5, true),
-//         1: Field(1, 5, true),
-//         2: Field(2, 2, true),
-//         3: Field(3, 8, true),
-//         4: Field(4, 3, true),
-//         5: Field(5, 7, true),
-//       };
-//       desk = Desk(0, 0, numbers, 3); // 3 кнопки в ряду
-//     });
-//
-//     test('newStage увеличивает количество стадий и добавляет активные клетки', () {
-//       desk.addFields();
-//       expect(desk.stage, 1);
-//       expect(desk.numbers.length, 12); // Увеличено на активные клетки
-//     });
-//
-//     test('isCorrectMove возвращает true для корректных ходов', () {
-//       expect(desk.isCorrectMove(0, 1), isTrue); // Одинаковые значения
-//       expect(desk.isCorrectMove(2, 3), isTrue); // Сумма равна 10
-//     });
-//
-//     test('isCorrectMove возвращает false для некорректных ходов', () {
-//       expect(desk.isCorrectMove(0, 2), isFalse); // Разные значения, не дают 10
-//       expect(desk.isCorrectMove(3, 4), isFalse); // Разные значения
-//     });
-//
-//     test('move правильно удаляет клетки и увеличивает счет', () {
-//       desk.move(0, 1); // Одинаковые числа 5 и 5
-//       expect(desk.numbers[0]!.isActive, isFalse);
-//       expect(desk.numbers[1]!.isActive, isFalse);
-//       expect(desk.score, 10); // Счет должен увеличиться на 10
-//     });
-//
-//     test('findHint находит правильные подсказки', () {
-//       Hint? hint = desk.findHint();
-//       expect(hint, isNotNull);
-//       expect(hint!.hint1, 0); // Первые одинаковые клетки
-//       expect(hint.hint2, 1);
-//     });
-//
-//     test('findHint возвращает null, если нет возможных ходов', () {
-//       // Все клетки неактивны
-//       desk.numbers[0]!.isActive = false;
-//       desk.numbers[1]!.isActive = false;
-//       desk.numbers[2]!.isActive = false;
-//       desk.numbers[3]!.isActive = false;
-//       desk.numbers[4]!.isActive = false;
-//       desk.numbers[5]!.isActive = false;
-//
-//       Hint? hint = desk.findHint();
-//       expect(hint, isNull);
-//     });
-//
-//     test('isGameOver возвращает true, если все клетки неактивны', () {
-//       desk.numbers[0]!.isActive = false;
-//       desk.numbers[1]!.isActive = false;
-//       desk.numbers[2]!.isActive = false;
-//       desk.numbers[3]!.isActive = false;
-//       desk.numbers[4]!.isActive = false;
-//       desk.numbers[5]!.isActive = false;
-//
-//       expect(desk.isVictory(), isTrue);
-//     });
-//
-//     test('isGameOver возвращает false, если хотя бы одна клетка активна', () {
-//       desk.numbers[0]!.isActive = false;
-//       desk.numbers[1]!.isActive = false;
-//       expect(desk.isVictory(), isFalse);
-//     });
-//
-//     test('checkAndRemoveEmptyRows удаляет пустые ряды', () {
-//       // Делаем 0 и 1 клетки неактивными, чтобы они составили пустую строку
-//       desk.numbers[0]!.isActive = false;
-//       desk.numbers[1]!.isActive = false;
-//       desk.numbers[2]!.isActive = false;
-//
-//       bool removed = desk.checkAndRemoveEmptyRows();
-//       expect(removed, isTrue); // Пустой ряд должен быть удален
-//       expect(desk.numbers.length, 3); // Количество должно уменьшиться
-//     });
-//
-//     test('isRowEmpty возвращает true для пустого ряда', () {
-//       desk.numbers[0]!.isActive = false;
-//       desk.numbers[1]!.isActive = false;
-//       desk.numbers[2]!.isActive = false;
-//       expect(desk.isRowEmpty(0), isTrue);
-//     });
-//
-//     test('isRowEmpty возвращает false для непустого ряда', () {
-//       desk.numbers[0]!.isActive = false;
-//       desk.numbers[1]!.isActive = true;
-//       desk.numbers[2]!.isActive = false;
-//       expect(desk.isRowEmpty(0), isFalse);
-//     });
-//   });
-// }
+import 'package:flutter_test/flutter_test.dart';
+import 'package:numerocide/game/desk.dart';
+import 'package:numerocide/game/field.dart';
+import 'package:numerocide/game/hint.dart';
+
+void main() {
+  group('Desk', () {
+    late Desk desk;
+
+    setUp(() {
+      desk = Desk.newGame();
+    });
+
+    test('newGame should initialize a new desk with default values', () {
+      final newDesk = Desk.newGame();
+      expect(newDesk.stage, 1);
+      expect(newDesk.score, 0);
+      expect(newDesk.remainingAddClicks, Desk.defaultAddsCount);
+      expect(newDesk.numbers.length, Desk.initialButtonsCount);
+    });
+
+    test('addFields should add new active fields if clicks remain', () {
+      final initialLength = desk.numbers.length;
+      desk.addFields();
+      expect(desk.numbers.length, greaterThan(initialLength));
+      expect(desk.remainingAddClicks, Desk.defaultAddsCount - 1);
+    });
+
+    test('addFields should not add fields if no clicks remain', () {
+      desk.remainingAddClicks = 0;
+      final initialLength = desk.numbers.length;
+      desk.addFields();
+      expect(desk.numbers.length, initialLength);
+    });
+
+    test('generateRandomNumbers should generate the correct number of fields',
+        () {
+      final numbers = Desk.generateRandomNumbers(5);
+      expect(numbers.length, 5);
+    });
+
+    test('newStage should reset the desk for the next stage', () {
+      desk.newStage(10);
+      expect(desk.stage, 2);
+      expect(desk.remainingAddClicks, Desk.defaultAddsCount);
+      expect(desk.numbers.length, 10);
+    });
+
+    test('checkGameStatus should return true for victory', () {
+      desk.numbers.updateAll((key, value) => Field(key, value.number, false));
+      expect(desk.checkGameStatus(), true);
+    });
+
+    test('isCorrectMove should return true for valid move', () {
+      desk.numbers[0] = Field(0, 5, true);
+      desk.numbers[1] = Field(1, 5, true);
+      expect(desk.isCorrectMove(0, 1), true);
+    });
+
+    test('isCorrectMove should return false for invalid move', () {
+      desk.numbers[0] = Field(0, 5, true);
+      desk.numbers[1] = Field(1, 3, true);
+      expect(desk.isCorrectMove(0, 1), false);
+    });
+
+    test('findHint should return a valid hint if available', () {
+      desk.numbers[0] = Field(0, 5, true);
+      desk.numbers[1] = Field(1, 5, true);
+      expect(desk.findHint(), isA<Hint>());
+    });
+
+    test('findHint should return null if no hint is available', () {
+      desk.numbers.updateAll((key, value) => Field(key, value.number, false));
+      expect(desk.findHint(), null);
+    });
+
+    test('move should deactivate fields and update score for valid move', () {
+      desk.numbers[0] = Field(0, 5, true);
+      desk.numbers[1] = Field(1, 5, true);
+      desk.move(0, 1);
+      expect(desk.numbers[0]!.isActive, false);
+      expect(desk.numbers[1]!.isActive, false);
+      expect(desk.score, 2 * desk.stage);
+    });
+
+    test('move should return false for invalid move', () {
+      desk.numbers[0] = Field(0, 5, true);
+      desk.numbers[1] = Field(1, 3, true);
+      final moved = desk.move(0, 1);
+      expect(moved, false);
+    });
+
+    test('isVictory should return true if all fields are inactive', () {
+      desk.numbers.updateAll((key, value) => Field(key, value.number, false));
+      expect(desk.isVictory(), true);
+    });
+
+    test('isVictory should return false if any field is active', () {
+      desk.numbers[0] = Field(0, 5, true);
+      expect(desk.isVictory(), false);
+    });
+  });
+}

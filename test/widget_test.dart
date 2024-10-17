@@ -7,13 +7,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:numerocide/game/settings.dart';
 
 import 'package:numerocide/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    Settings settings = Settings(sound: true, vibro: true, theme: Settings.green);
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(MyApp(settings: settings));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
