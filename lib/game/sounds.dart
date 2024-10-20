@@ -9,52 +9,52 @@ class Sounds {
   });
 
   final Settings settings;
-  static const String sound_tap = 'tap.aiff';
-  static const String sound_remove_row = 'remove_row.mp3';
-  static const String sound_remove_numbers = 'remove_numbers.mp3';
-  static const String sound_no_hints = 'no_hints.mp3';
-  static const String sound_hint = 'hint.wav';
-  static const String sound_gameover_win = 'gameover-victory.flac';
-  static const String sound_gameover_lose = 'gameover-lose.mp3';
-  static const String sound_desk_cleared = 'desk_cleared.wav';
-  static const String sound_add_row = 'add_rows.mp3';
+  static const String soundTap = 'tap.aiff';
+  static const String soundRemoveRow = 'remove_row.mp3';
+  static const String soundRemoveNumbers = 'remove_numbers.mp3';
+  static const String soundNoHints = 'no_hints.mp3';
+  static const String soundHint = 'hint.wav';
+  static const String soundGameOverWin = 'gameover-victory.flac';
+  static const String soundGameOverLose = 'gameover-lose.mp3';
+  static const String soundDeskCleared = 'desk_cleared.wav';
+  static const String soundAddRow = 'add_rows.mp3';
 
   static final player = AudioPlayer();
 
   void playTapSound() async {
-    _playSound(sound_tap);
+    _playSound(soundTap);
   }
 
   void playRemoveRowSound() async {
-    _playSound(sound_remove_row);
+    _playSound(soundRemoveRow);
   }
 
   void playRemoveNumbersSound() async {
-    _playSound(sound_remove_numbers);
+    _playSound(soundRemoveNumbers);
   }
 
   void playNoHintsSound() async {
-    _playSound(sound_no_hints);
+    _playSound(soundNoHints);
   }
 
   void playGameOverWinSound() async {
-    _playSound(sound_gameover_win);
+    _playSound(soundGameOverWin);
   }
 
   void playHintSound() async {
-    _playSound(sound_hint);
+    _playSound(soundHint);
   }
 
   void playGameOverLoseSound() async {
-    _playSound(sound_gameover_lose);
+    _playSound(soundGameOverLose);
   }
 
   void playDeskClearedSound() async {
-    _playSound(sound_desk_cleared);
+    _playSound(soundDeskCleared);
   }
 
   void playAddRowSound() async {
-    _playSound(sound_add_row);
+    _playSound(soundAddRow);
   }
 
   void _playSound(String filename) async {
@@ -65,7 +65,7 @@ class Sounds {
     double deviceVolume = await VolumeControl.volume;
     debugPrint(filename);
     player.play(
-      AssetSource('sounds/${filename}'),
+      AssetSource('sounds/$filename'),
       volume: deviceVolume,
     );
   }

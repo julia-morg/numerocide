@@ -21,9 +21,9 @@ class Stage {
 
 class TutorialPage extends StatefulWidget {
   @override
-  _TutorialPageState createState() => _TutorialPageState();
+  State<TutorialPage> createState() => _TutorialPageState();
 
-  TutorialPage({
+  const TutorialPage({
     super.key,
     required this.settings,
   });

@@ -6,10 +6,10 @@ class Settings {
   bool sound;
   bool vibro;
   String theme;
-  static const String navy = 'navy';
+  static const String navy = 'water';
   static const String brown = 'cocoa';
-  static const String grey = 'grey';
-  static const String green = 'green';
+  static const String grey = 'stone';
+  static const String green = 'grass';
   static List<String> get allThemes => [navy, brown, grey, green];
 
   Settings({required this.sound, required this.vibro, required this.theme});

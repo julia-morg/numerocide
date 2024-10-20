@@ -8,3 +8,4 @@ linter:
     unnecessary_new: true
     unnecessary_const: true
     prefer_single_quotes: true
+    use_build_context_synchronously: false

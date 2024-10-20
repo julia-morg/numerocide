@@ -89,12 +89,12 @@ class AnimatedButtonState extends State<AnimatedButton>
                 height: 60,
                 child: FloatingActionButton(
                   onPressed: widget.active ? widget.onPressed : null,
-                  child: Icon(widget.icon,
-                      color: widget.active ? activeColor : inactiveColor,
-                      size: 32),
                   heroTag: widget.heroTag,
                   mini: false,
                   backgroundColor: widget.active ? lightColor : lightInactiveColor,
+                  child: Icon(widget.icon,
+                      color: widget.active ? activeColor : inactiveColor,
+                      size: 32),
                 ),
               ),
               if (widget.labelCount != null)

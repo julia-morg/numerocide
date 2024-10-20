@@ -11,13 +11,16 @@ void main() async {
 class MyApp extends StatefulWidget {
   final Settings settings;
 
-  const MyApp({Key? key, required this.settings}) : super(key: key);
+  const MyApp({super.key, required this.settings});
 
   @override
-  _MyAppState createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 
-  static _MyAppState? of(BuildContext context) {
-    return context.findAncestorStateOfType<_MyAppState>();
+  static void updateTheme(BuildContext context, ThemeData newTheme) {
+    _MyAppState? m =  context.findAncestorStateOfType<_MyAppState>();
+    if (m != null) {
+      m.updateTheme(newTheme);
+    }
   }
 }
 

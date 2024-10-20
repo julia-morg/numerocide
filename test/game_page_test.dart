@@ -20,7 +20,7 @@ void main() {
 
     debugPrint('state: ${gamePage.settings.sound}');
 
-    final finder = find.byKey(Key('label-container-addButton'));
+    final finder = find.byKey(const Key('label-container-addButton'));
     expect(finder, findsOneWidget);
     expect(
       find.descendant(

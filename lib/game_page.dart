@@ -11,7 +11,7 @@ import 'game/vibro.dart';
 import 'game/save.dart';
 
 class GamePage extends StatefulWidget {
-  GamePage({
+  const GamePage({
     super.key,
     required this.title,
     required this.maxScore,
@@ -20,7 +20,7 @@ class GamePage extends StatefulWidget {
   });
 
   final String title;
-  int maxScore;
+  final int maxScore;
   final bool mode;
   final Settings settings;
 
@@ -111,11 +111,11 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh, color: colorLight),
+            icon: const Icon(Icons.refresh),
             onPressed: _restartGame,
           ),
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
                 context,
@@ -138,7 +138,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    'Best\n${_maxScore}',
+                    'Best\n$_maxScore',
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
@@ -165,7 +165,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
             ),
             Expanded(
               child: ScrollConfiguration(
-                behavior: ScrollBehavior()
+                behavior: const ScrollBehavior()
                     .copyWith(overscroll: false, scrollbars: false),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
@@ -229,61 +229,61 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
       builder: (BuildContext context) {
         return GestureDetector(
           onTap: _handleGameOver,
-            child: WillPopScope(
-            onWillPop: () async {
-              _handleGameOver();
-          return false;
-        },
-          child: AlertDialog(
-          title: Text(
-            'GAME OVER',
-            textAlign: TextAlign.center,
-            style: Theme.of(context)
-                .textTheme
-                .headlineSmall!
-                .copyWith(color: Theme.of(context).colorScheme.primary),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 10),
-              Text(
-                'SCORE: ${desk.score}',
+          child: PopScope(
+            onPopInvokedWithResult: (bool didPop, dynamic result) {
+              if (!didPop) {
+                _handleGameOver();
+              }
+            },
+            child: AlertDialog(
+              title: Text(
+                'GAME OVER',
+                textAlign: TextAlign.center,
                 style: Theme.of(context)
                     .textTheme
-                    .labelLarge!
+                    .headlineSmall!
                     .copyWith(color: Theme.of(context).colorScheme.primary),
-                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 10),
-              Text(
-                isVictory ? "This is your max score ever!" : "",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium!
-                    .copyWith(color: Theme.of(context).colorScheme.primary),
-                textAlign: TextAlign.center,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 10),
+                  Text(
+                    'SCORE: ${desk.score}',
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelLarge!
+                        .copyWith(color: Theme.of(context).colorScheme.primary),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    isVictory ? 'This is your best score ever!' : '',
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelMedium!
+                        .copyWith(color: Theme.of(context).colorScheme.primary),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
-            ],
-          ),
-          actions: <Widget>[
-            Center(
-              child: ElevatedButton(
-                child: const Text('RETURN'),
-                onPressed: _handleGameOver,
-                style: ElevatedButton.styleFrom(
-                  elevation: 5,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Отступы
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10), // Закругленные углы
+              actions: <Widget>[
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _handleGameOver,
+                    style: ElevatedButton.styleFrom(
+                      elevation: 5,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Отступы
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10), // Закругленные углы
+                      ),
+                    ),
+                    child: const Text('RETURN'),
                   ),
                 ),
-              ),
+              ],
             ),
-
-          ],
-        )
-            ),
+          ),
         );
       },
     );
@@ -361,6 +361,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
 
   void _onShowHintPressed() {
     vibro.vibrateLight();
+    _showGameOverDialog(true);
     setState(() {
       currentHint = desk.findHint();
       if (currentHint == null && desk.remainingAddClicks > 0) {

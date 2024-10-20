@@ -11,15 +11,15 @@ class ButtonGrid extends StatefulWidget {
   final Desk desk;
 
   const ButtonGrid({
-    Key? key,
+    super.key,
     required this.onButtonPressed,
     required this.selectedButtons,
     required this.desk,
     this.hint,
-  }) : super(key: key);
+  });
 
   @override
-  _ButtonGridState createState() => _ButtonGridState();
+  State<ButtonGrid> createState() => _ButtonGridState();
 }
 
 class _ButtonGridState extends State<ButtonGrid> {

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'donate_page.dart';
 import 'game_page.dart';
 import 'settings_page.dart';
-import 'tutorial_page.dart';
 import 'game/settings.dart';
 import 'game/save.dart';
 
@@ -12,7 +9,7 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.settings});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
@@ -61,15 +58,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _showTutorial() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TutorialPage(settings: widget.settings,),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
@@ -92,7 +80,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
                 context,

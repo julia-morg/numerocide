@@ -45,7 +45,7 @@ class Save {
 
   Future<int> loadMaxScore() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return await prefs.getInt('maxScore') ?? 0;
+    return prefs.getInt('maxScore') ?? 0;
   }
 
   Future<Desk> loadGame() async {

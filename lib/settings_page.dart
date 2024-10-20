@@ -6,12 +6,12 @@ import 'game/settings.dart';
 import 'main.dart';
 
 class SettingsPage extends StatefulWidget {
-  Settings settings;
+  final Settings settings;
 
-  SettingsPage({Key? key, required this.settings}) : super(key: key);
+  const SettingsPage({super.key, required this.settings});
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
@@ -77,7 +77,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
             const SizedBox(height: 8),
-            Divider(),
+            const Divider(),
             InkWell(
               onTap: () {
                 setState(() {
@@ -102,7 +102,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
             const SizedBox(height: 8),
-            Divider(),
+            const Divider(),
             Text('Theme', style: labelStyle),
             Column(
               children: Settings.allThemes.map((themeName) {
@@ -112,7 +112,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       widget.settings.theme = themeName;
                     });
                     widget.settings.saveSettings();
-                    MyApp.of(context)?.updateTheme(
+                    MyApp.updateTheme(context,
                         Settings.getThemeData(widget.settings.theme));
                   },
                   child: Container(
@@ -149,7 +149,7 @@ class _SettingsPageState extends State<SettingsPage> {
               }).toList(),
             ),
             const SizedBox(height: 8),
-            Divider(),
+            const Divider(),
             const SizedBox(height: 8),
             Text('Info', style: labelStyle),
             InkWell(
@@ -201,9 +201,9 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             TextButton(
               onPressed: () async {
-                const url = 'https://www.yourwebsite.com/privacy-policy';
-                if (await canLaunch(url)) {
-                  await launch(url);
+                Uri url = Uri(scheme: 'https', host: 'www.yourwebsite.com/privacy-policy');
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url);
                 } else {
                   throw 'Could not launch $url';
                 }
@@ -213,7 +213,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Privacy Policy',
                       style: TextStyle(
                         decoration: TextDecoration.underline,
@@ -225,9 +225,9 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             TextButton(
               onPressed: () async {
-                const url = 'https://www.yourwebsite.com/privacy-policy';
-                if (await canLaunch(url)) {
-                  await launch(url);
+                Uri url = Uri(scheme: 'https', host: 'www.yourwebsite.com/terms-of-service');
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url);
                 } else {
                   throw 'Could not launch $url';
                 }
