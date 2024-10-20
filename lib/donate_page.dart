@@ -55,12 +55,12 @@ class _DonatePageState extends State<DonatePage> {
         child: Column(
           children: [
             Text(
-              'Support Us by Donating',
+              'This game contains no advertisements and is available for free.\nIf you would like to support the developer, here are the available donation options:',
               style: Theme.of(context)
                   .textTheme
                   .headlineSmall!
-                  .copyWith(color: colorDark, fontSize: 24),
-              textAlign: TextAlign.center,
+                  .copyWith(color: colorDark, fontSize: 20, fontWeight: FontWeight.normal),
+              textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 20),
             Expanded(
@@ -75,7 +75,7 @@ class _DonatePageState extends State<DonatePage> {
                           .headlineSmall!
                           .copyWith(color: colorDark, fontSize: 18),
                     ),
-                    trailing: const Icon(Icons.payment),
+                    trailing: Icon(Icons.payment, color: colorDark,),
                     onTap: () {
                       _processDonation(context, donations[index]);
                     },
@@ -95,18 +95,26 @@ class _DonatePageState extends State<DonatePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirm Donation'),
+          titleTextStyle: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 20,
+              ),
           content: Text(
             'You are about to donate \$$amount. This action cannot be undone. Do you want to proceed?',
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall!
+                .copyWith(color: Theme.of(context).colorScheme.primary, fontSize: 16, fontWeight: FontWeight.normal),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Confirm'),
+              child: const Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               onPressed: () async {
                 bool result = await _processPayment(amount);
                 if (!mounted) return;
@@ -129,13 +137,13 @@ class _DonatePageState extends State<DonatePage> {
     final productId = '$donationProductPrefix$amount';
     bool available = await inAppPurchase.isAvailable();
     if (!available) {
-    //  print('In-app purchases not available');
+      debugPrint('In-app purchases not available');
       return false;
     }
     final ProductDetailsResponse response =
         await inAppPurchase.queryProductDetails({productId});
     if (response.notFoundIDs.isNotEmpty) {
-    //  print('Product not found: $productId');
+      debugPrint('Product not found: $productId');
       return false;
     }
     final productDetails = response.productDetails.first;

@@ -201,7 +201,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             TextButton(
               onPressed: () async {
-                Uri url = Uri(scheme: 'https', host: 'www.yourwebsite.com/privacy-policy');
+                Uri url = Uri(scheme: 'https', host: 'julia_morg.tilda.ws', path: 'privacy_policy');
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 } else {
@@ -225,7 +225,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             TextButton(
               onPressed: () async {
-                Uri url = Uri(scheme: 'https', host: 'www.yourwebsite.com/terms-of-service');
+                Uri url = Uri(scheme: 'https', host: 'julia_morg.tilda.ws', path: 'terms_of_service');
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 } else {

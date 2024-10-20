@@ -273,9 +273,9 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
                     onPressed: _handleGameOver,
                     style: ElevatedButton.styleFrom(
                       elevation: 5,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Отступы
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10), // Закругленные углы
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: const Text('RETURN'),

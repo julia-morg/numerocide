@@ -110,7 +110,6 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Row(
                   mainAxisSize: MainAxisSize.min,
-                  // Чтобы Row занял только необходимую ширину
                   children: [
                     Icon(Icons.star, color: colorStar, size: 30),
                     const SizedBox(width: 5),
