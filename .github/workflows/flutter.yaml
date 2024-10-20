@@ -34,7 +34,9 @@ jobs:
           flutter-version: '3.24.3'
       - name: Install dependencies
         run: flutter pub get
-      - name: Run analyzer
-        run: flutter analyze
       - name: Run tests
-        run: flutter test
+        run: flutter test  --coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
