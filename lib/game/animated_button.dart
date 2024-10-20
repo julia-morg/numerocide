@@ -99,6 +99,7 @@ class AnimatedButtonState extends State<AnimatedButton>
               ),
               if (widget.labelCount != null)
                 Positioned(
+                  key: Key('label-container-${widget.heroTag}'),
                   top: 0,
                   left: 0,
                   child: Container(
