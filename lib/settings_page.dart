@@ -23,7 +23,6 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
-    Color colorLight = Theme.of(context).colorScheme.surface;
     TextStyle labelStyle = TextStyle(
       fontSize: 20,
       fontWeight: FontWeight.bold,
@@ -38,15 +37,6 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
-        iconTheme: IconThemeData(
-          color: colorLight,
-          size: 40.0,
-        ),
-        titleTextStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
-              color: colorLight,
-              fontSize: 22,
-            ),
-        backgroundColor: colorDark,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

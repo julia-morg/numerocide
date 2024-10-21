@@ -10,7 +10,7 @@ void main() {
     GamePage gamePage = GamePage(
       title: 'test',
       maxScore: 0,
-      mode: true,
+      mode: GamePage.modeNewGame,
       settings: settings,
     );
 

@@ -35,68 +35,103 @@ class Settings {
   }
 
   static ThemeData getThemeData(String theme) {
-    TextTheme textTheme = const TextTheme(
-      headlineLarge: TextStyle(fontWeight: FontWeight.bold),
-      headlineMedium: TextStyle(fontWeight: FontWeight.bold),
-      headlineSmall: TextStyle(fontWeight: FontWeight.bold),
-      titleLarge: TextStyle(fontWeight: FontWeight.bold),
-      titleMedium: TextStyle(fontWeight: FontWeight.bold),
-      titleSmall: TextStyle(fontWeight: FontWeight.bold),
-      bodyLarge: TextStyle(fontWeight: FontWeight.bold),
-      bodyMedium: TextStyle(fontWeight: FontWeight.bold),
-      bodySmall: TextStyle(fontWeight: FontWeight.bold),
-      labelLarge: TextStyle(fontWeight: FontWeight.bold),
-      labelMedium: TextStyle(fontWeight: FontWeight.bold),
-      labelSmall: TextStyle(fontWeight: FontWeight.bold),
+    ColorScheme colorScheme =
+        ColorScheme.fromSeed(seedColor: Colors.blueAccent).copyWith(
+      onSecondary: Colors.grey[400],
+      onSecondaryContainer: Colors.grey[200]!,
+      secondary: Colors.blueGrey[50]!,
+      outline: Colors.green.withOpacity(0.5),
     );
-    switch (theme) {
-      case brown:
-        return ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink).copyWith(
-            onSecondary: Colors.grey[400],
-            onSecondaryContainer: Colors.grey[200]!,
-            secondary: Colors.blueGrey[50]!,
-            outline: Colors.green.withOpacity(0.5),
-          ),
-          textTheme: textTheme,
-          useMaterial3: true,
-        );
-      case grey:
-        return ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey, dynamicSchemeVariant: DynamicSchemeVariant.neutral,).copyWith(
-            onSecondary: Colors.grey[400],
-            onSecondaryContainer: Colors.grey[200]!,
-            secondary: Colors.blueGrey[50]!,
-            outline: Colors.green.withOpacity(0.5),
-          ),
-          textTheme: textTheme,
-          useMaterial3: true,
-        );
-      case green:
-        return ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green).copyWith(
-            onSecondary: Colors.grey[400],
-            onSecondaryContainer: Colors.grey[200]!,
-            secondary: Colors.blueGrey[50]!,
-            outline: Colors.green.withOpacity(0.5),
-          ),
-          textTheme: textTheme,
-          useMaterial3: true,
-        );
-      case navy:
-      default:
-        ThemeData theme = ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent).copyWith(
-            onSecondary: Colors.grey[400],
-            onSecondaryContainer: Colors.grey[200]!,
-            secondary: Colors.blueGrey[50]!,
-            outline: Colors.green.withOpacity(0.5),
-          ),
-          textTheme: textTheme,
-          useMaterial3: true,
-        );
-        return theme;
+
+    if (theme == brown) {
+      colorScheme =
+          ColorScheme.fromSeed(seedColor: Colors.pink).copyWith(
+        onSecondary: Colors.grey[400],
+        onSecondaryContainer: Colors.grey[200]!,
+        secondary: Colors.blueGrey[50]!,
+        outline: Colors.green.withOpacity(0.5),
+      );
+    } else if (theme == grey) {
+      colorScheme = ColorScheme.fromSeed(
+        seedColor: Colors.blueGrey,
+        dynamicSchemeVariant: DynamicSchemeVariant.neutral,
+      ).copyWith(
+        onSecondary: Colors.grey[400],
+        onSecondaryContainer: Colors.grey[200]!,
+        secondary: Colors.blueGrey[50]!,
+        outline: Colors.green.withOpacity(0.5),
+      );
+    } else if (theme == green) {
+      colorScheme = ColorScheme.fromSeed(seedColor: Colors.green).copyWith(
+        secondaryContainer: Colors.green[50]!,
+        onSecondary: Colors.grey[400],
+        onSecondaryContainer: Colors.grey[200]!,
+        secondary: Colors.blueGrey[50]!,
+        outline: Colors.green.withOpacity(0.5),
+      );
     }
+
+    TextStyle mainTextStyle = TextStyle(
+      color: colorScheme.primary,
+      fontWeight: FontWeight.bold,
+    );
+    TextStyle headlineTextStyle = TextStyle(
+      color: colorScheme.surface,
+      fontWeight: FontWeight.bold,
+    );
+    AppBarTheme  appBarTheme = AppBarTheme(
+      backgroundColor: colorScheme.primary,
+      titleTextStyle: TextStyle(
+        color: colorScheme.surface,
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
+      iconTheme: IconThemeData(
+        color: colorScheme.surface,
+        size: 40.0,
+      ),
+    );
+    TextTheme textTheme = TextTheme(
+      headlineLarge: headlineTextStyle,
+      headlineMedium: headlineTextStyle,
+      headlineSmall: headlineTextStyle,
+      titleLarge: mainTextStyle,
+      titleMedium: mainTextStyle,
+      titleSmall: mainTextStyle,
+      bodyLarge: mainTextStyle,
+      bodyMedium: mainTextStyle,
+      bodySmall: mainTextStyle,
+      labelLarge: mainTextStyle,
+      labelMedium: mainTextStyle,
+      labelSmall: mainTextStyle,
+      displayLarge: mainTextStyle,
+      displayMedium: mainTextStyle,
+      displaySmall: mainTextStyle,
+
+    );
+    ElevatedButtonThemeData elevatedButtonTheme = ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+        backgroundColor: colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+    IconThemeData iconTheme = IconThemeData(
+      color: colorScheme.primary,
+      size: 40.0,
+    );
+
+    return ThemeData(
+      colorScheme: colorScheme,
+      appBarTheme: appBarTheme,
+      textTheme: textTheme,
+      elevatedButtonTheme: elevatedButtonTheme,
+      iconTheme: iconTheme,
+      primaryIconTheme: iconTheme,
+      useMaterial3: true,
+    );
   }
 
   static List<Color> getThemeColors(String theme) {

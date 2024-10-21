@@ -21,19 +21,9 @@ class _DonatePageState extends State<DonatePage> {
   @override
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
-    Color colorLight = Theme.of(context).colorScheme.surface;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Donate'),
-        titleTextStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
-              color: colorLight,
-              fontSize: 22,
-            ),
-        backgroundColor: colorDark,
-        iconTheme: IconThemeData(
-          color: colorLight,
-          size: 40.0,
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -58,8 +48,7 @@ class _DonatePageState extends State<DonatePage> {
               'This game contains no advertisements and is available for free.\nIf you would like to support the developer, here are the available donation options:',
               style: Theme.of(context)
                   .textTheme
-                  .headlineSmall!
-                  .copyWith(color: colorDark, fontSize: 20, fontWeight: FontWeight.normal),
+                  .bodyLarge,
               textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 20),
@@ -72,8 +61,7 @@ class _DonatePageState extends State<DonatePage> {
                       'Donate \$${donations[index]}',
                       style: Theme.of(context)
                           .textTheme
-                          .headlineSmall!
-                          .copyWith(color: colorDark, fontSize: 18),
+                          .titleLarge,
                     ),
                     trailing: Icon(Icons.payment, color: colorDark,),
                     onTap: () {
@@ -95,26 +83,23 @@ class _DonatePageState extends State<DonatePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirm Donation'),
-          titleTextStyle: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 20,
-              ),
+          titleTextStyle: Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 20,),
           content: Text(
             'You are about to donate \$$amount. This action cannot be undone. Do you want to proceed?',
             style: Theme.of(context)
                 .textTheme
-                .headlineSmall!
-                .copyWith(color: Theme.of(context).colorScheme.primary, fontSize: 16, fontWeight: FontWeight.normal),
+                .bodyLarge!
+                .copyWith(fontWeight: FontWeight.normal),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              child: Text('Cancel', style: Theme.of(context).textTheme.titleLarge),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              child: Text('Confirm', style: Theme.of(context).textTheme.titleLarge),
               onPressed: () async {
                 bool result = await _processPayment(amount);
                 if (!mounted) return;
