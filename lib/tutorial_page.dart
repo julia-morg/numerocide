@@ -134,21 +134,9 @@ class _TutorialPageState extends State<TutorialPage> {
 
   @override
   Widget build(BuildContext context) {
-    Color colorDark = Theme.of(context).colorScheme.primary;
-    Color colorLight = Theme.of(context).colorScheme.surface;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tutorial'),
-        titleTextStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
-              color: colorLight,
-              fontSize: 22,
-            ),
-        backgroundColor: colorDark,
-        iconTheme: IconThemeData(
-          color: colorLight,
-          size: 40.0,
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -173,8 +161,8 @@ class _TutorialPageState extends State<TutorialPage> {
               '${step+1}. $hintText',
               style: Theme.of(context)
                   .textTheme
-                  .headlineSmall!
-                  .copyWith(color: colorDark, fontSize: 24),
+                  .titleSmall!
+                  .copyWith(fontSize: 20),
             ),
           ),
           Expanded(
@@ -200,7 +188,7 @@ class _TutorialPageState extends State<TutorialPage> {
     );
   }
 
-  void _onButtonPressed(int index, int value, Function removeButton) {
+  void _onButtonPressed(int index) {
     sounds.playTapSound();
     vibro.vibrateLight();
     setState(() {

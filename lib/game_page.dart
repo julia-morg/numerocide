@@ -11,6 +11,8 @@ import 'game/vibro.dart';
 import 'game/save.dart';
 
 class GamePage extends StatefulWidget {
+  static const modeNewGame = 'new';
+  static const modeLoadGame = 'load';
   const GamePage({
     super.key,
     required this.title,
@@ -21,7 +23,7 @@ class GamePage extends StatefulWidget {
 
   final String title;
   final int maxScore;
-  final bool mode;
+  final String mode;
   final Settings settings;
 
   @override
@@ -29,7 +31,7 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixin {
-  Desk desk = Desk(0, 0, 0, {});
+  late Desk desk;
   Hint? currentHint;
   List<int> selectedButtons = [];
   late Sounds sounds;
@@ -38,6 +40,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
   late int _maxScore = 0;
   late final GlobalKey<AnimatedButtonState> _addButtonKey =
       GlobalKey<AnimatedButtonState>();
+  bool _isLoading = false;
 
 
   @override
@@ -46,16 +49,17 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     sounds = Sounds(settings: widget.settings);
     vibro = Vibro(settings: widget.settings);
     _loadMaxScore();
-    widget.mode ? _initializeGame() : _loadGameState();
+    debugPrint('GamePage mode: ${widget.mode}');
+    (widget.mode == GamePage.modeNewGame) ? _initializeGame() : _loadGameState();
   }
 
-  void _initializeGame() {
-
+  Future<void> _initializeGame() async {
     setState(() {
       desk = Desk.newGame();
       selectedButtons.clear();
       _saveGameState();
     });
+    _checkGameState();
   }
 
   void _clearSavedGameState() async {
@@ -71,10 +75,15 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
   }
 
   Future<void> _loadGameState() async {
+    setState(() {
+      _isLoading = true;
+    });
     Desk savedGame = await save.loadGame();
     setState(() {
       desk = savedGame;
+      _isLoading = false;
     });
+    _checkGameState();
   }
 
   Future<void> _loadMaxScore() async {
@@ -84,45 +93,25 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     });
   }
 
-  void _restartGame() {
-    setState(() {
-      _initializeGame();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    Color colorDark = Theme.of(context).colorScheme.primary;
-    Color colorLight = Theme.of(context).colorScheme.surface;
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: Center(
           child: Text(widget.title),
         ),
-        titleTextStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
-              color: colorLight,
-              fontSize: 24,
-            ),
-        backgroundColor: colorDark,
-        iconTheme: IconThemeData(
-          color: colorLight,
-          size: 40.0,
-        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _restartGame,
-          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SettingsPage(
-                    settings: widget.settings,
-                  ),
+                  builder: (context) => SettingsPage(settings: widget.settings,),
                 ),
               );
             },
@@ -140,25 +129,16 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
                   Text(
                     'Best\n$_maxScore',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelMedium!
-                        .copyWith(color: colorDark,  fontWeight: FontWeight.w600,),
+                    style: Theme.of(context).textTheme.labelMedium,
                   ),
                   Text(
                     '${desk.score}',
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall!
-                        .copyWith(color: colorDark, fontWeight: FontWeight.w600,),
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   Text(
                     'Stage\n${desk.stage}',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelMedium!
-                        .copyWith(color: colorDark, fontWeight: FontWeight.w600,),
+                    style: Theme.of(context).textTheme.labelMedium,
                   ),
                 ],
               ),
@@ -220,6 +200,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     setState(() {
       desk.addFields();
       _saveGameState();
+      _checkGameState();
     });
   }
 
@@ -297,7 +278,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     );
   }
 
-  void _onButtonPressed(int index, int value, Function removeButton) {
+  void _onButtonPressed(int index) {
 
     setState(() {
       if (selectedButtons.isNotEmpty && selectedButtons[0] == index) {
@@ -319,7 +300,9 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
               selectedButtons.clear();
               currentHint = null;
             });
-            _checkGameState(rowRemoved);
+            rowRemoved ? sounds.playRemoveRowSound() : sounds.playRemoveNumbersSound();
+            rowRemoved ? vibro.vibrateHeavy() : vibro.vibrateLight();
+            _checkGameState();
 
           });
         } else {
@@ -332,11 +315,9 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     });
   }
 
-  void _checkGameState(bool isRowRemoved) {
+  void _checkGameState() {
     bool? state = desk.checkGameStatus();
     if (state == null) {
-      isRowRemoved ? sounds.playRemoveRowSound() : sounds.playRemoveNumbersSound();
-      isRowRemoved ? vibro.vibrateHeavy() : vibro.vibrateLight();
       _saveGameState();
       return;
     }
@@ -356,12 +337,10 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
       sounds.playDeskClearedSound();
     }
     vibro.vibrateHeavy();
-
   }
 
   void _onShowHintPressed() {
     vibro.vibrateLight();
-    _showGameOverDialog(true);
     setState(() {
       currentHint = desk.findHint();
       if (currentHint == null && desk.remainingAddClicks > 0) {

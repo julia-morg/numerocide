@@ -35,80 +35,158 @@ class Settings {
   }
 
   static ThemeData getThemeData(String theme) {
-    TextTheme textTheme = const TextTheme(
-      headlineLarge: TextStyle(fontWeight: FontWeight.bold),
-      headlineMedium: TextStyle(fontWeight: FontWeight.bold),
-      headlineSmall: TextStyle(fontWeight: FontWeight.bold),
-      titleLarge: TextStyle(fontWeight: FontWeight.bold),
-      titleMedium: TextStyle(fontWeight: FontWeight.bold),
-      titleSmall: TextStyle(fontWeight: FontWeight.bold),
-      bodyLarge: TextStyle(fontWeight: FontWeight.bold),
-      bodyMedium: TextStyle(fontWeight: FontWeight.bold),
-      bodySmall: TextStyle(fontWeight: FontWeight.bold),
-      labelLarge: TextStyle(fontWeight: FontWeight.bold),
-      labelMedium: TextStyle(fontWeight: FontWeight.bold),
-      labelSmall: TextStyle(fontWeight: FontWeight.bold),
+    ColorScheme colorScheme = getColorScheme(theme);
+
+    TextStyle mainTextStyle = TextStyle(
+      color: colorScheme.primary,
+      fontWeight: FontWeight.bold,
     );
-    switch (theme) {
-      case brown:
-        return ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink).copyWith(
-            onSecondary: Colors.grey[400],
-            onSecondaryContainer: Colors.grey[200]!,
-            secondary: Colors.blueGrey[50]!,
-            outline: Colors.green.withOpacity(0.5),
-          ),
-          textTheme: textTheme,
-          useMaterial3: true,
-        );
-      case grey:
-        return ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey, dynamicSchemeVariant: DynamicSchemeVariant.neutral,).copyWith(
-            onSecondary: Colors.grey[400],
-            onSecondaryContainer: Colors.grey[200]!,
-            secondary: Colors.blueGrey[50]!,
-            outline: Colors.green.withOpacity(0.5),
-          ),
-          textTheme: textTheme,
-          useMaterial3: true,
-        );
-      case green:
-        return ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green).copyWith(
-            onSecondary: Colors.grey[400],
-            onSecondaryContainer: Colors.grey[200]!,
-            secondary: Colors.blueGrey[50]!,
-            outline: Colors.green.withOpacity(0.5),
-          ),
-          textTheme: textTheme,
-          useMaterial3: true,
-        );
-      case navy:
-      default:
-        ThemeData theme = ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent).copyWith(
-            onSecondary: Colors.grey[400],
-            onSecondaryContainer: Colors.grey[200]!,
-            secondary: Colors.blueGrey[50]!,
-            outline: Colors.green.withOpacity(0.5),
-          ),
-          textTheme: textTheme,
-          useMaterial3: true,
-        );
-        return theme;
+    TextStyle headlineTextStyle = TextStyle(
+      color: colorScheme.secondary,
+      fontWeight: FontWeight.bold,
+    );
+    AppBarTheme  appBarTheme = AppBarTheme(
+      backgroundColor: colorScheme.primary,
+      titleTextStyle: TextStyle(
+        color: colorScheme.secondary,
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
+      iconTheme: IconThemeData(
+        color: colorScheme.secondary,
+        size: 40.0,
+      ),
+    );
+    TextTheme textTheme = TextTheme(
+      headlineLarge: headlineTextStyle,
+      headlineMedium: headlineTextStyle,
+      headlineSmall: headlineTextStyle,
+      titleLarge: mainTextStyle.copyWith(fontSize: 30),
+      titleMedium: mainTextStyle,
+      titleSmall: mainTextStyle,
+      bodyLarge: mainTextStyle,
+      bodyMedium: mainTextStyle,
+      bodySmall: mainTextStyle,
+      labelLarge: mainTextStyle.copyWith( fontWeight: FontWeight.w900),
+      labelMedium: mainTextStyle.copyWith( fontWeight: FontWeight.w900),
+      labelSmall: mainTextStyle.copyWith( fontWeight: FontWeight.w900),
+      displayLarge: mainTextStyle,
+      displayMedium: mainTextStyle,
+      displaySmall: mainTextStyle,
+
+    );
+    ElevatedButtonThemeData elevatedButtonTheme = ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+        backgroundColor: colorScheme.secondary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+    IconThemeData iconTheme = IconThemeData(
+      color: colorScheme.primary,
+      size: 40.0,
+    );
+    SwitchThemeData switchThemeData = SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith<Color>(
+        (Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.secondary;
+          }
+          return colorScheme.primary;
+        },
+      ),
+      trackColor: WidgetStateProperty.resolveWith<Color>(
+        (Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.primary;
+          }
+          return colorScheme.secondary;
+        },
+      ),
+      trackOutlineColor: WidgetStateProperty.resolveWith<Color>(
+        (Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.primary;
+          }
+          return colorScheme.primary;
+        },
+      ),
+    );
+
+    return ThemeData(
+      scaffoldBackgroundColor: colorScheme.secondary,
+      colorScheme: colorScheme,
+      appBarTheme: appBarTheme,
+      textTheme: textTheme,
+      elevatedButtonTheme: elevatedButtonTheme,
+      iconTheme: iconTheme,
+      primaryIconTheme: iconTheme,
+      useMaterial3: true,
+      switchTheme: switchThemeData,
+    );
+  }
+
+  static ColorScheme getColorScheme(String theme) {
+    ColorScheme colorScheme = ColorScheme(
+      primary: Colors.deepPurple,
+      onPrimary: Colors.white,
+      surface: Colors.white,
+      onSurface: Colors.black,
+      error: Colors.red,
+      onError: Colors.white,
+      onSecondary: Colors.grey[400]!,
+      secondary: Colors.blueGrey[50]!,
+      brightness: Brightness.light,
+      outline: Colors.green[200]!.withOpacity(0.8),
+    );
+
+    if (theme == navy) {
+      ColorScheme navyScheme = ColorScheme.fromSeed(seedColor: Colors.blue, dynamicSchemeVariant: DynamicSchemeVariant.fidelity);
+      colorScheme = colorScheme.copyWith(
+        primary: navyScheme.onSecondaryFixedVariant,
+        secondary: Colors.blueGrey[50]!,
+        secondaryContainer: Colors.blueGrey[100]!,
+      );
     }
+
+    if (theme == brown) {
+      ColorScheme brownScheme = ColorScheme.fromSeed(seedColor: Colors.pink);
+      colorScheme = colorScheme.copyWith(
+        primary: brownScheme.secondary,
+        secondary: Colors.brown[50]!,
+        secondaryContainer: Colors.brown[100]!,
+      );
+    }
+    if (theme == grey) {
+      ColorScheme greyScheme = ColorScheme.fromSeed(seedColor: Colors.blueGrey,);
+      colorScheme = colorScheme.copyWith(
+        primary: greyScheme.secondary,
+        secondary: Colors.blueGrey[50]!,
+        secondaryContainer: Colors.blueGrey[100]!,
+      );
+    }
+    if (theme == green) {
+      ColorScheme greenScheme = ColorScheme.fromSeed(seedColor: Colors.green);
+      colorScheme = colorScheme.copyWith(
+        primary: greenScheme.primary,
+        secondary: Colors.blueGrey[50]!,
+        secondaryContainer: Colors.blueGrey[100]!,
+      );
+    }
+    return colorScheme;
   }
 
   static List<Color> getThemeColors(String theme) {
     ThemeData themeData = getThemeData(theme);
     return [
-      themeData.colorScheme.primary,
-      themeData.colorScheme.secondaryContainer,
-      themeData.colorScheme.secondary,
-      themeData.colorScheme.onSecondary,
-      themeData.colorScheme.onSecondaryContainer,
-      themeData.colorScheme.surface,
-      themeData.colorScheme.primary.withOpacity(0.7),
+      themeData.colorScheme.primary, // primary color
+      themeData.colorScheme.primary.withOpacity(0.7), // highlight color
+      themeData.colorScheme.secondaryContainer, // menu buttons highlight
+      themeData.colorScheme.secondary, // background color
+      themeData.colorScheme.onSecondary, // inactive elements color
+      themeData.colorScheme.outline, // hint color
     ];
   }
 }

@@ -73,8 +73,7 @@ class AnimatedButtonState extends State<AnimatedButton>
   Widget build(BuildContext context) {
     Color inactiveColor = Theme.of(context).colorScheme.onSecondary;
     Color activeColor = widget.color;
-    Color lightColor = Theme.of(context).colorScheme.surface;
-    Color lightInactiveColor = Theme.of(context).colorScheme.secondaryContainer;
+    Color lightColor = Theme.of(context).colorScheme.secondary;
 
     return AnimatedBuilder(
       animation: _shakeAnimation,
@@ -91,7 +90,7 @@ class AnimatedButtonState extends State<AnimatedButton>
                   onPressed: widget.active ? widget.onPressed : null,
                   heroTag: widget.heroTag,
                   mini: false,
-                  backgroundColor: widget.active ? lightColor : lightInactiveColor,
+                  backgroundColor: lightColor,
                   child: Icon(widget.icon,
                       color: widget.active ? activeColor : inactiveColor,
                       size: 32),
@@ -113,7 +112,7 @@ class AnimatedButtonState extends State<AnimatedButton>
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: widget.active ? lightColor : lightInactiveColor,
+                        color: lightColor,
                       ),
                     ),
                   ),

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'field.dart';
 import 'hint.dart';
 import 'desk.dart';
 import 'dart:math';
 
 class ButtonGrid extends StatefulWidget {
-  final Function(int, int, Function(int)) onButtonPressed;
+  final Function(int) onButtonPressed;
   final List<int> selectedButtons;
   final Hint? hint;
   final Desk desk;
@@ -28,22 +27,25 @@ class _ButtonGridState extends State<ButtonGrid> {
 
   void startRemoveRowAnimation(int rowIndex) async {
     setState(() {
-      crossedOutIndexes = List.generate(widget.desk.rowLength, (i) => rowIndex * widget.desk.rowLength + i);
+      crossedOutIndexes = List.generate(
+          widget.desk.rowLength, (i) => rowIndex * widget.desk.rowLength + i);
     });
     await Future.delayed(const Duration(milliseconds: 1000));
     setState(() {
       crossedOutIndexes.clear();
-      widget.desk.numbers.removeWhere((key, _) => crossedOutIndexes.contains(key));
+      widget.desk.numbers
+          .removeWhere((key, _) => crossedOutIndexes.contains(key));
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    double buttonSize = (MediaQuery.of(context).size.width / widget.desk.rowLength).ceil().toDouble();
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     double appBarHeight = Scaffold.of(context).appBarMaxHeight ?? kToolbarHeight;
+    double buttonSize = (screenWidth / widget.desk.rowLength).ceil().toDouble();
     double availableHeight = screenHeight - appBarHeight;
-    int totalRowsInView = (availableHeight / (buttonSize + 1)).floor() - 1;
+    int totalRowsInView = (availableHeight /buttonSize).floor() - 1;
     int totalButtonsToShow = totalRowsInView * widget.desk.rowLength;
     int buttonsInLastRow = widget.desk.numbers.length % widget.desk.rowLength;
     int emptyCellsToAdd = buttonsInLastRow > 0 ? widget.desk.rowLength - buttonsInLastRow : 0;
@@ -52,82 +54,80 @@ class _ButtonGridState extends State<ButtonGrid> {
         emptyCellsToAdd +
         initialEmptyCells +
         widget.desk.rowLength.toInt();
-    Color backgroundColor = Theme.of(context).colorScheme.secondary;
+    int finalRows = (finalItemCount / widget.desk.rowLength).ceil();
+    Color highlightColor = Theme.of(context).colorScheme.primary.withOpacity(0.5);
+
+    return Container(
+        padding: const EdgeInsets.all(0),
+        decoration: BoxDecoration(
+          color: highlightColor,
+          border: Border.all(
+            color: highlightColor,
+            width: 1,
+          ),
+        ),
+        child: SizedBox(
+            height: finalRows * (buttonSize - 0.5),
+            child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: widget.desk.rowLength,
+                childAspectRatio: 1,
+                mainAxisSpacing: 1,
+                crossAxisSpacing: 1,
+              ),
+              itemCount: finalItemCount,
+              itemBuilder: (context, index) {
+                String text = index < widget.desk.numbers.length
+                    ? '${widget.desk.numbers[index]!.number}'
+                    : '';
+                bool isActive = index < widget.desk.numbers.length
+                    ? widget.desk.numbers[index]!.isActive
+                    : false;
+                bool isSelected = widget.selectedButtons.contains(index);
+                bool isHint = widget.hint != null && widget.hint!.isHint(index);
+                return buildButton(index, text, isActive, isSelected, isHint);
+              },
+            )));
+  }
+
+  buildButton(int index, String text, bool isActive, bool isSelected, bool isHint) {
     Color highlightColor = Theme.of(context).colorScheme.primary.withOpacity(0.7);
     Color hintColor = Theme.of(context).colorScheme.outline;
     Color inactiveTextColor = Theme.of(context).colorScheme.onSecondary;
     Color activeTextColor = Theme.of(context).colorScheme.primary;
-    Color highlightTextColor = Theme.of(context).colorScheme.surface;
-
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: widget.desk.rowLength,
-        childAspectRatio: 1,
-        mainAxisSpacing: 1,
-        crossAxisSpacing: 1,
+    Color highlightTextColor = Theme.of(context).colorScheme.secondary;
+    Color buttonColor = isActive
+        ? (isSelected
+            ? highlightColor
+            : isHint
+                ? hintColor
+                : highlightTextColor)
+        : highlightTextColor;
+    Color textColor = isSelected
+        ? highlightTextColor
+        : isActive
+            ? activeTextColor
+            : inactiveTextColor;
+    return SizedBox(
+      child: TextButton(
+        style: TextButton.styleFrom(
+          backgroundColor: buttonColor,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero),
+          padding: EdgeInsets.zero,
+        ),
+        onPressed: isActive
+            ? () => widget.onButtonPressed(index)
+            : null,
+        child: Text(
+          text,
+          style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+              color: textColor),
+        ),
       ),
-      itemCount: finalItemCount,
-      itemBuilder: (context, index) {
-        if (index >= widget.desk.numbers.length) {
-          return SizedBox(
-            child: TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: backgroundColor,
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                padding: EdgeInsets.zero,
-              ),
-              onPressed: null,
-              child: const Text(''),
-            ),
-          );
-        }
-
-        Field buttonField = widget.desk.numbers[index]!;
-        int buttonNumber = buttonField.number;
-        bool isSelected = widget.selectedButtons.contains(index);
-        bool isHint = widget.hint != null &&
-            (index == widget.hint!.hint1 || index == widget.hint!.hint2);
-
-        return TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: buttonField.isActive
-                ? (isSelected
-                    ? highlightColor
-                    : isHint
-                        ? hintColor
-                        : backgroundColor)
-                : backgroundColor,
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            padding: EdgeInsets.zero,
-          ),
-          onPressed: buttonField.isActive
-              ? () {
-            widget.onButtonPressed(index, buttonNumber, (idx) {
-              setState(() {
-                widget.desk.numbers[idx] = Field(idx, buttonNumber, false);
-              });
-            });
-          }
-              : null,
-          child: Text(
-            '$buttonNumber',
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w600,
-              color: isSelected
-                  ? highlightTextColor
-                  : buttonField.isActive
-                      ? activeTextColor
-                      : inactiveTextColor,
-              decoration: crossedOutIndexes.contains(index)
-                  ? TextDecoration.lineThrough
-                  : TextDecoration.none,
-            ),
-          ),
-        );
-      },
     );
   }
+
 }

@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 import 'field.dart';
 import 'hint.dart';
 import 'dart:math';
@@ -14,6 +16,7 @@ class Desk {
   Desk(this.stage, this.score, this.remainingAddClicks, this.numbers);
 
   static Desk newGame() {
+    debugPrint('newGame');
     return Desk(1, 0, defaultAddsCount, generateRandomNumbers(initialButtonsCount));
   }
 

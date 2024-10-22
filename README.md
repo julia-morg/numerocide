@@ -12,4 +12,4 @@ Numerocide is a strategic puzzle game where your goal is to clear a 9-cell wide 
  * [Julia Morgenstern](https://github.com/julia-morg)
 
 ## Contacts 
-    * [game site](https://julia_morg.tilda.ws/)
+ * [game site](https://julia_morg.tilda.ws/)
