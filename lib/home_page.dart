@@ -62,6 +62,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     Color colorStar = Colors.amberAccent;
     TextStyle largeTextStyle = Theme.of(context).textTheme.titleLarge!;
+    Color inactiveColor = Theme.of(context).colorScheme.primary.withOpacity(0.5);
 
     return Scaffold(
       appBar: AppBar(
@@ -121,7 +122,7 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: ElevatedButton(
               onPressed: _hasSavedGame ? () => _goToGame(context, GamePage.modeLoadGame) : null,
-              child: Text('CONTINUE GAME', style: largeTextStyle),
+              child: Text('CONTINUE GAME', style: largeTextStyle.copyWith(color: _hasSavedGame ? null : inactiveColor)),
             ),
           ),
           const Spacer(),

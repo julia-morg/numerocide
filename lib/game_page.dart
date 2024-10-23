@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'game/default_scaffold.dart';
 import 'home_page.dart';
-import 'settings_page.dart';
 import 'game/button_grid.dart';
 import 'game/hint.dart';
 import 'game/desk.dart';
@@ -99,25 +99,9 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Center(
-          child: Text(widget.title),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SettingsPage(settings: widget.settings,),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+    return DefaultScaffold(
+        title: widget.title,
+        settings: widget.settings,
       body: Center(
         child: Column(
           children: <Widget>[

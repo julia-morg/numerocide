@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:numerocide/settings_page.dart';
+import 'game/default_scaffold.dart';
 import 'game/settings.dart';
 
 
@@ -21,34 +21,16 @@ class _DonatePageState extends State<DonatePage> {
   @override
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Donate'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SettingsPage(
-                    settings: widget.settings,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+    return DefaultScaffold(
+      title: 'Donate',
+      settings: widget.settings,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Text(
               'This game contains no advertisements and is available for free.\nIf you would like to support the developer, here are the available donation options:',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge,
+              style: Theme.of(context).textTheme.bodyLarge,
               textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 20),
@@ -59,14 +41,10 @@ class _DonatePageState extends State<DonatePage> {
                   return ListTile(
                     title: Text(
                       'Donate \$${donations[index]}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     trailing: Icon(Icons.payment, color: colorDark,),
-                    onTap: () {
-                      _processDonation(context, donations[index]);
-                    },
+                    onTap: () => _processDonation(context, donations[index]),
                   );
                 },
               ),
@@ -101,20 +79,25 @@ class _DonatePageState extends State<DonatePage> {
             TextButton(
               child: Text('Confirm', style: Theme.of(context).textTheme.titleLarge),
               onPressed: () async {
-                bool result = await _processPayment(amount);
-                if (!mounted) return;
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(result ? 'Thank you for donating \$$amount!' : 'Failed to process donation'),
-                  ),
-                );
+                bool result = await _processPayment(amount);
+                _showSnackBar(result, amount);
               },
             ),
           ],
         );
       },
     );
+  }
+
+  void _showSnackBar(bool result, double amount) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result ? 'Thank you for donating \$$amount!' : 'Failed to process donation'),
+        ),
+      );
+    });
   }
 
   Future<bool> _processPayment(double amount) async {

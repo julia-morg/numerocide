@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:numerocide/game/default_scaffold.dart';
 import 'package:numerocide/game/hint.dart';
-import 'package:numerocide/settings_page.dart';
 import 'game/desk.dart';
 import 'game/field.dart';
 import 'game/button_grid.dart';
@@ -134,35 +134,16 @@ class _TutorialPageState extends State<TutorialPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tutorial'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SettingsPage(
-                    settings: widget.settings,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+    return DefaultScaffold(
+      settings: widget.settings,
+      title: 'Tutorial',
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(10),
             child: Text(
               '${step+1}. $hintText',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleSmall!
-                  .copyWith(fontSize: 20),
+              style: Theme.of(context).textTheme.titleSmall!,
             ),
           ),
           Expanded(
@@ -173,16 +154,16 @@ class _TutorialPageState extends State<TutorialPage> {
               hint: hint,
             ),
           ),
+          const SizedBox(height: 20,),
           ElevatedButton(
             onPressed: stageCompleted ? _nextStep : null,
-            child: Text(isNextStepAvailable() ? 'Next Step' : 'Got it! To Main Menu'),
-          ),
-          Transform.scale(
-            scale: 0.8,
-            child: Center(
-              child: Image.asset('assets/pic/example.png'),
+            child: Text(
+              isNextStepAvailable() ? 'Next Step' : 'Got it! To Main Menu',
+              style: Theme.of(context).textTheme.titleSmall!,
             ),
           ),
+          const SizedBox(height: 20,),
+          const Spacer(),
         ],
       ),
     );
