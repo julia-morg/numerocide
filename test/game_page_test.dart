@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:numerocide/game/desk.dart';
 import 'package:numerocide/game/settings.dart';
-import 'package:numerocide/game_page.dart';
+import 'package:numerocide/pages/game_page.dart';
 
 void main() {
   testWidgets('AddRowsTest', (WidgetTester tester) async {

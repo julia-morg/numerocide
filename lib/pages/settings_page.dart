@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:numerocide/tutorial_page.dart';
+import 'package:numerocide/pages/tutorial_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'donate_page.dart';
-import 'game/settings.dart';
-import 'main.dart';
+import '../game/settings.dart';
+import '../main.dart';
 
 class SettingsPage extends StatefulWidget {
   final Settings settings;
@@ -23,16 +23,12 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
-    TextStyle labelStyle = TextStyle(
-      fontSize: 20,
-      fontWeight: FontWeight.bold,
-      color: Theme.of(context).colorScheme.primary,
-    );
-    TextStyle themeLabelStyle = TextStyle(
-      fontSize: 16,
-      fontWeight: FontWeight.bold,
-      color: Theme.of(context).colorScheme.primary,
-    );
+    TextStyle labelStyle = Theme.of(context).textTheme.titleSmall!;
+    TextStyle themeLabelStyle = Theme.of(context).textTheme.displaySmall!;
+    TextStyle linkStyle = Theme.of(context).textTheme.displaySmall!.copyWith(
+          decoration: TextDecoration.underline,
+          decorationColor: Theme.of(context).colorScheme.primary,
+        );
 
     return Scaffold(
       appBar: AppBar(
@@ -67,7 +63,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
             const SizedBox(height: 8),
-            const Divider(),
+            Divider(color: Theme.of(context).colorScheme.primary,),
             InkWell(
               onTap: () {
                 setState(() {
@@ -153,7 +149,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Rules',
+                      'How to play',
                       style: labelStyle,
                     ),
                     Icon(Icons.arrow_forward, color: colorDark,),
@@ -198,16 +194,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   throw 'Could not launch $url';
                 }
               },
-              child: const SizedBox(
+              child: SizedBox(
                 width: double.infinity,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Privacy Policy',
-                      style: TextStyle(
-                        decoration: TextDecoration.underline,
-                      ),
+                      style: linkStyle,
                     ),
                   ],
                 ),
@@ -222,16 +216,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   throw 'Could not launch $url';
                 }
               },
-              child: const SizedBox(
+              child: SizedBox(
                 width: double.infinity,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Terms of Service',
-                      style: TextStyle(
-                        decoration: TextDecoration.underline,
-                      ),
+                      style: linkStyle,
                     ),
                   ],
                 ),

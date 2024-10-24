@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:numerocide/components/dialog_action.dart';
+import '../components/popup_dialog.dart';
 import 'game_page.dart';
 import 'settings_page.dart';
-import 'game/settings.dart';
-import 'game/save.dart';
+import '../game/settings.dart';
+import '../game/save.dart';
 
 class HomePage extends StatefulWidget {
   final Settings settings;
@@ -62,7 +64,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     Color colorStar = Colors.amberAccent;
     TextStyle largeTextStyle = Theme.of(context).textTheme.titleLarge!;
-    Color inactiveColor = Theme.of(context).colorScheme.primary.withOpacity(0.5);
+    Color inactiveColor = Theme.of(context).colorScheme.onSecondary;
 
     return Scaffold(
       appBar: AppBar(
@@ -115,7 +117,7 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: ElevatedButton(
               onPressed: () => _onNewGamePressed(context),
-              child: Text('NEW GAME',   style: largeTextStyle,),
+              child: Text('NEW GAME', style: largeTextStyle,),
             ),
           ),
           const SizedBox(height: 20),
@@ -137,22 +139,22 @@ class _HomePageState extends State<HomePage> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Warning'),
-            content: const Text('You have a saved game. Are you sure you want to start a new game? Your current progress will be lost.'),
+          return PopupDialog(
+            title: 'You have a saved game',
+            content: 'Are you sure you want to start a new game?\nYour current progress will be lost.',
             actions: [
-              TextButton(
+              DialogAction(
+                text: 'BACK',
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text('No'),
               ),
-              TextButton(
+              DialogAction(
+                text: 'NEW GAME',
                 onPressed: () {
                   Navigator.of(context).pop();
                   _goToGame(context, GamePage.modeNewGame);
                 },
-                child: const Text('Yes, go to new game'),
               ),
             ],
           );

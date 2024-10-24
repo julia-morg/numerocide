@@ -1,7 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:volume_control/volume_control.dart';
 import 'package:flutter/material.dart';
-import 'settings.dart';
+import '../game/settings.dart';
 
 class Sounds {
   const Sounds({

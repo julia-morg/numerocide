@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'game/default_scaffold.dart';
-import 'game/settings.dart';
+import 'package:numerocide/components/dialog_action.dart';
+import 'package:numerocide/components/popup_dialog.dart';
+import '../components/default_scaffold.dart';
+import '../game/settings.dart';
 
 
 class DonatePage extends StatefulWidget {
@@ -59,33 +61,26 @@ class _DonatePageState extends State<DonatePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Donation'),
-          titleTextStyle: Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 20,),
-          content: Text(
-            'You are about to donate \$$amount. This action cannot be undone. Do you want to proceed?',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge!
-                .copyWith(fontWeight: FontWeight.normal),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel', style: Theme.of(context).textTheme.titleLarge),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Confirm', style: Theme.of(context).textTheme.titleLarge),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                bool result = await _processPayment(amount);
-                _showSnackBar(result, amount);
-              },
-            ),
-          ],
-        );
+        return PopupDialog(
+            title: 'Confirm Donation',
+            content: 'You are about to donate \$$amount',
+            note: 'This action cannot be undone. Do you want to proceed?',
+            actions:  <DialogAction>[
+              DialogAction(
+                text: 'Cancel',
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              DialogAction(
+                text: 'Confirm',
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  bool result = await _processPayment(amount);
+                  _showSnackBar(result, amount);
+                },
+              ),
+            ]);
       },
     );
   }

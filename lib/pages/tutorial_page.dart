@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:numerocide/game/default_scaffold.dart';
+import 'package:numerocide/components/default_scaffold.dart';
+import 'package:numerocide/components/dialog_action.dart';
+import 'package:numerocide/components/popup_dialog.dart';
 import 'package:numerocide/game/hint.dart';
-import 'game/desk.dart';
-import 'game/field.dart';
-import 'game/button_grid.dart';
-import 'game/settings.dart';
-import 'game/sounds.dart';
-import 'game/vibro.dart';
+import 'package:numerocide/components/text_plate.dart';
+import '../game/desk.dart';
+import '../game/field.dart';
+import '../components/button_grid.dart';
+import '../game/settings.dart';
+import '../effects/sounds.dart';
+import '../effects/vibro.dart';
+import 'home_page.dart';
 
 class Stage {
   final String text;
@@ -70,8 +74,8 @@ class _TutorialPageState extends State<TutorialPage> {
       Stage(
           'If the cells are diagonal to each other, you can also remove them',
           6,
-          [4, 2, 1, 5, 7, 9, 1, 5, 3, 2],
-          Hint(5, 6)),
+          [4, 9, 3, 5, 7, 2, 1, 5, 4, 2],
+          Hint(1, 6)),
       Stage('The direction of the diagonal doesn’t matter',
           6,
           [2, 4, 1, 5, 7, 9, 5, 8, 3, 8],
@@ -117,7 +121,7 @@ class _TutorialPageState extends State<TutorialPage> {
 
   void _nextStep() {
     if (!isNextStepAvailable()) {
-      Navigator.pop(context);
+      goToMainMenu();
       return;
     }
     setState(() {
@@ -132,21 +136,30 @@ class _TutorialPageState extends State<TutorialPage> {
     return step < stages.length - 1;
   }
 
+  void goToMainMenu() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage(settings: widget.settings,)),
+          (Route<dynamic> route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    int stepsCount = stages.length;
     return DefaultScaffold(
       settings: widget.settings,
-      title: 'Tutorial',
+      title: 'How to play',
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Text(
-              '${step+1}. $hintText',
-              style: Theme.of(context).textTheme.titleSmall!,
-            ),
+          TextPlate(
+              centeredText: '${step+1}/$stepsCount\n',
+              justifiedText: hintText
           ),
-          Expanded(
+          const SizedBox(height: 20,),
+          SizedBox(
+            height: 260,
             child: ButtonGrid(
               onButtonPressed: _onButtonPressed,
               selectedButtons: selectedButtons,
@@ -159,11 +172,10 @@ class _TutorialPageState extends State<TutorialPage> {
             onPressed: stageCompleted ? _nextStep : null,
             child: Text(
               isNextStepAvailable() ? 'Next Step' : 'Got it! To Main Menu',
-              style: Theme.of(context).textTheme.titleSmall!,
+              style: Theme.of(context).textTheme.titleSmall!.copyWith(color: stageCompleted ? null: Theme.of(context).colorScheme.onSecondary),
             ),
           ),
-          const SizedBox(height: 20,),
-          const Spacer(),
+          const SizedBox(height: 60,),
         ],
       ),
     );
@@ -192,7 +204,32 @@ class _TutorialPageState extends State<TutorialPage> {
               hint = null;
             });
             stageCompleted = true;
-            debugPrint(desk.findHint().toString());
+            if (desk.isVictory()) {
+              if (!mounted) return;
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return PopupDialog(
+                    title: 'Hooraay!',
+                    content: 'The tutorial is completed and you are ready to play the game!',
+                    actions: [
+                      DialogAction(
+                        text: 'Restart',
+                        onPressed: () {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (context) => TutorialPage(settings: widget.settings,)),
+                          );
+                        },
+                      ),
+                      DialogAction(
+                        text: 'Main Menu',
+                        onPressed: () => goToMainMenu(),
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
           });
         } else {
           selectedButtons.clear();

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'hint.dart';
-import 'desk.dart';
+import '../game/hint.dart';
+import '../game/desk.dart';
 import 'dart:math';
 
 class ButtonGrid extends StatefulWidget {
@@ -55,7 +55,7 @@ class _ButtonGridState extends State<ButtonGrid> {
         initialEmptyCells +
         widget.desk.rowLength.toInt();
     int finalRows = (finalItemCount / widget.desk.rowLength).ceil();
-    Color highlightColor = Theme.of(context).colorScheme.primary.withOpacity(0.5);
+    Color highlightColor = Theme.of(context).colorScheme.onPrimary;
 
     return Container(
         padding: const EdgeInsets.all(0),
@@ -93,7 +93,7 @@ class _ButtonGridState extends State<ButtonGrid> {
   }
 
   buildButton(int index, String text, bool isActive, bool isSelected, bool isHint) {
-    Color highlightColor = Theme.of(context).colorScheme.primary.withOpacity(0.7);
+    Color highlightColor = Theme.of(context).colorScheme.onPrimary;
     Color hintColor = Theme.of(context).colorScheme.outline;
     Color inactiveTextColor = Theme.of(context).colorScheme.onSecondary;
     Color activeTextColor = Theme.of(context).colorScheme.primary;

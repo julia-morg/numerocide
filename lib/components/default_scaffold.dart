@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numerocide/game/settings.dart';
-import 'package:numerocide/settings_page.dart';
+import 'package:numerocide/pages/settings_page.dart';
 
 class DefaultScaffold extends StatelessWidget {
   final Widget body;

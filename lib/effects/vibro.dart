@@ -1,4 +1,4 @@
-import 'settings.dart';
+import '../game/settings.dart';
 import 'package:vibration/vibration.dart';
 import 'package:flutter/services.dart';
 

@@ -109,9 +109,7 @@ class AnimatedButtonState extends State<AnimatedButton>
                     ),
                     child: Text(
                       '${widget.labelCount}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                      style: Theme.of(context).textTheme.labelSmall!.copyWith(
                         color: lightColor,
                       ),
                     ),

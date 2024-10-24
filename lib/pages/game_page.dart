@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'game/default_scaffold.dart';
+import 'package:numerocide/components/dialog_action.dart';
+import '../components/default_scaffold.dart';
+import '../components/popup_dialog.dart';
 import 'home_page.dart';
-import 'game/button_grid.dart';
-import 'game/hint.dart';
-import 'game/desk.dart';
-import 'game/animated_button.dart';
-import 'game/settings.dart';
-import 'game/sounds.dart';
-import 'game/vibro.dart';
-import 'game/save.dart';
+import '../components/button_grid.dart';
+import '../game/hint.dart';
+import '../game/desk.dart';
+import '../components/animated_button.dart';
+import '../game/settings.dart';
+import '../effects/sounds.dart';
+import '../effects/vibro.dart';
+import '../game/save.dart';
 
 class GamePage extends StatefulWidget {
   static const modeNewGame = 'new';
@@ -189,6 +191,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
   }
 
   void _showGameOverDialog(bool isVictory) async {
+    String bestScore = isVictory ? 'This is your best score ever!' : '';
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -200,51 +203,14 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
                 _handleGameOver();
               }
             },
-            child: AlertDialog(
-              title: Text(
-                'GAME OVER',
-                textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall!
-                    .copyWith(color: Theme.of(context).colorScheme.primary),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(height: 10),
-                  Text(
-                    'SCORE: ${desk.score}',
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelLarge!
-                        .copyWith(color: Theme.of(context).colorScheme.primary),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    isVictory ? 'This is your best score ever!' : '',
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelMedium!
-                        .copyWith(color: Theme.of(context).colorScheme.primary),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                Center(
-                  child: ElevatedButton(
+            child: PopupDialog(
+              title:'GAME OVER',
+              content: 'SCORE: ${desk.score} \n',
+              note: bestScore,
+              actions: [
+                DialogAction(
                     onPressed: _handleGameOver,
-                    style: ElevatedButton.styleFrom(
-                      elevation: 5,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text('RETURN'),
-                  ),
+                    text: 'RETURN',
                 ),
               ],
             ),
