@@ -1,0 +1,71 @@
+{
+    "@@locale": "es",
+    "appTitle": "Numerocidio",
+    "homePageNewGame": "NUEVO JUEGO",
+    "homePageContinueGame": "CONTINUAR JUEGO",
+    "homePageBestResult": "MEJOR RESULTADO",
+    "homePageStage": "Nivel",
+    "homePageBestScore": "Mejor",
+    "homePageSavedGamePopupTitle": "Tienes una partida guardada",
+    "homePageSavedGamePopupText": "¿Estás seguro de que quieres empezar un nuevo juego?\nTu progreso actual se perderá.",
+    "homePageSavedGamePopupCancel": "VOLVER",
+    "homePageSavedGamePopupConfirm": "NUEVO JUEGO",
+
+    "gamePageStage": "Nivel",
+    "gamePageBest": "Mejor",
+    "gamePageGameOverPopupTitle": "FIN DEL JUEGO",
+    "gamePageGameOverPopupBest": "¡Este es tu mejor resultado hasta ahora!",
+    "gamePageGameOverPopupScore": "PUNTUACIÓN: ",
+    "gamePageGameOverPopupConfirm": "VOLVER",
+
+    "settingsPageHeader": "Configuraciones",
+    "settingsPageSound": "Sonido",
+    "settingsPageVibro": "Vibración",
+    "settingsPageLang": "Idioma",
+    "settingsPageTheme": "Tema",
+    "settingsPageInfo": "Información",
+    "settingsPagePrivacyPolicy": "Política de privacidad",
+    "settingsPageTermsOfService": "Términos del servicio",
+    "settingsPageThemeNavy": "Marino",
+    "settingsPageThemeCocoa": "Cacao",
+    "settingsPageThemeStone": "Piedra",
+    "settingsPageThemeGrass": "Hierba",
+
+    "donatePageHeader": "Donar",
+    "donatePageText": "Este juego no contiene publicidad y está disponible de manera gratuita.\nSi deseas apoyar al desarrollador, estas son las opciones de donación disponibles:",
+    "donatePageOption": "Donar ",
+    "donatePagePopupTitle": "Confirmar donación",
+    "donatePagePopupText": "Estás a punto de donar ",
+    "donatePagePopupNote": "Esta acción no se puede deshacer. ¿Deseas continuar?",
+    "donatePagePopupCancel": "Cancelar",
+    "donatePagePopupConfirm": "Confirmar",
+    "donatePageThanks": "¡Gracias por donar ${amount}!",
+      "@donatePageThanks": {
+        "placeholders": {
+          "amount": {
+            "type": "double",
+            "example": "5.00"
+          }
+        }
+      },
+    "donatePageFail": "Error al procesar la donación",
+
+    "tutorialPageHeader": "Cómo jugar",
+    "tutorialPageNextStep": "Siguiente paso",
+    "tutorialPageGotoMenu": "¡Entendido! Al Menú Principal",
+    "tutorialPagePopupTitle": "¡Hurra!",
+    "tutorialPagePopupText": "¡El tutorial está completo y estás listo para jugar!",
+    "tutorialPagePopupRestart": "Reiniciar",
+    "tutorialPagePopupFinish": "Menú Principal",
+    "tutorialPageStep1": "Puedes eliminar celdas con números iguales o que suman 10 si están adyacentes",
+    "tutorialPageStep2": "… o si están uno sobre el otro",
+    "tutorialPageStep3": "Incluso si hay un salto de línea entre las celdas, pero son adyacentes, puedes eliminarlas",
+    "tutorialPageStep4": "Si las celdas están en diagonal, también puedes eliminarlas",
+    "tutorialPageStep5": "La dirección de la diagonal no importa",
+    "tutorialPageStep6": "Esto es válido para cualquier diagonal, siempre y cuando no haya celdas activas en ellas",
+    "tutorialPageStep7": "También puedes eliminar la primera y la última celda de una fila",
+    "tutorialPageStep8": "Si eliminas todas las celdas de una fila, la fila se destruye",
+    "tutorialPageStep9": "Si limpias todo el tablero, avanzas al siguiente nivel",
+
+    "testPageHeader": "Prueba"
+}

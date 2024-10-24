@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'components/themes.dart';
 import 'pages/home_page.dart';
 import 'game/settings.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,15 +25,24 @@ class MyApp extends StatefulWidget {
       m.updateTheme(newTheme);
     }
   }
+  static void setLocale(BuildContext context, Locale newLocale) {
+    _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
+    state?.changeLanguage(newLocale);
+  }
 }
 
 class _MyAppState extends State<MyApp> {
   late ThemeData _themeData;
+  Locale? _locale;
 
   @override
   void initState() {
     super.initState();
-    _themeData = Settings.getThemeData(widget.settings.theme);
+    _themeData = Themes.getThemeData(widget.settings.theme);
+
+    if (widget.settings.language.isNotEmpty) {
+      _locale = Locale(widget.settings.language);
+    }
   }
 
   void updateTheme(ThemeData newTheme) {
@@ -39,19 +51,42 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void changeLanguage(Locale locale) {
+    setState(() {
+      _locale = locale;
+      widget.settings.language = locale.languageCode;
+      widget.settings.saveSettings();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Numerocide',
       theme: _themeData,
-      home: HomePage(settings: widget.settings,),
-      builder: (context, child) {
-        return Center(
-          child: SizedBox(
-            child: child,
-          ),
-        );
+      locale: _locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+
+      localeResolutionCallback: (locale, supportedLocales) {
+        if (_locale == null) {
+          return locale;
+        }
+
+        for (var supportedLocale in supportedLocales) {
+          if (supportedLocale.languageCode == _locale!.languageCode) {
+            return supportedLocale;
+          }
+        }
+        return supportedLocales.first;
       },
+
+      home: HomePage(settings: widget.settings),
     );
   }
 }

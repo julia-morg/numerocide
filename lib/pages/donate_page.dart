@@ -4,7 +4,7 @@ import 'package:numerocide/components/dialog_action.dart';
 import 'package:numerocide/components/popup_dialog.dart';
 import '../components/default_scaffold.dart';
 import '../game/settings.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DonatePage extends StatefulWidget {
   final Settings settings;
@@ -24,14 +24,13 @@ class _DonatePageState extends State<DonatePage> {
   Widget build(BuildContext context) {
     Color colorDark = Theme.of(context).colorScheme.primary;
     return DefaultScaffold(
-      title: 'Donate',
+      title: AppLocalizations.of(context)!.donatePageHeader,
       settings: widget.settings,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text(
-              'This game contains no advertisements and is available for free.\nIf you would like to support the developer, here are the available donation options:',
+            Text(AppLocalizations.of(context)!.donatePageText,
               style: Theme.of(context).textTheme.bodyLarge,
               textAlign: TextAlign.justify,
             ),
@@ -41,8 +40,7 @@ class _DonatePageState extends State<DonatePage> {
                 itemCount: donations.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(
-                      'Donate \$${donations[index]}',
+                    title: Text('${AppLocalizations.of(context)!.donatePageOption}\$${donations[index]}',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     trailing: Icon(Icons.payment, color: colorDark,),
@@ -62,18 +60,18 @@ class _DonatePageState extends State<DonatePage> {
       context: context,
       builder: (BuildContext context) {
         return PopupDialog(
-            title: 'Confirm Donation',
-            content: 'You are about to donate \$$amount',
-            note: 'This action cannot be undone. Do you want to proceed?',
+            title: AppLocalizations.of(context)!.donatePagePopupTitle,
+            content: '${AppLocalizations.of(context)!.donatePagePopupText}\$$amount',
+            note: AppLocalizations.of(context)!.donatePagePopupNote,
             actions:  <DialogAction>[
               DialogAction(
-                text: 'Cancel',
+                text: AppLocalizations.of(context)!.donatePagePopupCancel,
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               DialogAction(
-                text: 'Confirm',
+                text: AppLocalizations.of(context)!.donatePagePopupConfirm,
                 onPressed: () async {
                   Navigator.of(context).pop();
                   bool result = await _processPayment(amount);
@@ -86,13 +84,14 @@ class _DonatePageState extends State<DonatePage> {
   }
 
   void _showSnackBar(bool result, double amount) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result ? 'Thank you for donating \$$amount!' : 'Failed to process donation'),
-        ),
-      );
-    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: result ? Colors.green : Colors.red,
+        content: Text(result
+            ? AppLocalizations.of(context)!.donatePageThanks(amount)
+            : AppLocalizations.of(context)!.donatePageFail),
+      ),
+    );
   }
 
   Future<bool> _processPayment(double amount) async {

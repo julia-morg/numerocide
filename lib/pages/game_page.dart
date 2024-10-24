@@ -11,6 +11,7 @@ import '../game/settings.dart';
 import '../effects/sounds.dart';
 import '../effects/vibro.dart';
 import '../game/save.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GamePage extends StatefulWidget {
   static const modeNewGame = 'new';
@@ -51,7 +52,6 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     sounds = Sounds(settings: widget.settings);
     vibro = Vibro(settings: widget.settings);
     _loadMaxScore();
-    debugPrint('GamePage mode: ${widget.mode}');
     (widget.mode == GamePage.modeNewGame) ? _initializeGame() : _loadGameState();
   }
 
@@ -113,7 +113,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    'Best\n$_maxScore',
+                    '${AppLocalizations.of(context)!.gamePageBest}\n$_maxScore',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
@@ -122,7 +122,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   Text(
-                    'Stage\n${desk.stage}',
+                    '${AppLocalizations.of(context)!.gamePageStage}\n${desk.stage}',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
@@ -191,7 +191,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
   }
 
   void _showGameOverDialog(bool isVictory) async {
-    String bestScore = isVictory ? 'This is your best score ever!' : '';
+    String? bestScore = isVictory ? AppLocalizations.of(context)!.gamePageGameOverPopupBest : null;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -204,13 +204,13 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
               }
             },
             child: PopupDialog(
-              title:'GAME OVER',
-              content: 'SCORE: ${desk.score} \n',
+              title:AppLocalizations.of(context)!.gamePageGameOverPopupTitle,
+              content: '${AppLocalizations.of(context)!.gamePageGameOverPopupScore}${desk.score} \n',
               note: bestScore,
               actions: [
                 DialogAction(
                     onPressed: _handleGameOver,
-                    text: 'RETURN',
+                    text: AppLocalizations.of(context)!.gamePageGameOverPopupConfirm,
                 ),
               ],
             ),

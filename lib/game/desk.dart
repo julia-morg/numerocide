@@ -248,10 +248,9 @@ class Desk {
     int counter = 0;
 
     numbers.forEach((index, field) {
-      buffer.write('${field.number} ');  // Добавляем число в строку
+      buffer.write('${field.number} ');
       counter++;
 
-      // Если набрали rowLength элементов, добавляем перенос строки
       if (counter % rowLength == 0) {
         buffer.write('\n');
       }

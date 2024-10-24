@@ -1,0 +1,71 @@
+{
+    "@@locale": "ru",
+    "appTitle": "Нумероцид",
+    "homePageNewGame": "НОВАЯ ИГРА",
+    "homePageContinueGame": "ПРОДОЛЖИТЬ ИГРУ",
+    "homePageBestResult": "ЛУЧШИЙ РЕЗУЛЬТАТ",
+    "homePageStage": "Уровень",
+    "homePageBestScore": "Лучший",
+    "homePageSavedGamePopupTitle": "У вас есть сохранённая игра",
+    "homePageSavedGamePopupText": "Вы уверены, что хотите начать новую игру?\nВаш текущий прогресс будет утерян.",
+    "homePageSavedGamePopupCancel": "НАЗАД",
+    "homePageSavedGamePopupConfirm": "НОВАЯ ИГРА",
+
+    "gamePageStage": "Уровень",
+    "gamePageBest": "Лучший",
+    "gamePageGameOverPopupTitle": "ИГРА ОКОНЧЕНА",
+    "gamePageGameOverPopupBest": "Это ваш лучший результат за всё время!",
+    "gamePageGameOverPopupScore": "СЧЁТ: ",
+    "gamePageGameOverPopupConfirm": "ВЕРНУТЬСЯ",
+
+    "settingsPageHeader": "Настройки",
+    "settingsPageSound": "Звук",
+    "settingsPageVibro": "Вибрация",
+    "settingsPageLang": "Язык",
+    "settingsPageTheme": "Тема",
+    "settingsPageInfo": "Информация",
+    "settingsPagePrivacyPolicy": "Политика конфиденциальности",
+    "settingsPageTermsOfService": "Условия обслуживания",
+    "settingsPageThemeNavy": "Морская",
+    "settingsPageThemeCocoa": "Какао",
+    "settingsPageThemeStone": "Каменная",
+    "settingsPageThemeGrass": "Травяная",
+
+    "donatePageHeader": "Поддержать",
+    "donatePageText": "В этой игре нет рекламы, и она доступна бесплатно.\nЕсли вы хотите поддержать разработчика, вот доступные варианты пожертвований:",
+    "donatePageOption": "Пожертвовать ",
+    "donatePagePopupTitle": "Подтвердите пожертвование",
+    "donatePagePopupText": "Вы собираетесь пожертвовать ",
+    "donatePagePopupNote": "Это действие нельзя отменить. Вы хотите продолжить?",
+    "donatePagePopupCancel": "Отмена",
+    "donatePagePopupConfirm": "Подтвердить",
+    "donatePageThanks": "Спасибо за пожертвование ${amount}!",
+      "@donatePageThanks": {
+        "placeholders": {
+          "amount": {
+            "type": "double",
+            "example": "5.00"
+          }
+        }
+      },
+    "donatePageFail": "Не удалось обработать пожертвование",
+
+    "tutorialPageHeader": "Как играть",
+    "tutorialPageNextStep": "Следующий шаг",
+    "tutorialPageGotoMenu": "Понял! В главное меню",
+    "tutorialPagePopupTitle": "Ура!",
+    "tutorialPagePopupText": "Обучение завершено, и вы готовы начать игру!",
+    "tutorialPagePopupRestart": "Начать заново",
+    "tutorialPagePopupFinish": "Главное меню",
+    "tutorialPageStep1": "Вы можете удалять клетки с одинаковыми числами или числами, которые в сумме дают 10, если они находятся рядом",
+    "tutorialPageStep2": "…или если они расположены друг над другом",
+    "tutorialPageStep3": "Даже если между клетками есть разрыв, но они смежные, их можно удалить",
+    "tutorialPageStep4": "Если клетки расположены по диагонали, их тоже можно удалить",
+    "tutorialPageStep5": "Направление диагонали не имеет значения",
+    "tutorialPageStep6": "Это верно для любых диагоналей, если на них нет активных клеток",
+    "tutorialPageStep7": "Вы также можете удалить первую и последнюю клетки на поле",
+    "tutorialPageStep8": "Если удалить все клетки в строке, строка исчезнет",
+    "tutorialPageStep9": "Если вы очистите всё поле, вы перейдёте на следующий уровень",
+
+    "testPageHeader": "Тест"
+}

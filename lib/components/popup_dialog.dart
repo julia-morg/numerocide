@@ -7,6 +7,7 @@ class PopupDialog extends StatefulWidget {
   final String content;
   final String? note;
   final List<DialogAction> actions;
+  final bool hasConfetti;
 
   const PopupDialog({
     super.key,
@@ -14,6 +15,7 @@ class PopupDialog extends StatefulWidget {
     required this.content,
     this.note,
     required this.actions,
+    this.hasConfetti = false,
   });
 
   @override
@@ -27,7 +29,9 @@ class _PopupDialogState extends State<PopupDialog> {
   void initState() {
     super.initState();
     _confettiController = ConfettiController(duration: const Duration(seconds: 5));
-    _confettiController.play();
+    if(widget.hasConfetti){
+      _confettiController.play();
+    }
   }
 
   @override

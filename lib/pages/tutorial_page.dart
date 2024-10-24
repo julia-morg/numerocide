@@ -12,6 +12,7 @@ import '../effects/sounds.dart';
 import '../effects/vibro.dart';
 import '../game/tutorial.dart';
 import 'home_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TutorialPage extends StatefulWidget {
   @override
@@ -31,7 +32,6 @@ class _TutorialPageState extends State<TutorialPage> {
   List<int> selectedButtons = [];
   List<Stage> stages = [];
   late Desk desk;
-  late String hintText;
   late Hint? hint;
   late int rowLength;
   int step = 0;
@@ -52,7 +52,6 @@ class _TutorialPageState extends State<TutorialPage> {
           MapEntry(index,
               Field(index, number, !stage.inactiveNumbers.contains(index))));
       desk = Desk(0, 0, stage.buttonsPerRow, numbers, stage.buttonsPerRow);
-      hintText = stage.text;
       hint = stage.hint;
       rowLength = stage.buttonsPerRow;
       stageCompleted = false;
@@ -90,13 +89,13 @@ class _TutorialPageState extends State<TutorialPage> {
     int stepsCount = stages.length;
     return DefaultScaffold(
       settings: widget.settings,
-      title: 'How to play',
+      title: AppLocalizations.of(context)!.tutorialPageHeader,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           TextPlate(
               centeredText: '${step+1}/$stepsCount\n',
-              justifiedText: hintText
+              justifiedText: getLocalizedStep(context, step + 1)
           ),
           const SizedBox(height: 20,),
           SizedBox(
@@ -112,7 +111,9 @@ class _TutorialPageState extends State<TutorialPage> {
           ElevatedButton(
             onPressed: stageCompleted ? _nextStep : null,
             child: Text(
-              isNextStepAvailable() ? 'Next Step' : 'Got it! To Main Menu',
+              isNextStepAvailable()
+                  ? AppLocalizations.of(context)!.tutorialPageNextStep
+                  : AppLocalizations.of(context)!.tutorialPageGotoMenu,
               style: Theme.of(context).textTheme.titleSmall!.copyWith(color: stageCompleted ? null: Theme.of(context).colorScheme.onSecondary),
             ),
           ),
@@ -120,6 +121,22 @@ class _TutorialPageState extends State<TutorialPage> {
         ],
       ),
     );
+  }
+
+  String getLocalizedStep(BuildContext context, int stepNumber) {
+    Map<int, String Function(AppLocalizations)> tutorialStepMap = {
+      1: (localizations) => localizations.tutorialPageStep1,
+      2: (localizations) => localizations.tutorialPageStep2,
+      3: (localizations) => localizations.tutorialPageStep3,
+      4: (localizations) => localizations.tutorialPageStep4,
+      5: (localizations) => localizations.tutorialPageStep5,
+      6: (localizations) => localizations.tutorialPageStep6,
+      7: (localizations) => localizations.tutorialPageStep7,
+      8: (localizations) => localizations.tutorialPageStep8,
+      9: (localizations) => localizations.tutorialPageStep9,
+    };
+    final localizations = AppLocalizations.of(context)!;
+    return tutorialStepMap[stepNumber]!.call(localizations);
   }
 
   void _onButtonPressed(int index) {
@@ -151,11 +168,12 @@ class _TutorialPageState extends State<TutorialPage> {
                 context: context,
                 builder: (BuildContext context) {
                   return PopupDialog(
-                    title: 'Hooraay!',
-                    content: 'The tutorial is completed and you are ready to play the game!',
+                    title: AppLocalizations.of(context)!.tutorialPagePopupTitle,
+                    content: AppLocalizations.of(context)!.tutorialPagePopupText,
+                    hasConfetti: true,
                     actions: [
                       DialogAction(
-                        text: 'Restart',
+                        text: AppLocalizations.of(context)!.tutorialPagePopupRestart,
                         onPressed: () {
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(builder: (context) => TutorialPage(settings: widget.settings,)),
@@ -163,7 +181,7 @@ class _TutorialPageState extends State<TutorialPage> {
                         },
                       ),
                       DialogAction(
-                        text: 'Main Menu',
+                        text: AppLocalizations.of(context)!.tutorialPagePopupFinish,
                         onPressed: () => goToMainMenu(),
                       ),
                     ],

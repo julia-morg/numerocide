@@ -5,6 +5,7 @@ import 'game_page.dart';
 import 'settings_page.dart';
 import '../game/settings.dart';
 import '../game/save.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
   final Settings settings;
@@ -17,7 +18,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _maxScore = 0;
   bool _hasSavedGame = false;
-  final String _title = 'Numerocide';
+  String _title = 'Numerocide';
   Save save = Save();
 
   @override
@@ -65,7 +66,7 @@ class _HomePageState extends State<HomePage> {
     Color colorStar = Colors.amberAccent;
     TextStyle largeTextStyle = Theme.of(context).textTheme.titleLarge!;
     Color inactiveColor = Theme.of(context).colorScheme.onSecondary;
-
+    _title = AppLocalizations.of(context)!.appTitle;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -96,7 +97,7 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: Column(
               children: [
-                const Text('BEST RESULT',),
+                Text(AppLocalizations.of(context)!.homePageBestResult,),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -117,14 +118,15 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: ElevatedButton(
               onPressed: () => _onNewGamePressed(context),
-              child: Text('NEW GAME', style: largeTextStyle,),
+              child: Text(AppLocalizations.of(context)!.homePageNewGame, style: largeTextStyle,),
             ),
           ),
           const SizedBox(height: 20),
           Center(
             child: ElevatedButton(
               onPressed: _hasSavedGame ? () => _goToGame(context, GamePage.modeLoadGame) : null,
-              child: Text('CONTINUE GAME', style: largeTextStyle.copyWith(color: _hasSavedGame ? null : inactiveColor)),
+              child: Text(AppLocalizations.of(context)!.homePageContinueGame,
+                  style: largeTextStyle.copyWith(color: _hasSavedGame ? null : inactiveColor)),
             ),
           ),
           const Spacer(),
@@ -140,17 +142,17 @@ class _HomePageState extends State<HomePage> {
         context: context,
         builder: (BuildContext context) {
           return PopupDialog(
-            title: 'You have a saved game',
-            content: 'Are you sure you want to start a new game?\nYour current progress will be lost.',
+            title: AppLocalizations.of(context)!.homePageSavedGamePopupTitle,
+            content: AppLocalizations.of(context)!.homePageSavedGamePopupText,
             actions: [
               DialogAction(
-                text: 'BACK',
+                text: AppLocalizations.of(context)!.homePageSavedGamePopupCancel,
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               DialogAction(
-                text: 'NEW GAME',
+                text: AppLocalizations.of(context)!.homePageSavedGamePopupConfirm,
                 onPressed: () {
                   Navigator.of(context).pop();
                   _goToGame(context, GamePage.modeNewGame);
