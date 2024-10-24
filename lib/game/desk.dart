@@ -7,13 +7,14 @@ import 'dart:math';
 class Desk {
   static const defaultAddsCount = 3;
   static const initialButtonsCount = 36;
+  static const defaultRowLength = 9;
   int stage = 0;
   int score = 0;
   int remainingAddClicks = defaultAddsCount;
   Map<int, Field> numbers = {};
-  int rowLength = 9;
+  int rowLength;
 
-  Desk(this.stage, this.score, this.remainingAddClicks, this.numbers);
+  Desk(this.stage, this.score, this.remainingAddClicks, this.numbers, [this.rowLength = defaultRowLength]);
 
   static Desk newGame() {
     debugPrint('newGame');
@@ -239,5 +240,24 @@ class Desk {
       }
     }
     return true;
+  }
+
+  @override
+  String toString() {
+    StringBuffer buffer = StringBuffer();
+    int counter = 0;
+
+    numbers.forEach((index, field) {
+      buffer.write('${field.number} ');  // Добавляем число в строку
+      counter++;
+
+      // Если набрали rowLength элементов, добавляем перенос строки
+      if (counter % rowLength == 0) {
+        buffer.write('\n');
+      }
+    });
+
+
+    return 'Desk{stage: $stage, score: $score, remainingAddClicks: $remainingAddClicks, rowLength: $rowLength}\nnumbers: \n${buffer.toString().trim()}\n';
   }
 }

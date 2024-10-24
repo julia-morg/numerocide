@@ -17,6 +17,7 @@ dependencies:
   volume_control: ^0.1.5
   in_app_purchase: ^3.0.0
   url_launcher: ^6.0.9
+  confetti: ^0.6.0
 
 dev_dependencies:
   flutter_test:
