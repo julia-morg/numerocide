@@ -43,9 +43,8 @@ class AnimatedButtonState extends State<AnimatedButton>
     ]).animate(_shakeController);
   }
 
-  void startShakeAnimation() {
+  void startShakeAnimation([int maxShakes = 1]) {
     int shakeCount = 0;
-    const int maxShakes = 1;
 
     _shakeController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {

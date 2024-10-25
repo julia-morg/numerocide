@@ -21,9 +21,7 @@ class GotoPageTile extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => nextPage,
-          ),
+          MaterialPageRoute(builder: (context) => nextPage,),
         );
       },
       splashColor: splashColor,
@@ -34,14 +32,8 @@ class GotoPageTile extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: labelStyle,
-            ),
-            Icon(
-              icon,
-              color: colorDark,
-            ),
+            Text(title, style: labelStyle,),
+            Icon(icon, color: colorDark,),
           ],
         ),
       ),

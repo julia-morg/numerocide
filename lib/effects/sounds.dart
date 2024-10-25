@@ -1,6 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:volume_control/volume_control.dart';
-import 'package:flutter/material.dart';
 import '../game/settings.dart';
 
 class Sounds {
@@ -63,7 +62,6 @@ class Sounds {
     }
     await player.stop();
     double deviceVolume = await VolumeControl.volume;
-    debugPrint(filename);
     player.play(
       AssetSource('sounds/$filename'),
       volume: deviceVolume,
