@@ -59,12 +59,13 @@ class _PopupDialogState extends State<PopupDialog> {
               Text(
                 widget.content,
                 style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.justify,
               ),
               if (widget.note != null) ...[
                 Text(
                   widget.note!,
                   style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.justify,
                 ),
               ],
             ],
@@ -72,6 +73,9 @@ class _PopupDialogState extends State<PopupDialog> {
           actions: widget.actions.map((action) {
             return ElevatedButton(
               onPressed: action.onPressed,
+              style: Theme.of(context).elevatedButtonTheme.style!.copyWith(
+                padding: WidgetStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.symmetric(horizontal: 10)),
+              ),
               child: Text(action.text.toUpperCase()),
             );
           }).toList(),

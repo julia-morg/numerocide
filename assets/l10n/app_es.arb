@@ -11,6 +11,11 @@
     "homePageSavedGamePopupText": "¿Estás seguro de que quieres empezar un nuevo juego?\nTu progreso actual se perderá.",
     "homePageSavedGamePopupCancel": "VOLVER",
     "homePageSavedGamePopupConfirm": "NUEVO JUEGO",
+    "suggestTutorialPopupTitle": "Cómo jugar",
+    "suggestTutorialPopupText": "Parece que estás aquí por primera vez. ¿Te gustaría conocer las reglas del juego?",
+    "suggestTutorialPopupConfirm": "TUTORIAL",
+    "suggestTutorialPopupCancel": "IR AL JUEGO",
+    "suggestTutorialPopupOnCancel": "Las reglas siempre están disponibles en el menú de configuración.",
 
     "gamePageStage": "Nivel",
     "gamePageBest": "Mejor",

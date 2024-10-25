@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numerocide/components/dialog_action.dart';
+import 'package:numerocide/pages/tutorial_page.dart';
 import '../components/popup_dialog.dart';
 import 'game_page.dart';
 import 'settings_page.dart';
@@ -18,6 +19,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _maxScore = 0;
   bool _hasSavedGame = false;
+  bool _isTutorialPassed = false;
   String _title = 'Numerocide';
   Save save = Save();
 
@@ -26,6 +28,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _loadMaxScore();
     _checkSavedGame();
+    _checkTutorial();
   }
 
   Future<void> _loadMaxScore() async {
@@ -44,6 +47,14 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _checkTutorial() async {
+    save.isTutorialPassed().then((value) {
+      setState(() {
+        _isTutorialPassed = value;
+      });
+    });
+  }
+
   void _goToGame(BuildContext context, String mode) {
     Navigator.push(
       context,
@@ -53,6 +64,20 @@ class _HomePageState extends State<HomePage> {
           maxScore: _maxScore,
           settings: widget.settings,
           mode: mode,
+        ),
+      ),
+    ).then((_) {
+      _loadMaxScore();
+      _checkSavedGame();
+    });
+  }
+
+  void _goToTutorial(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TutorialPage(
+          settings: widget.settings,
         ),
       ),
     ).then((_) {
@@ -137,7 +162,41 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onNewGamePressed(BuildContext context) {
-    if (_hasSavedGame) {
+
+    if(!_isTutorialPassed){
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return PopupDialog(
+            title: AppLocalizations.of(context)!.suggestTutorialPopupTitle,
+            content: AppLocalizations.of(context)!.suggestTutorialPopupText,
+            actions: [
+              DialogAction(
+                text: AppLocalizations.of(context)!.suggestTutorialPopupCancel,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _goToGame(context, GamePage.modeNewGame);
+                  _showSnackBar();
+                  _isTutorialPassed = true;
+                  save.saveTutorialPassed();
+                },
+              ),
+              DialogAction(
+                text: AppLocalizations.of(context)!.suggestTutorialPopupConfirm,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _goToTutorial(context);
+                  _showSnackBar();
+                  _isTutorialPassed = true;
+                  save.saveTutorialPassed();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+    else if (_hasSavedGame) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -173,4 +232,14 @@ class _HomePageState extends State<HomePage> {
     _checkSavedGame();
     _loadMaxScore();
   }
+
+  void _showSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        content: Text(AppLocalizations.of(context)!.suggestTutorialPopupOnCancel),
+      ),
+    );
+  }
+
 }

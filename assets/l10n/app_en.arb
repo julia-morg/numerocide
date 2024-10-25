@@ -11,6 +11,12 @@
     "homePageSavedGamePopupText": "Are you sure you want to start a new game?\nYour current progress will be lost.",
     "homePageSavedGamePopupCancel": "BACK",
     "homePageSavedGamePopupConfirm": "NEW GAME",
+    "suggestTutorialPopupTitle": "How to play",
+    "suggestTutorialPopupText": "It seems you’re here for the first time. Would you like to learn the game rules?",
+    "suggestTutorialPopupConfirm": "TUTORIAL",
+    "suggestTutorialPopupCancel": "GO TO GAME",
+    "suggestTutorialPopupOnCancel": "The rules are always available in the settings menu.",
+
 
     "gamePageStage": "Stage",
     "gamePageBest": "Best",
