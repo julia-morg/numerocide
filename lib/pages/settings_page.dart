@@ -34,7 +34,8 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: SingleChildScrollView(
+    child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SettingsSwitchTile(
@@ -53,7 +54,10 @@ class _SettingsPageState extends State<SettingsPage> {
             const Divider(),
             ThemeTile(settings: widget.settings),
             const Divider(),
-            LanguageTile(settings: widget.settings),
+            LanguageTile(
+                title: AppLocalizations.of(context)!.settingsPageLang,
+                settings: widget.settings
+            ),
             const Divider(),
             Text(AppLocalizations.of(context)!.settingsPageInfo, style: labelStyle),
             GotoPageTile(
@@ -74,6 +78,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

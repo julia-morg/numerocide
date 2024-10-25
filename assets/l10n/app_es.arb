@@ -1,6 +1,7 @@
 {
     "@@locale": "es",
     "appTitle": "Numerocidio",
+    "languageName": "Español",
     "homePageNewGame": "NUEVO JUEGO",
     "homePageContinueGame": "CONTINUAR JUEGO",
     "homePageBestResult": "MEJOR RESULTADO",

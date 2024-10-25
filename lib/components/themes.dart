@@ -58,6 +58,20 @@ class Themes {
     DividerThemeData dividerThemeData = DividerThemeData(
       color: colorScheme.primary,
     );
+    DropdownMenuThemeData dropdownButtonTheme =  DropdownMenuThemeData(
+      inputDecorationTheme: InputDecorationTheme(
+        fillColor: colorScheme.secondaryContainer,
+        filled: true,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: colorScheme.primary,
+          ),
+        ),
+      ),
+      textStyle: textTheme.bodyMedium,
+    );
+
 
     return ThemeData(
       useMaterial3: true,
@@ -71,6 +85,7 @@ class Themes {
       switchTheme: switchThemeData,
       dialogTheme: dialogTheme,
       dividerTheme: dividerThemeData,
+      dropdownMenuTheme: dropdownButtonTheme,
     );
   }
 

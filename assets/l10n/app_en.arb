@@ -1,6 +1,7 @@
 {
     "@@locale": "en",
     "appTitle": "Numerocide",
+    "languageName": "English",
     "homePageNewGame": "NEW GAME",
     "homePageContinueGame": "CONTINUE GAME",
     "homePageBestResult": "BEST RESULT",

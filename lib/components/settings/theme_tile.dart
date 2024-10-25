@@ -53,7 +53,7 @@ class _ThemeTileState extends State<ThemeTile> {
                   children: [
                     Expanded(
                       child: Text(
-                        Themes.themeDisplayName(themeName),
+                        _getLocalizedTheme(context, themeName),
                         style: themeLabelStyle,
                       ),
                     ),
@@ -75,4 +75,16 @@ class _ThemeTileState extends State<ThemeTile> {
       ],
     );
   }
+
+  String _getLocalizedTheme(BuildContext context, String themeName) {
+    Map<String, String Function(AppLocalizations)> tutorialStepMap = {
+      Themes.brown: (localizations) => localizations.settingsPageThemeCocoa,
+      Themes.navy: (localizations) => localizations.settingsPageThemeNavy,
+      Themes.grey: (localizations) => localizations.settingsPageThemeStone,
+      Themes.green: (localizations) => localizations.settingsPageThemeGrass
+    };
+    final localizations = AppLocalizations.of(context)!;
+    return tutorialStepMap[themeName]!.call(localizations);
+  }
+
 }
