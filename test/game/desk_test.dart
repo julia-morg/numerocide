@@ -13,9 +13,9 @@ void main() {
 
     test('newGame should initialize a new desk with default values', () {
       final newDesk = Desk.newGame();
-      expect(newDesk.stage, 1);
-      expect(newDesk.score, 0);
-      expect(newDesk.remainingAddClicks, Desk.defaultAddsCount);
+      expect(newDesk.getStage(), 1);
+      expect(newDesk.getScore(), 0);
+      expect(newDesk.getRemainingAddClicks(), Desk.defaultAddsCount);
       expect(newDesk.numbers.length, Desk.initialButtonsCount);
     });
 
@@ -23,11 +23,11 @@ void main() {
       final initialLength = desk.numbers.length;
       desk.addFields();
       expect(desk.numbers.length, greaterThan(initialLength));
-      expect(desk.remainingAddClicks, Desk.defaultAddsCount - 1);
+      expect(desk.getRemainingAddClicks(), Desk.defaultAddsCount - 1);
     });
 
     test('addFields should not add fields if no clicks remain', () {
-      desk.remainingAddClicks = 0;
+      desk.setRemainingAddClicks(0);
       final initialLength = desk.numbers.length;
       desk.addFields();
       expect(desk.numbers.length, initialLength);
@@ -41,8 +41,8 @@ void main() {
 
     test('newStage should reset the desk for the next stage', () {
       desk.newStage(10);
-      expect(desk.stage, 2);
-      expect(desk.remainingAddClicks, Desk.defaultAddsCount);
+      expect(desk.getStage(), 2);
+      expect(desk.getRemainingAddClicks(), Desk.defaultAddsCount);
       expect(desk.numbers.length, 10);
     });
 
@@ -80,7 +80,7 @@ void main() {
       desk.move(0, 1);
       expect(desk.numbers[0]!.isActive, false);
       expect(desk.numbers[1]!.isActive, false);
-      expect(desk.score, 2 * desk.stage);
+      expect(desk.getScore(), 2 * desk.getStage());
     });
 
     test('move should return false for invalid move', () {
@@ -99,5 +99,29 @@ void main() {
       desk.numbers[0] = Field(0, 5, true);
       expect(desk.isVictory(), false);
     });
+  });
+  test('toString should return correct string representation of Desk', () {
+    final desk = Desk(1, 100, 2, {
+      0: Field(0, 5, true),
+      1: Field(1, 3, false),
+      2: Field(2, 7, true),
+    });
+
+    final expectedString = 'Desk{stage: 1, score: 100, remainingAddClicks: 2, rowLength: 9}\nnumbers: \n5 3 7\n';
+    expect(desk.toString(), expectedString);
+  });
+
+  test('toString should return correct string representation of Desk with more numbers than row length', () {
+    final desk = Desk(1, 100, 2, {
+      0: Field(0, 5, true),
+      1: Field(1, 3, false),
+      2: Field(2, 7, true),
+      3: Field(3, 2, true),
+      4: Field(4, 8, false),
+      5: Field(5, 1, true),
+    }, 3);
+
+    final expectedString = 'Desk{stage: 1, score: 100, remainingAddClicks: 2, rowLength: 3}\nnumbers: \n5 3 7\n2 8 1\n';
+    expect(desk.toString(), expectedString);
   });
 }

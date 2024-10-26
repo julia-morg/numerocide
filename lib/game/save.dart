@@ -41,9 +41,9 @@ class Save {
       await prefs.setInt('$paramSavedGamNumbersPrefix$index', field.number);
       await prefs.setBool('$paramSavedGamStatusPrefix$index', field.isActive);
     }
-    await prefs.setInt(paramSavedGameScore, desk.score);
-    await prefs.setInt(paramSavedGameStage, desk.stage);
-    await prefs.setInt(paramSavedGameRemainingAdds, desk.remainingAddClicks);
+    await prefs.setInt(paramSavedGameScore, desk.getScore());
+    await prefs.setInt(paramSavedGameStage, desk.getStage());
+    await prefs.setInt(paramSavedGameRemainingAdds, desk.getRemainingAddClicks());
   }
 
   Future<bool> saveMaxScore(int score) async {
@@ -62,18 +62,22 @@ class Save {
     return prefs.getInt(paramMaxScore) ?? 0;
   }
 
+  int extractNumber(String input, String prefix) {
+    final regex = RegExp(RegExp.escape(prefix) + r'(\d+)');
+    return int.tryParse(regex.firstMatch(input)?.group(1) ?? '') ?? -1;
+  }
+
   Future<Desk> loadGame() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getKeys().any((key) => key.startsWith(paramSavedGamNumbersPrefix))) {
       Map<int, Field> numbers = {};
-      int index = 0;
       for (String key in prefs.getKeys()) {
         if (key.startsWith(paramSavedGamNumbersPrefix)) {
+          int index = extractNumber(key, paramSavedGamNumbersPrefix);
           int? number = prefs.getInt('$paramSavedGamNumbersPrefix$index');
           bool? isActive = prefs.getBool('$paramSavedGamStatusPrefix$index');
           if (number != null && isActive != null) {
             numbers[index] = Field(index, number, isActive);
-            index++;
           }
         }
       }

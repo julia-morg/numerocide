@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'components/themes.dart';
+import 'game/save.dart';
 import 'pages/home_page.dart';
 import 'game/settings.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -8,13 +9,15 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Settings settings = await Settings.loadSettings();
-  runApp(MyApp(settings: settings));
+  Save save = Save();
+  runApp(MyApp(settings: settings, save: save));
 }
 
 class MyApp extends StatefulWidget {
   final Settings settings;
+  final Save save;
 
-  const MyApp({super.key, required this.settings});
+  const MyApp({super.key, required this.settings, required this.save});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -86,7 +89,7 @@ class _MyAppState extends State<MyApp> {
         return supportedLocales.first;
       },
 
-      home: HomePage(settings: widget.settings),
+      home: HomePage(settings: widget.settings, save: widget.save),
     );
   }
 }

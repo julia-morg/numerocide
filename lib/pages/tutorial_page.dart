@@ -4,6 +4,7 @@ import 'package:numerocide/components/dialog_action.dart';
 import 'package:numerocide/components/popup_dialog.dart';
 import 'package:numerocide/game/hint.dart';
 import 'package:numerocide/components/text_plate.dart';
+import 'package:numerocide/game/save.dart';
 import '../game/desk.dart';
 import '../game/field.dart';
 import '../components/button_grid.dart';
@@ -20,10 +21,11 @@ class TutorialPage extends StatefulWidget {
 
   const TutorialPage({
     super.key,
-    required this.settings,
+    required this.settings, required this.save,
   });
 
   final Settings settings;
+  final Save save;
 }
 
 class _TutorialPageState extends State<TutorialPage> {
@@ -79,7 +81,7 @@ class _TutorialPageState extends State<TutorialPage> {
   void goToMainMenu() {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => HomePage(settings: widget.settings,)),
+      MaterialPageRoute(builder: (context) => HomePage(settings: widget.settings, save: widget.save,)),
           (Route<dynamic> route) => false,
     );
   }
@@ -89,6 +91,7 @@ class _TutorialPageState extends State<TutorialPage> {
     int stepsCount = stages.length;
     return DefaultScaffold(
       settings: widget.settings,
+      save: widget.save,
       title: AppLocalizations.of(context)!.tutorialPageHeader,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -176,7 +179,7 @@ class _TutorialPageState extends State<TutorialPage> {
                         text: AppLocalizations.of(context)!.tutorialPagePopupRestart,
                         onPressed: () {
                           Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (context) => TutorialPage(settings: widget.settings,)),
+                            MaterialPageRoute(builder: (context) => TutorialPage(settings: widget.settings, save: widget.save)),
                           );
                         },
                       ),

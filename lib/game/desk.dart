@@ -6,21 +6,45 @@ class Desk {
   static const defaultAddsCount = 3;
   static const initialButtonsCount = 36;
   static const defaultRowLength = 9;
-  int stage = 0;
-  int score = 0;
-  int remainingAddClicks = defaultAddsCount;
+  int _stage = 0;
+  int _score = 0;
+  int _remainingAddClicks = defaultAddsCount;
   Map<int, Field> numbers = {};
   int rowLength;
 
-  Desk(this.stage, this.score, this.remainingAddClicks, this.numbers, [this.rowLength = defaultRowLength]);
+  Desk(this._stage, this._score, this._remainingAddClicks, this.numbers, [this.rowLength = defaultRowLength]);
 
   static Desk newGame() {
     return Desk(1, 0, defaultAddsCount, generateRandomNumbers(initialButtonsCount));
   }
 
+  Map<int, Field> getNumbers() {
+    return numbers;
+  }
+
+  int getStage() {
+    return _stage;
+  }
+
+  int getScore() {
+    return _score;
+  }
+
+  int getRemainingAddClicks() {
+    return _remainingAddClicks;
+  }
+
+  int setRemainingAddClicks(int value) {
+    return _remainingAddClicks = value;
+  }
+
+  int decrementRemainingAddClicks() {
+    return --_remainingAddClicks;
+  }
+
   void addFields() {
-    if (remainingAddClicks == 0) return;
-    remainingAddClicks--;
+    if (_remainingAddClicks == 0) return;
+    _remainingAddClicks--;
     List<Field> activeFields = [];
     for(int i = 0; i < numbers.length; i++) {
       if (numbers[i]?.isActive == true) {
@@ -42,8 +66,8 @@ class Desk {
   }
 
   void newStage(int count) {
-    stage++;
-    remainingAddClicks = Desk.defaultAddsCount;
+    _stage++;
+    _remainingAddClicks = Desk.defaultAddsCount;
     numbers.clear();
     numbers = generateRandomNumbers(count);
   }
@@ -51,7 +75,7 @@ class Desk {
   bool? checkGameStatus() {
     if (isVictory()) {
       return true;
-    } else if (remainingAddClicks == 0 && findHint() == null) {
+    } else if (_remainingAddClicks == 0 && findHint() == null) {
       return false;
     }
     return null;
@@ -99,7 +123,7 @@ class Desk {
     if (isCorrectMove(firstIndex, secondIndex)) {
       numbers[firstIndex]!.isActive = false;
       numbers[secondIndex]!.isActive = false;
-      score += 2*stage;
+      _score += 2*_stage;
       return _checkAndRemoveEmptyRows();
     }
     return false;
@@ -245,15 +269,14 @@ class Desk {
     int counter = 0;
 
     numbers.forEach((index, field) {
-      buffer.write('${field.number} ');
+      buffer.write(field.number);
       counter++;
-
       if (counter % rowLength == 0) {
         buffer.write('\n');
+      } else {
+        buffer.write(' ');
       }
     });
-
-
-    return 'Desk{stage: $stage, score: $score, remainingAddClicks: $remainingAddClicks, rowLength: $rowLength}\nnumbers: \n${buffer.toString().trim()}\n';
+    return 'Desk{stage: $_stage, score: $_score, remainingAddClicks: $_remainingAddClicks, rowLength: $rowLength}\nnumbers: \n${buffer.toString().trim()}\n';
   }
 }

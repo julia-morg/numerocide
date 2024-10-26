@@ -3,11 +3,14 @@ import 'package:volume_control/volume_control.dart';
 import '../game/settings.dart';
 
 class Sounds {
-  const Sounds({
+  Sounds({
     required this.settings,
-  });
+    AudioPlayer? player,
+  }) : _player = player ?? AudioPlayer();
 
   final Settings settings;
+  final AudioPlayer _player;
+
   static const String soundTap = 'tap.aiff';
   static const String soundRemoveRow = 'remove_row.mp3';
   static const String soundRemoveNumbers = 'remove_numbers.mp3';
@@ -18,51 +21,49 @@ class Sounds {
   static const String soundDeskCleared = 'desk_cleared.wav';
   static const String soundAddRow = 'add_rows.mp3';
 
-  static final player = AudioPlayer();
-
-  void playTapSound() async {
-    _playSound(soundTap);
+  Future<void> playTapSound() async {
+    await _playSound(soundTap);
   }
 
-  void playRemoveRowSound() async {
-    _playSound(soundRemoveRow);
+  Future<void> playRemoveRowSound() async {
+    await _playSound(soundRemoveRow);
   }
 
-  void playRemoveNumbersSound() async {
-    _playSound(soundRemoveNumbers);
+  Future<void> playRemoveNumbersSound() async {
+    await _playSound(soundRemoveNumbers);
   }
 
-  void playNoHintsSound() async {
-    _playSound(soundNoHints);
+  Future<void> playNoHintsSound() async {
+    await _playSound(soundNoHints);
   }
 
-  void playGameOverWinSound() async {
-    _playSound(soundGameOverWin);
+  Future<void> playGameOverWinSound() async {
+    await _playSound(soundGameOverWin);
   }
 
-  void playHintSound() async {
-    _playSound(soundHint);
+  Future<void> playHintSound() async {
+    await _playSound(soundHint);
   }
 
-  void playGameOverLoseSound() async {
-    _playSound(soundGameOverLose);
+  Future<void> playGameOverLoseSound() async {
+    await _playSound(soundGameOverLose);
   }
 
-  void playDeskClearedSound() async {
-    _playSound(soundDeskCleared);
+  Future<void> playDeskClearedSound() async {
+    await _playSound(soundDeskCleared);
   }
 
-  void playAddRowSound() async {
-    _playSound(soundAddRow);
+  Future<void> playAddRowSound() async {
+    await _playSound(soundAddRow);
   }
 
-  void _playSound(String filename) async {
+  Future<void> _playSound(String filename) async {
     if (!settings.sound) {
       return;
     }
-    await player.stop();
+    await _player.stop();
     double deviceVolume = await VolumeControl.volume;
-    player.play(
+    await _player.play(
       AssetSource('sounds/$filename'),
       volume: deviceVolume,
     );

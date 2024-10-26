@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:numerocide/game/settings.dart';
 import 'package:numerocide/pages/settings_page.dart';
 
+import '../game/save.dart';
+
 class DefaultScaffold extends StatelessWidget {
   final Widget body;
   final String title;
   final List<Widget>? actions;
   final Settings settings;
+  final Save save;
   final Widget? floatingActionButton;
 
   const DefaultScaffold({
@@ -16,6 +19,7 @@ class DefaultScaffold extends StatelessWidget {
     required this.settings,
     this.actions,
     this.floatingActionButton,
+    required this.save,
   });
 
   @override
@@ -32,6 +36,7 @@ class DefaultScaffold extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => SettingsPage(
                     settings: settings,
+                    save: save,
                   ),
                 ),
               );

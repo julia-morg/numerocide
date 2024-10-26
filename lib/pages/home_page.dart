@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:numerocide/components/default_scaffold.dart';
 import 'package:numerocide/components/dialog_action.dart';
 import 'package:numerocide/pages/tutorial_page.dart';
 import '../components/popup_dialog.dart';
 import 'game_page.dart';
-import 'settings_page.dart';
 import '../game/settings.dart';
 import '../game/save.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
   final Settings settings;
-  const HomePage({super.key, required this.settings});
+  final Save save;
+
+  const HomePage({super.key, required this.settings, required this.save});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -21,7 +23,6 @@ class _HomePageState extends State<HomePage> {
   bool _hasSavedGame = false;
   bool _isTutorialPassed = false;
   String _title = 'Numerocide';
-  Save save = Save();
 
   @override
   void initState() {
@@ -32,7 +33,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadMaxScore() async {
-    save.loadMaxScore().then((value) {
+    widget.save.loadMaxScore().then((value) {
       setState(() {
         _maxScore = value;
       });
@@ -40,7 +41,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _checkSavedGame() async {
-    save.hasSavedGame().then((value) {
+    widget.save.hasSavedGame().then((value) {
       setState(() {
         _hasSavedGame = value;
       });
@@ -48,7 +49,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _checkTutorial() async {
-    save.isTutorialPassed().then((value) {
+    widget.save.isTutorialPassed().then((value) {
       setState(() {
         _isTutorialPassed = value;
       });
@@ -60,9 +61,8 @@ class _HomePageState extends State<HomePage> {
       context,
       MaterialPageRoute(
         builder: (context) => GamePage(
-          title: _title,
-          maxScore: _maxScore,
           settings: widget.settings,
+          save: widget.save,
           mode: mode,
         ),
       ),
@@ -78,6 +78,7 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(
         builder: (context) => TutorialPage(
           settings: widget.settings,
+          save: widget.save,
         ),
       ),
     ).then((_) {
@@ -92,27 +93,10 @@ class _HomePageState extends State<HomePage> {
     TextStyle largeTextStyle = Theme.of(context).textTheme.titleLarge!;
     Color inactiveColor = Theme.of(context).colorScheme.onSecondary;
     _title = AppLocalizations.of(context)!.appTitle;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _title.toUpperCase(),
-        ),
-        toolbarHeight: MediaQuery.of(context).size.height * 0.12,
-        titleTextStyle: Theme.of(context).textTheme.headlineLarge,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SettingsPage(settings: widget.settings),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+    return DefaultScaffold(
+      title: _title.toUpperCase(),
+      settings: widget.settings,
+      save: widget.save,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -122,7 +106,9 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: Column(
               children: [
-                Text(AppLocalizations.of(context)!.homePageBestResult,),
+                Text(
+                  AppLocalizations.of(context)!.homePageBestResult,
+                ),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -143,27 +129,31 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: ElevatedButton(
               onPressed: () => _onNewGamePressed(context),
-              child: Text(AppLocalizations.of(context)!.homePageNewGame, style: largeTextStyle,),
+              child: Text(
+                AppLocalizations.of(context)!.homePageNewGame,
+                style: largeTextStyle,
+              ),
             ),
           ),
           const SizedBox(height: 20),
           Center(
             child: ElevatedButton(
-              onPressed: _hasSavedGame ? () => _goToGame(context, GamePage.modeLoadGame) : null,
+              onPressed: _hasSavedGame
+                  ? () => _goToGame(context, GamePage.modeLoadGame)
+                  : null,
               child: Text(AppLocalizations.of(context)!.homePageContinueGame,
-                  style: largeTextStyle.copyWith(color: _hasSavedGame ? null : inactiveColor)),
+                  style: largeTextStyle.copyWith(
+                      color: _hasSavedGame ? null : inactiveColor)),
             ),
           ),
           const Spacer(),
-
         ],
       ),
     );
   }
 
   void _onNewGamePressed(BuildContext context) {
-
-    if(!_isTutorialPassed){
+    if (!_isTutorialPassed) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -178,7 +168,7 @@ class _HomePageState extends State<HomePage> {
                   _goToGame(context, GamePage.modeNewGame);
                   _showSnackBar();
                   _isTutorialPassed = true;
-                  save.saveTutorialPassed();
+                  widget.save.saveTutorialPassed();
                 },
               ),
               DialogAction(
@@ -188,15 +178,14 @@ class _HomePageState extends State<HomePage> {
                   _goToTutorial(context);
                   _showSnackBar();
                   _isTutorialPassed = true;
-                  save.saveTutorialPassed();
+                  widget.save.saveTutorialPassed();
                 },
               ),
             ],
           );
         },
       );
-    }
-    else if (_hasSavedGame) {
+    } else if (_hasSavedGame) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -205,13 +194,15 @@ class _HomePageState extends State<HomePage> {
             content: AppLocalizations.of(context)!.homePageSavedGamePopupText,
             actions: [
               DialogAction(
-                text: AppLocalizations.of(context)!.homePageSavedGamePopupCancel,
+                text:
+                    AppLocalizations.of(context)!.homePageSavedGamePopupCancel,
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               DialogAction(
-                text: AppLocalizations.of(context)!.homePageSavedGamePopupConfirm,
+                text:
+                    AppLocalizations.of(context)!.homePageSavedGamePopupConfirm,
                 onPressed: () {
                   Navigator.of(context).pop();
                   _goToGame(context, GamePage.modeNewGame);
@@ -237,9 +228,9 @@ class _HomePageState extends State<HomePage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
-        content: Text(AppLocalizations.of(context)!.suggestTutorialPopupOnCancel),
+        content:
+            Text(AppLocalizations.of(context)!.suggestTutorialPopupOnCancel),
       ),
     );
   }
-
 }

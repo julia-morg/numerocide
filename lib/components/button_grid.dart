@@ -112,6 +112,7 @@ class _ButtonGridState extends State<ButtonGrid> {
             : inactiveTextColor;
     return SizedBox(
       child: TextButton(
+        key: Key('number_$index'),
         style: TextButton.styleFrom(
           backgroundColor: buttonColor,
           shape: const RoundedRectangleBorder(

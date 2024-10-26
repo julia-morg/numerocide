@@ -3,13 +3,15 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:numerocide/components/dialog_action.dart';
 import 'package:numerocide/components/popup_dialog.dart';
 import '../components/default_scaffold.dart';
+import '../game/save.dart';
 import '../game/settings.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DonatePage extends StatefulWidget {
   final Settings settings;
+  final Save save;
 
-  const DonatePage({super.key, required this.settings});
+  const DonatePage({super.key, required this.settings, required this.save});
 
   @override
   State<DonatePage> createState() => _DonatePageState();
@@ -26,6 +28,7 @@ class _DonatePageState extends State<DonatePage> {
     return DefaultScaffold(
       title: AppLocalizations.of(context)!.donatePageHeader,
       settings: widget.settings,
+      save: widget.save,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

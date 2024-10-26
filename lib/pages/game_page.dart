@@ -16,18 +16,19 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class GamePage extends StatefulWidget {
   static const modeNewGame = 'new';
   static const modeLoadGame = 'load';
-  const GamePage({
+
+  GamePage({
     super.key,
-    required this.title,
-    required this.maxScore,
     required this.mode,
     required this.settings,
-  });
+    required this.save,
+    Sounds? sounds}): sounds = sounds ?? Sounds(settings: settings);
 
-  final String title;
-  final int maxScore;
+  final Save save;
   final String mode;
   final Settings settings;
+  final Sounds sounds;
+
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -39,7 +40,6 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
   List<int> selectedButtons = [];
   late Sounds sounds;
   late Vibro vibro;
-  Save save = Save();
   late int _maxScore = 0;
   late final GlobalKey<AnimatedButtonState> _addButtonKey =
       GlobalKey<AnimatedButtonState>();
@@ -49,7 +49,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
   @override
   void initState() {
     super.initState();
-    sounds = Sounds(settings: widget.settings);
+    sounds = widget.sounds;
     vibro = Vibro(settings: widget.settings);
     _loadMaxScore();
     (widget.mode == GamePage.modeNewGame) ? _initializeGame() : _loadGameState();
@@ -65,22 +65,22 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
   }
 
   void _clearSavedGameState() async {
-    save.removeGame();
+    widget.save.removeGame();
   }
 
   Future<void> _saveGameState() async {
-    save.saveGame(desk);
+    widget.save.saveGame(desk);
   }
 
   Future<bool> _saveMaxScore() async {
-    return save.saveMaxScore(desk.score);
+    return widget.save.saveMaxScore(desk.getScore());
   }
 
   Future<void> _loadGameState() async {
     setState(() {
       _isLoading = true;
     });
-    Desk savedGame = await save.loadGame();
+    Desk savedGame = await widget.save.loadGame();
     setState(() {
       desk = savedGame;
       _isLoading = false;
@@ -89,7 +89,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
   }
 
   Future<void> _loadMaxScore() async {
-    int maxScore = await save.loadMaxScore();
+    int maxScore = await widget.save.loadMaxScore();
     setState(() {
       _maxScore = maxScore;
     });
@@ -102,8 +102,9 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     }
 
     return DefaultScaffold(
-        title: widget.title,
-        settings: widget.settings,
+      title: AppLocalizations.of(context)!.appTitle,
+      settings: widget.settings,
+      save: widget.save,
       body: Center(
         child: Column(
           children: <Widget>[
@@ -118,11 +119,11 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
                   Text(
-                    '${desk.score}',
+                    '${desk.getScore()}',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   Text(
-                    '${AppLocalizations.of(context)!.gamePageStage}\n${desk.stage}',
+                    '${AppLocalizations.of(context)!.gamePageStage}\n${desk.getStage()}',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
@@ -171,8 +172,8 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
                     icon: Icons.add,
                     color: Theme.of(context).colorScheme.primary,
                     heroTag: 'addButton',
-                    active: desk.remainingAddClicks > 0,
-                    labelCount: desk.remainingAddClicks,
+                    active: desk.getRemainingAddClicks() > 0,
+                    labelCount: desk.getRemainingAddClicks(),
                   ),
                 ),
               ],
@@ -205,7 +206,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
             },
             child: PopupDialog(
               title:AppLocalizations.of(context)!.gamePageGameOverPopupTitle,
-              content: '${AppLocalizations.of(context)!.gamePageGameOverPopupScore}${desk.score} \n',
+              content: '${AppLocalizations.of(context)!.gamePageGameOverPopupScore}${desk.getScore()} \n',
               note: bestScore,
               actions: [
                 DialogAction(
@@ -223,7 +224,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
   void _handleGameOver(){
     Navigator.of(context).pop();
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => HomePage(settings: widget.settings)),
+      MaterialPageRoute(builder: (context) => HomePage(settings: widget.settings, save: widget.save)),
           (Route<dynamic> route) => false,
     );
   }
@@ -273,8 +274,8 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     }
     if (state == false) {
       bool isVictory = false;
-      if (desk.score > _maxScore) {
-        _maxScore = desk.score;
+      if (desk.getScore() > _maxScore) {
+        _maxScore = desk.getScore();
         isVictory = true;
       }
       isVictory ? sounds.playGameOverWinSound() : sounds.playGameOverLoseSound();
@@ -293,7 +294,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     vibro.vibrateLight();
     setState(() {
       currentHint = desk.findHint();
-      if (currentHint == null && desk.remainingAddClicks > 0) {
+      if (currentHint == null && desk.getRemainingAddClicks() > 0) {
         _addButtonKey.currentState?.startShakeAnimation();
       }
       currentHint == null ? sounds.playNoHintsSound() : sounds.playHintSound();

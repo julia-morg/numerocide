@@ -9,7 +9,7 @@ class Hint {
   }
 
   @override
-  String toString(){
+  String toString() {
     return '[$hint1; $hint2]';
   }
 }
