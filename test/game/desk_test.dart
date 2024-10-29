@@ -107,7 +107,7 @@ void main() {
       2: Field(2, 7, true),
     });
 
-    final expectedString = 'Desk{stage: 1, score: 100, remainingAddClicks: 2, rowLength: 9}\nnumbers: \n5 3 7\n';
+    final expectedString = 'Desk{stage: 1, score: 100, remainingAddClicks: 2, rowLength: 9}\nnumbers: \n5/a 3/d 7/a\n';
     expect(desk.toString(), expectedString);
   });
 
@@ -121,7 +121,7 @@ void main() {
       5: Field(5, 1, true),
     }, 3);
 
-    final expectedString = 'Desk{stage: 1, score: 100, remainingAddClicks: 2, rowLength: 3}\nnumbers: \n5 3 7\n2 8 1\n';
+    final expectedString = 'Desk{stage: 1, score: 100, remainingAddClicks: 2, rowLength: 3}\nnumbers: \n5/a 3/d 7/a\n2/a 8/d 1/a\n';
     expect(desk.toString(), expectedString);
   });
 }

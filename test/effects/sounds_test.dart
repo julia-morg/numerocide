@@ -52,9 +52,7 @@ void main() {
 
   test('playTapSound does not play sound if sound is disabled', () {
     when(() => mockSettings.sound).thenReturn(false);
-
     sounds.playTapSound();
-
     verifyNever(() => mockPlayer.play(any(), volume: any(named: 'volume')));
   });
 
@@ -65,5 +63,56 @@ void main() {
     verify(() => mockPlayer.stop()).called(1);
     final captured = verify(() => mockPlayer.play(captureAny(), volume: 0.5)).captured;
     expect((captured.first as AssetSource).path, equals('sounds/remove_row.mp3'));
+  });
+
+  test('playRemoveNumbersSound calls play with correct sound if sound is enabled', () async {
+    when(() => mockSettings.sound).thenReturn(true);
+    sounds.playRemoveNumbersSound();
+    await Future.delayed(const Duration(milliseconds: 30));
+    verify(() => mockPlayer.stop()).called(1);
+    final captured = verify(() => mockPlayer.play(captureAny(), volume: 0.5)).captured;
+    expect((captured.first as AssetSource).path, equals('sounds/${Sounds.soundRemoveNumbers}'));
+  });
+
+  test('playNoHintsSound calls play with correct sound if sound is enabled', () async {
+    when(() => mockSettings.sound).thenReturn(true);
+    sounds.playNoHintsSound();
+    await Future.delayed(const Duration(milliseconds: 30));
+    verify(() => mockPlayer.stop()).called(1);
+    final captured = verify(() => mockPlayer.play(captureAny(), volume: 0.5)).captured;
+    expect((captured.first as AssetSource).path, equals('sounds/${Sounds.soundNoHints}'));
+  });
+
+  test('playGameOverWinSound calls play with correct sound if sound is enabled', () async {
+    when(() => mockSettings.sound).thenReturn(true);
+    sounds.playGameOverWinSound();
+    await Future.delayed(const Duration(milliseconds: 30));
+    verify(() => mockPlayer.stop()).called(1);
+    final captured = verify(() => mockPlayer.play(captureAny(), volume: 0.5)).captured;
+    expect((captured.first as AssetSource).path, equals('sounds/gameover-victory.flac'));
+  });
+  test('playHintSound calls play with correct sound if sound is enabled', () async {
+    when(() => mockSettings.sound).thenReturn(true);
+    sounds.playHintSound();
+    await Future.delayed(const Duration(milliseconds: 30));
+    verify(() => mockPlayer.stop()).called(1);
+    final captured = verify(() => mockPlayer.play(captureAny(), volume: 0.5)).captured;
+    expect((captured.first as AssetSource).path, equals('sounds/${Sounds.soundHint}'));
+  });
+  test('playGameOverLoseSound calls play with correct sound if sound is enabled', () async {
+    when(() => mockSettings.sound).thenReturn(true);
+    sounds.playGameOverLoseSound();
+    await Future.delayed(const Duration(milliseconds: 30));
+    verify(() => mockPlayer.stop()).called(1);
+    final captured = verify(() => mockPlayer.play(captureAny(), volume: 0.5)).captured;
+    expect((captured.first as AssetSource).path, equals('sounds/gameover-lose.mp3'));
+  });
+  test('playDeskClearedSound calls play with correct sound if sound is enabled', () async {
+    when(() => mockSettings.sound).thenReturn(true);
+    sounds.playDeskClearedSound();
+    await Future.delayed(const Duration(milliseconds: 30));
+    verify(() => mockPlayer.stop()).called(1);
+    final captured = verify(() => mockPlayer.play(captureAny(), volume: 0.5)).captured;
+    expect((captured.first as AssetSource).path, equals('sounds/desk_cleared.wav'));
   });
 }

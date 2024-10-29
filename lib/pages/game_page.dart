@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:numerocide/components/dialog_action.dart';
 import '../components/default_scaffold.dart';
 import '../components/popup_dialog.dart';
 import 'home_page.dart';
@@ -230,7 +229,6 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
   }
 
   void _onButtonPressed(int index) {
-
     setState(() {
       if (selectedButtons.isNotEmpty && selectedButtons[0] == index) {
         selectedButtons.clear();

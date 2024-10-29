@@ -18,10 +18,6 @@ class Desk {
     return Desk(1, 0, defaultAddsCount, generateRandomNumbers(initialButtonsCount));
   }
 
-  Map<int, Field> getNumbers() {
-    return numbers;
-  }
-
   int getStage() {
     return _stage;
   }
@@ -36,10 +32,6 @@ class Desk {
 
   int setRemainingAddClicks(int value) {
     return _remainingAddClicks = value;
-  }
-
-  int decrementRemainingAddClicks() {
-    return --_remainingAddClicks;
   }
 
   void addFields() {
@@ -270,6 +262,8 @@ class Desk {
 
     numbers.forEach((index, field) {
       buffer.write(field.number);
+      buffer.write('/');
+      buffer.write(field.isActive ? 'a' : 'd');
       counter++;
       if (counter % rowLength == 0) {
         buffer.write('\n');

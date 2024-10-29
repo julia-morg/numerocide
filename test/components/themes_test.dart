@@ -35,5 +35,37 @@ void main() {
       expect(themeData.textTheme.headlineMedium!.color, themeData.colorScheme.secondary);
       expect(themeData.elevatedButtonTheme.style?.backgroundColor?.resolve({}), themeData.colorScheme.secondaryContainer);
     });
+
+    group('getSwitchThemeData', () {
+      final colorScheme = ColorScheme.fromSwatch(
+        primarySwatch: Colors.blue,
+        accentColor: Colors.green,
+        backgroundColor: Colors.white,
+      );
+
+      test('returns correct thumbColor for selected and unselected states', () {
+        final switchThemeData = Themes.getSwitchThemeData(colorScheme);
+        final thumbColorSelected = switchThemeData.thumbColor!.resolve({WidgetState.selected});
+        expect(thumbColorSelected, colorScheme.secondary);
+        final thumbColorUnselected = switchThemeData.thumbColor!.resolve({});
+        expect(thumbColorUnselected, colorScheme.primary);
+      });
+
+      test('returns correct trackColor for selected and unselected states', () {
+        final switchThemeData = Themes.getSwitchThemeData(colorScheme);
+        final trackColorSelected = switchThemeData.trackColor!.resolve({WidgetState.selected});
+        expect(trackColorSelected, colorScheme.primary);
+        final trackColorUnselected = switchThemeData.trackColor!.resolve({});
+        expect(trackColorUnselected, colorScheme.secondary);
+      });
+
+      test('returns correct trackOutlineColor for selected and unselected states', () {
+        final switchThemeData = Themes.getSwitchThemeData(colorScheme);
+        final trackOutlineColorSelected = switchThemeData.trackOutlineColor!.resolve({WidgetState.selected});
+        expect(trackOutlineColorSelected, colorScheme.primary);
+        final trackOutlineColorUnselected = switchThemeData.trackOutlineColor!.resolve({});
+        expect(trackOutlineColorUnselected, colorScheme.primary);
+      });
+    });
   });
 }

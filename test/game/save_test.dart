@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:numerocide/game/save.dart';
@@ -70,7 +69,6 @@ void main() {
       expect(loadedDesk.getScore(), 200);
       expect(loadedDesk.getStage(), 2);
       expect(loadedDesk.getRemainingAddClicks(), 5);
-      debugPrint(loadedDesk.toString());
       expect(loadedDesk.numbers[0]?.number, 10);
       expect(loadedDesk.numbers[0]?.isActive, false);
     });

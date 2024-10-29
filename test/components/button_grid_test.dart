@@ -5,9 +5,9 @@ import 'package:numerocide/game/desk.dart';
 import 'package:numerocide/game/field.dart';
 import 'package:numerocide/game/hint.dart';
 
-
 void main() {
-  testWidgets('ButtonGrid displays buttons with correct text and styles', (WidgetTester tester) async {
+  testWidgets('ButtonGrid displays buttons with correct text and styles',
+      (WidgetTester tester) async {
     final desk = Desk(
       1,
       100,
@@ -25,13 +25,17 @@ void main() {
     final hint = Hint(1, 3);
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: ButtonGrid(
-            onButtonPressed: (_) {},
-            selectedButtons: selectedButtons,
-            desk: desk,
-            hint: hint,
+      MediaQuery(
+        data: const MediaQueryData(
+            size: Size(400, 1200), padding: EdgeInsets.all(1)),
+        child: MaterialApp(
+          home: Scaffold(
+            body: ButtonGrid(
+              onButtonPressed: (_) {},
+              selectedButtons: selectedButtons,
+              desk: desk,
+              hint: hint,
+            ),
           ),
         ),
       ),
@@ -57,7 +61,8 @@ void main() {
     expect(fourthButton.style?.backgroundColor?.resolve({}), isNotNull);
   });
 
-  testWidgets('ButtonGrid calls onButtonPressed when active button is pressed', (WidgetTester tester) async {
+  testWidgets('ButtonGrid calls onButtonPressed when active button is pressed',
+      (WidgetTester tester) async {
     final desk = Desk(
       1,
       100,
@@ -74,24 +79,27 @@ void main() {
     bool wasPressed = false;
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: ButtonGrid(
-            onButtonPressed: (index) {
-              wasPressed = true;
-              expect(index, equals(0));
-            },
-            selectedButtons: [],
-            desk: desk,
+      MediaQuery(
+        data: const MediaQueryData(
+            size: Size(400, 1200), padding: EdgeInsets.all(1)),
+        child: MaterialApp(
+          home: Scaffold(
+            body: ButtonGrid(
+              onButtonPressed: (index) {
+                wasPressed = true;
+                expect(index, equals(0));
+              },
+              selectedButtons: [],
+              desk: desk,
+            ),
           ),
         ),
       ),
     );
 
-    await tester.tap(find.text('1'));
+    await tester.tap(find.byKey(const Key('number_0')));
     await tester.pumpAndSettle();
 
     expect(wasPressed, isTrue);
   });
-
 }

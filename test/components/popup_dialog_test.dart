@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:confetti/confetti.dart';
 import 'package:numerocide/components/popup_dialog.dart';
-import 'package:numerocide/components/dialog_action.dart';
 
 void main() {
   testWidgets('PopupDialog displays title, content, note, actions, and plays confetti when hasConfetti is true', (WidgetTester tester) async {

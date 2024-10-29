@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:numerocide/components/default_scaffold.dart';
-import 'package:numerocide/components/dialog_action.dart';
 import 'package:numerocide/pages/tutorial_page.dart';
 import '../components/popup_dialog.dart';
 import 'game_page.dart';

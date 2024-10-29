@@ -9,9 +9,6 @@ class Themes {
   static const String green = 'grass';
   static List<String> get allThemes => [navy, brown, grey, green];
 
-  Themes();
-
-
   static String themeDisplayName(String theme) {
     return theme.capitalize();
   }

@@ -50,8 +50,7 @@ void main() {
 
     when(() => mockDesk.checkGameStatus()).thenReturn(true);
     when(() => mockDesk.rowLength).thenReturn(5);
-    when(() => mockDesk.numbers)
-        .thenReturn({0: Field(0, 5, true), 1: Field(1, 4, true)});
+    when(() => mockDesk.numbers).thenReturn({0: Field(0, 5, true), 1: Field(1, 4, true)});
     when(() => mockDesk.getRemainingAddClicks()).thenReturn(1);
     when(() => mockDesk.getScore()).thenReturn(1);
     when(() => mockDesk.getStage()).thenReturn(1);
@@ -62,6 +61,7 @@ void main() {
     when(() => mockSave.hasSavedGame()).thenAnswer((_) async => true);
     when(() => mockSave.loadMaxScore()).thenAnswer((_) async => 1000);
     when(() => mockSave.saveMaxScore(any())).thenAnswer((_) async => true);
+    when(() => mockSave.isTutorialPassed()).thenAnswer((_) async => true);
     when(() => mockSounds.playTapSound()).thenAnswer((_) async {});
     when(() => mockSounds.playDeskClearedSound()).thenAnswer((_) async {});
     when(() => mockSounds.playAddRowSound()).thenAnswer((_) async {});
@@ -69,12 +69,14 @@ void main() {
     when(() => mockSounds.playRemoveNumbersSound()).thenAnswer((_) async {});
     when(() => mockSounds.playNoHintsSound()).thenAnswer((_) async {});
     when(() => mockSounds.playHintSound()).thenAnswer((_) async {});
+    when(() => mockSounds.playGameOverWinSound()).thenAnswer((_) async {});
   });
 
   Future<void> pumpGamePage(WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: ThemeData(
+          colorScheme: ColorScheme.fromSwatch().copyWith(primary:Colors.red, secondary: Colors.green, onPrimary: Colors.blue),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -97,18 +99,68 @@ void main() {
     registerFallbackValue(MockDesk());
   });
 
-  testWidgets('Displays game over dialog on losing the game',
-      (WidgetTester tester) async {
+  testWidgets('Displays game over dialog on losing the game and press return', (WidgetTester tester) async {
     await pumpGamePage(tester);
     when(() => mockDesk.checkGameStatus()).thenReturn(false);
     await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
-
+    expect(find.byType(AlertDialog), findsOne);
     expect(find.textContaining('GAME OVER'), findsOneWidget);
     expect(find.textContaining('SCORE'), findsOneWidget);
+    await tester.tap(find.text('RETURN'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+  });
+
+  testWidgets('Displays game over dialog on win the game and press return', (WidgetTester tester) async {
+    when(() => mockDesk.getScore()).thenReturn(2000);
+    await pumpGamePage(tester);
+    when(() => mockDesk.isVictory()).thenReturn(true);
+    when(() => mockDesk.checkGameStatus()).thenReturn(false);
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOne);
+    expect(find.textContaining('GAME OVER'), findsOneWidget);
+    expect(find.textContaining('SCORE: 2000'), findsOneWidget);
+    expect(find.textContaining('Best\n2000'), findsOneWidget);
+    expect(find.textContaining('best score'), findsOneWidget);
+    await tester.tap(find.text('RETURN'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+  });
+
+  testWidgets('Displays game over dialog on losing the game and taps outside', (WidgetTester tester) async {
+    await pumpGamePage(tester);
+    when(() => mockDesk.checkGameStatus()).thenReturn(false);
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOne);
+    expect(find.textContaining('GAME OVER'), findsOneWidget);
+    expect(find.textContaining('SCORE'), findsOneWidget);
+    await tester.tapAt(const Offset(0, 0));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
   });
 
   testWidgets('Processes button press', (WidgetTester tester) async {
+    when(() => mockDesk.isCorrectMove(0, 1)).thenReturn(false);
+    when(() => mockDesk.move(any(), any())).thenReturn(false);
+    await pumpGamePage(tester);
+    await tester.tap(find.byKey(const Key('number_0')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('number_1')));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
+    verifyNever(() => mockSounds.playRemoveNumbersSound());
+    TextButton btn = tester.widget<TextButton>(find.byKey(const Key('number_0')));
+    Color? backgroundColor = btn.style?.backgroundColor?.resolve({WidgetState.pressed});
+    expect(backgroundColor, equals(Colors.green));
+    btn = tester.widget<TextButton>(find.byKey(const Key('number_1')));
+    backgroundColor = btn.style?.backgroundColor?.resolve({WidgetState.pressed});
+    expect(backgroundColor, equals(Colors.blue));
+    await tester.tap(find.byKey(const Key('number_1')));
+    await tester.pumpAndSettle();
+
     when(() => mockDesk.isCorrectMove(0, 1)).thenReturn(true);
     when(() => mockDesk.move(any(), any())).thenReturn(false);
     await pumpGamePage(tester);
@@ -119,6 +171,26 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
      verify(() => mockSounds.playRemoveNumbersSound()).called(1);
   });
+
+  testWidgets('Check button press', (WidgetTester tester) async {
+    when(() => mockDesk.isCorrectMove(0, 1)).thenReturn(true);
+    when(() => mockDesk.move(any(), any())).thenReturn(false);
+    await pumpGamePage(tester);
+    TextButton btn = tester.widget<TextButton>(find.byKey(const Key('number_0')));
+    Color? backgroundColor = btn.style?.backgroundColor?.resolve({WidgetState.pressed});
+    expect(backgroundColor, equals(Colors.green));
+    await tester.tap(find.byKey(const Key('number_0')));
+    await tester.pumpAndSettle();
+    btn = tester.widget<TextButton>(find.byKey(const Key('number_0')));
+    backgroundColor = btn.style?.backgroundColor?.resolve({WidgetState.pressed});
+    expect(backgroundColor, equals(Colors.blue));
+    await tester.tap(find.byKey(const Key('number_0')));
+    await tester.pumpAndSettle();
+    btn = tester.widget<TextButton>(find.byKey(const Key('number_0')));
+    backgroundColor = btn.style?.backgroundColor?.resolve({WidgetState.pressed});
+    expect(backgroundColor, equals(Colors.green));
+  });
+
 
   testWidgets('Check game state updates and score tracking',
       (WidgetTester tester) async {
@@ -167,8 +239,6 @@ void main() {
         Locale('en'),
       ],
     ));
-
-    debugPrint('state: ${gamePage.settings.sound}');
 
     final finder = find.byKey(const Key('label-container-addButton'));
     expect(finder, findsOneWidget);

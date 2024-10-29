@@ -15,14 +15,14 @@ void main() {
             MapEntry(index,
                 Field(index, number, !stage.inactiveNumbers.contains(index))));
         Desk desk = Desk(0, 0, 0, numbers, stage.buttonsPerRow);
-        if (stage.hint.hint1 < 0) {
+        if (stage.hint == null) {
           continue;
         }
-        bool isHintCorrect = desk.isCorrectMove(stage.hint.hint1, stage.hint.hint2);
+        bool isHintCorrect = desk.isCorrectMove(stage.hint!.hint1, stage.hint!.hint2);
         expect(isHintCorrect, isTrue,
             reason:
                 'Hint move should be correct for stage: $step. ${stage.text}');
-        desk.move(stage.hint.hint1, stage.hint.hint2).toString();
+        desk.move(stage.hint!.hint1, stage.hint!.hint2).toString();
         Hint? hint = desk.findHint();
         expect(hint, isNull,
             reason:

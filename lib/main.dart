@@ -28,6 +28,7 @@ class MyApp extends StatefulWidget {
       m.updateTheme(newTheme);
     }
   }
+
   static void setLocale(BuildContext context, Locale newLocale) {
     _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
     state?.changeLanguage(newLocale);

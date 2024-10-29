@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
-import 'dialog_action.dart';
+
+class DialogAction {
+  final String text;
+  final VoidCallback onPressed;
+
+  DialogAction({
+    required this.text,
+    required this.onPressed,
+  });
+}
 
 class PopupDialog extends StatefulWidget {
   final String? title;
@@ -81,7 +90,7 @@ class _PopupDialogState extends State<PopupDialog> {
           }).toList(),
         ),
         Align(
-          alignment: Alignment.center,
+          alignment: Alignment.topCenter,
           child: ConfettiWidget(
             confettiController: _confettiController,
             blastDirectionality: BlastDirectionality.explosive,

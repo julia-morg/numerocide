@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:numerocide/components/default_scaffold.dart';
-import 'package:numerocide/components/dialog_action.dart';
 import 'package:numerocide/components/popup_dialog.dart';
 import 'package:numerocide/game/hint.dart';
 import 'package:numerocide/components/text_plate.dart';
 import 'package:numerocide/game/save.dart';
 import '../game/desk.dart';
-import '../game/field.dart';
 import '../components/button_grid.dart';
 import '../game/settings.dart';
 import '../effects/sounds.dart';
@@ -19,13 +17,13 @@ class TutorialPage extends StatefulWidget {
   @override
   State<TutorialPage> createState() => _TutorialPageState();
 
-  const TutorialPage({
-    super.key,
-    required this.settings, required this.save,
-  });
+  const TutorialPage(
+      {super.key, required this.settings, required this.save, int? step})
+      : step = step ?? 0;
 
   final Settings settings;
   final Save save;
+  final int step;
 }
 
 class _TutorialPageState extends State<TutorialPage> {
@@ -36,24 +34,28 @@ class _TutorialPageState extends State<TutorialPage> {
   late Desk desk;
   late Hint? hint;
   late int rowLength;
-  int step = 0;
+  late int step;
   bool stageCompleted = false;
+
+  @override
+  String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
+    return desk.toString();
+  }
+
 
   @override
   void initState() {
     super.initState();
+    step = widget.step;
     sounds = Sounds(settings: widget.settings);
     vibro = Vibro(settings: widget.settings);
     stages = Tutorial().getSteps();
-    _applyStage(stages[0]);
+    _applyStage(stages[step]);
   }
 
   void _applyStage(Stage stage) {
     setState(() {
-      Map<int, Field> numbers = stage.numbers.asMap().map((index, number) =>
-          MapEntry(index,
-              Field(index, number, !stage.inactiveNumbers.contains(index))));
-      desk = Desk(0, 0, stage.buttonsPerRow, numbers, stage.buttonsPerRow);
+      desk = Desk(0, 0, 0, stage.getFields(), stage.buttonsPerRow);
       hint = stage.hint;
       rowLength = stage.buttonsPerRow;
       stageCompleted = false;
@@ -63,7 +65,7 @@ class _TutorialPageState extends State<TutorialPage> {
 
   void _nextStep() {
     if (!isNextStepAvailable()) {
-      goToMainMenu();
+      _goToMainMenu();
       return;
     }
     setState(() {
@@ -78,11 +80,17 @@ class _TutorialPageState extends State<TutorialPage> {
     return step < stages.length - 1;
   }
 
-  void goToMainMenu() {
+  void _goToMainMenu() {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => HomePage(settings: widget.settings, save: widget.save,)),
           (Route<dynamic> route) => false,
+    );
+  }
+
+  void _goToTutorial() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => TutorialPage(settings: widget.settings, save: widget.save)),
     );
   }
 
@@ -101,14 +109,13 @@ class _TutorialPageState extends State<TutorialPage> {
               justifiedText: getLocalizedStep(context, step + 1)
           ),
           const SizedBox(height: 20,),
-          SizedBox(
-            height: 260,
-            child: ButtonGrid(
+            ButtonGrid(
               onButtonPressed: _onButtonPressed,
               selectedButtons: selectedButtons,
               desk: desk,
               hint: hint,
-            ),
+              rows: 4,
+              withScroll: false,
           ),
           const SizedBox(height: 20,),
           ElevatedButton(
@@ -177,15 +184,11 @@ class _TutorialPageState extends State<TutorialPage> {
                     actions: [
                       DialogAction(
                         text: AppLocalizations.of(context)!.tutorialPagePopupRestart,
-                        onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (context) => TutorialPage(settings: widget.settings, save: widget.save)),
-                          );
-                        },
+                        onPressed: () => _goToTutorial(),
                       ),
                       DialogAction(
                         text: AppLocalizations.of(context)!.tutorialPagePopupFinish,
-                        onPressed: () => goToMainMenu(),
+                        onPressed: () => _goToMainMenu(),
                       ),
                     ],
                   );

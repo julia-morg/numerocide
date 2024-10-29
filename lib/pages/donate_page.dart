@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:numerocide/components/dialog_action.dart';
 import 'package:numerocide/components/popup_dialog.dart';
 import '../components/default_scaffold.dart';
 import '../game/save.dart';
@@ -10,8 +9,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class DonatePage extends StatefulWidget {
   final Settings settings;
   final Save save;
+  final InAppPurchase inAppPurchase;
 
-  const DonatePage({super.key, required this.settings, required this.save});
+  DonatePage({super.key, required this.settings, required this.save, InAppPurchase? inAppPurchase})
+      : inAppPurchase = inAppPurchase ?? InAppPurchase.instance;
 
   @override
   State<DonatePage> createState() => _DonatePageState();
@@ -98,7 +99,7 @@ class _DonatePageState extends State<DonatePage> {
   }
 
   Future<bool> _processPayment(double amount) async {
-    final InAppPurchase inAppPurchase = InAppPurchase.instance;
+    final InAppPurchase inAppPurchase = widget.inAppPurchase;
     final productId = '$donationProductPrefix$amount';
     bool available = await inAppPurchase.isAvailable();
     if (!available) {

@@ -6,6 +6,7 @@ import 'package:numerocide/game/settings.dart';
 class MockSettings extends Mock implements Settings {}
 class MockHapticFeedbackWrapper extends Mock implements HapticFeedbackWrapper {}
 
+
 void main() {
   late MockSettings mockSettings;
   late MockHapticFeedbackWrapper mockHapticFeedback;
