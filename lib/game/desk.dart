@@ -115,7 +115,7 @@ class Desk {
     if (isCorrectMove(firstIndex, secondIndex)) {
       numbers[firstIndex]!.isActive = false;
       numbers[secondIndex]!.isActive = false;
-      _score += 2*_stage;
+      _score += _calculateScore(firstIndex, secondIndex);
       return _checkAndRemoveEmptyRows();
     }
     return false;
@@ -123,6 +123,29 @@ class Desk {
 
   bool isVictory() {
     return numbers.values.every((field) => !field.isActive);
+  }
+
+  int _calculateScore(int firstIndex, int secondIndex) {
+    if (isVictory()) {
+      return 100 * _stage;
+    }
+    if (_calculateRemovedRows() > 0) {
+      return 10 * _calculateRemovedRows() * _stage;
+    }
+
+    if (_areButtonsInSameRow(firstIndex, secondIndex)) {
+      if ((firstIndex - secondIndex).abs() >= 5) {
+        return 4 * _stage;
+      }
+    }
+    if (_areButtonsInSameColumn(firstIndex, secondIndex)) {
+      int row1 = firstIndex ~/ rowLength;
+      int row2 = secondIndex ~/ rowLength;
+      if ((row1 - row2).abs() >= 5) {
+        return 4 * _stage;
+      }
+    }
+    return 2 * _stage;
   }
 
   bool _areButtonsInSameRow(int firstIndex, int secondIndex) {
@@ -204,6 +227,16 @@ class Desk {
 
     return (firstIndex == firstActiveIndex && secondIndex == lastActiveIndex) ||
         (firstIndex == lastActiveIndex && secondIndex == firstActiveIndex);
+  }
+
+  int _calculateRemovedRows() {
+    int removedRows = 0;
+    for (int i = 0; i < numbers.length; i += rowLength) {
+      if (_isRowEmpty(i ~/ rowLength)) {
+        removedRows++;
+      }
+    }
+    return removedRows;
   }
 
   bool _checkAndRemoveEmptyRows() {

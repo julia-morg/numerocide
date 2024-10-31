@@ -118,7 +118,7 @@ void main() {
     when(() => mockDesk.isVictory()).thenReturn(true);
     when(() => mockDesk.checkGameStatus()).thenReturn(false);
     await tester.tap(find.byIcon(Icons.add));
-    await tester.pumpAndSettle();
+    await tester.pump();
     expect(find.byType(AlertDialog), findsOne);
     expect(find.textContaining('GAME OVER'), findsOneWidget);
     expect(find.textContaining('SCORE: 2000'), findsOneWidget);

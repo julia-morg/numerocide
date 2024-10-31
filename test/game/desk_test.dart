@@ -124,4 +124,88 @@ void main() {
     final expectedString = 'Desk{stage: 1, score: 100, remainingAddClicks: 2, rowLength: 3}\nnumbers: \n5/a 3/d 7/a\n2/a 8/d 1/a\n';
     expect(desk.toString(), expectedString);
   });
+
+  group('Desk - Score Calculation Tests', () {
+    late Desk desk;
+
+    setUp(() {
+      desk = Desk.newGame();
+    });
+
+    test('Victory score calculation', () {
+      Hint? hint = desk.findHint();
+      while (hint == null) {
+        desk = Desk.newGame();
+        hint = desk.findHint();
+      }
+      desk.numbers.updateAll((key, field) => Field(key, field.number, hint!.isHint(key)? true : false));
+      desk.move(hint.hint1, hint.hint2);
+      expect(desk.getScore(), equals(100 * desk.getStage()));
+    });
+
+    test('Score calculation for removing a row', () {
+      desk.rowLength = 3;
+      desk.numbers = {
+        0: Field(0, 5, true),
+        1: Field(1, 5, true),
+        2: Field(2, 3, false),
+        3: Field(3, 3, true),
+      };
+      desk.move(0, 1);
+      expect(desk.getScore(), equals(10 * desk.getStage()));  // Умножение на число удаленных рядов
+    });
+
+    test('Score calculation for move in same row', () {
+      desk.numbers = {
+        0: Field(0, 5, true),
+        1: Field(1, 5, false),
+        2: Field(2, 5, false),
+        3: Field(3, 5, false),
+        4: Field(4, 5, false),
+        5: Field(5, 5, true),
+        6: Field(6, 5, true),
+      };
+      desk.move(0, 5);
+      expect(desk.getScore(), equals(4 * desk.getStage()));
+    });
+
+    test('Score calculation for move in same column', () {
+      desk.rowLength = 2;
+      desk.numbers = {
+        0: Field(0, 5, true),
+        1: Field(1, 5, false),
+        2: Field(2, 5, false),
+        3: Field(3, 5, false),
+        4: Field(4, 5, false),
+        5: Field(5, 5, false),
+        6: Field(6, 5, false),
+        7: Field(7, 5, false),
+        8: Field(8, 5, false),
+        9: Field(9, 5, false),
+        10: Field(10, 5, false),
+        11: Field(11, 5, false),
+        12: Field(12, 5, false),
+        13: Field(13, 5, false),
+        14: Field(14, 5, false),
+        15: Field(15, 5, false),
+        16: Field(16, 5, false),
+        17: Field(17, 5, false),
+        18: Field(18, 5, true),
+        19: Field(19, 5, true),
+      };
+      desk.move(0, 18);
+      expect(desk.getScore(), equals(9 * 10 * desk.getStage()));
+    });
+
+    test('Default score calculation for valid move', () {
+      desk.numbers = {
+        0: Field(0, 5, true),
+        1: Field(1, 5, true),
+        2: Field(2, 5, true),
+      };
+      desk.move(0, 1);
+      expect(desk.getScore(), equals(2 * desk.getStage()));
+    });
+  });
+
 }

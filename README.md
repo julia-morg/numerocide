@@ -13,3 +13,11 @@ Numerocide is a strategic puzzle game where your goal is to clear a 9-cell wide 
 
 ## Contacts 
  * [game site](https://julia_morg.tilda.ws/)
+
+## Localization
+`flutter gen-l10n`
+
+## Icon generation
+`dart run flutter_launcher_icons:main`
+
+

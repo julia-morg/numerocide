@@ -185,7 +185,6 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
     vibro.vibrateMedium();
     setState(() {
       desk.addFields();
-      _saveGameState();
       _checkGameState();
     });
   }
@@ -205,7 +204,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
             },
             child: PopupDialog(
               title:AppLocalizations.of(context)!.gamePageGameOverPopupTitle,
-              content: '${AppLocalizations.of(context)!.gamePageGameOverPopupScore}${desk.getScore()} \n',
+              content: '${AppLocalizations.of(context)!.gamePageGameOverPopupScore}${desk.getScore()}',
               note: bestScore,
               hasConfetti: isVictory,
               actions: [
