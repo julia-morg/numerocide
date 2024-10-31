@@ -22,7 +22,7 @@
     "gamePageBest": "Best",
     "gamePageGameOverPopupTitle": "GAME OVER",
     "gamePageGameOverPopupBest": "This is your best score ever!",
-    "gamePageGameOverPopupScore": "SCORE: ",
+    "gamePageGameOverPopupScore": "No more moves!\nSCORE: ",
     "gamePageGameOverPopupConfirm": "RETURN",
 
 

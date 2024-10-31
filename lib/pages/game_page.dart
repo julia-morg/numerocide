@@ -207,6 +207,7 @@ class _GamePageState extends State<GamePage>  with SingleTickerProviderStateMixi
               title:AppLocalizations.of(context)!.gamePageGameOverPopupTitle,
               content: '${AppLocalizations.of(context)!.gamePageGameOverPopupScore}${desk.getScore()} \n',
               note: bestScore,
+              hasConfetti: isVictory,
               actions: [
                 DialogAction(
                     onPressed: _handleGameOver,

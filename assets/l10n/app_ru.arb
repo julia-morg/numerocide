@@ -21,7 +21,7 @@
     "gamePageBest": "Лучший",
     "gamePageGameOverPopupTitle": "ИГРА ОКОНЧЕНА",
     "gamePageGameOverPopupBest": "Это ваш лучший результат за всё время!",
-    "gamePageGameOverPopupScore": "СЧЁТ: ",
+    "gamePageGameOverPopupScore": "Ходов больше нет\nСЧЁТ: ",
     "gamePageGameOverPopupConfirm": "ВЕРНУТЬСЯ",
 
     "settingsPageHeader": "Настройки",

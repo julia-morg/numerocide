@@ -21,7 +21,7 @@
     "gamePageBest": "Mejor",
     "gamePageGameOverPopupTitle": "FIN DEL JUEGO",
     "gamePageGameOverPopupBest": "¡Este es tu mejor resultado hasta ahora!",
-    "gamePageGameOverPopupScore": "PUNTUACIÓN: ",
+    "gamePageGameOverPopupScore": "No hay más movimientos\nPUNTUACIÓN: ",
     "gamePageGameOverPopupConfirm": "VOLVER",
 
     "settingsPageHeader": "Configuraciones",
