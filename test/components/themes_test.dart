@@ -27,13 +27,21 @@ void main() {
       expect(greenScheme.secondaryContainer, Colors.teal[50]!);
     });
 
-    test('getThemeData generates correct ThemeData', () {
-      final themeData = Themes.getThemeData(Themes.navy);
-
-      expect(themeData.colorScheme.primary, isNotNull);
-      expect(themeData.appBarTheme.backgroundColor, themeData.colorScheme.primary);
-      expect(themeData.textTheme.headlineMedium!.color, themeData.colorScheme.secondary);
-      expect(themeData.elevatedButtonTheme.style?.backgroundColor?.resolve({}), themeData.colorScheme.secondaryContainer);
+    testWidgets('getThemeData generates correct ThemeData', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (BuildContext context) {
+              final themeData = Themes.getThemeData(Themes.navy, context);
+              expect(themeData.colorScheme.primary, isNotNull);
+              expect(themeData.appBarTheme.backgroundColor, themeData.colorScheme.primary);
+              expect(themeData.textTheme.headlineMedium!.color, themeData.colorScheme.secondary);
+              expect(themeData.elevatedButtonTheme.style?.backgroundColor?.resolve({}), themeData.colorScheme.secondaryContainer);
+              return Container(); // Возвращаем пустой контейнер, так как тестируем только данные темы
+            },
+          ),
+        ),
+      );
     });
 
     group('getSwitchThemeData', () {

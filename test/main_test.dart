@@ -53,17 +53,17 @@ void main() {
       ),
     );
 
-    expect(appWidget.theme?.colorScheme.primary, Themes.getThemeData('stone').colorScheme.primary);
+    expect(appWidget.theme?.colorScheme.primary, Themes.getThemeData('stone', tester.element(find.byType(MyApp))).colorScheme.primary);
     expect(appWidget.locale, const Locale('en'));
   });
 
   testWidgets('updateTheme updates theme correctly', (WidgetTester tester) async {
     await pumpMyApp(tester);
     Finder finder = find.byType(MaterialApp).last;
-    MyApp.updateTheme(tester.element(finder), Themes.getThemeData('navy'),);
+    MyApp.updateTheme(tester.element(finder), Themes.getThemeData('navy', tester.element(finder)));
     await tester.pumpAndSettle();
     final MaterialApp appWidget = tester.widget<MaterialApp>(finder);
-    expect(appWidget.theme?.colorScheme.primary, Themes.getThemeData('navy').colorScheme.primary);
+    expect(appWidget.theme?.colorScheme.primary, Themes.getThemeData('navy', tester.element(finder)).colorScheme.primary);
   });
 
   testWidgets('setLocale updates locale correctly', (WidgetTester tester) async {
@@ -71,7 +71,7 @@ void main() {
     Finder finder = find.byType(MaterialApp).last;
     MyApp.setLocale(tester.element(finder), const Locale('fr'));
     await tester.pumpAndSettle();
-    await tester.pumpAndSettle();
+
     final locale = tester.widget<MaterialApp>(finder).locale;
     expect(locale, equals(const Locale('fr')));
   });

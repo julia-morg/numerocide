@@ -92,6 +92,7 @@ class _HomePageState extends State<HomePage> {
     TextStyle largeTextStyle = Theme.of(context).textTheme.titleLarge!;
     Color inactiveColor = Theme.of(context).colorScheme.onSecondary;
     _title = AppLocalizations.of(context)!.appTitle;
+    Icon star = Icon(Icons.star, color: colorStar, size: Theme.of(context).iconTheme.size);
     return DefaultScaffold(
       title: _title.toUpperCase(),
       settings: widget.settings,
@@ -111,14 +112,14 @@ class _HomePageState extends State<HomePage> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.star, color: colorStar, size: 30),
+                    star,
                     const SizedBox(width: 5),
                     Text(
                       '$_maxScore',
                       style: largeTextStyle,
                     ),
                     const SizedBox(width: 5),
-                    Icon(Icons.star, color: colorStar, size: 30),
+                    star,
                   ],
                 ),
               ],

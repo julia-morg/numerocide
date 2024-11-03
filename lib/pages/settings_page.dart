@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:numerocide/components/default_scaffold.dart';
 import 'package:numerocide/components/settings/language_tile.dart';
 import 'package:numerocide/components/settings/theme_tile.dart';
 import 'package:numerocide/pages/tutorial_page.dart';
@@ -30,10 +31,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     TextStyle labelStyle = Theme.of(context).textTheme.titleSmall!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.settingsPageHeader),
-      ),
+    return DefaultScaffold(
+      title: AppLocalizations.of(context)!.settingsPageHeader,
+      settings: widget.settings,
+      save: widget.save,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(

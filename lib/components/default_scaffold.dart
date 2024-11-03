@@ -23,10 +23,15 @@ class DefaultScaffold extends StatelessWidget {
   });
 
   @override
+  @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double toolbarHeight = screenHeight * 0.1;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
+        toolbarHeight: toolbarHeight,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -46,7 +51,7 @@ class DefaultScaffold extends StatelessWidget {
         ],
       ),
       body: body,
-        floatingActionButton: floatingActionButton
+      floatingActionButton: floatingActionButton,
     );
   }
 }

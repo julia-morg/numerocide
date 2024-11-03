@@ -13,21 +13,21 @@ class Themes {
     return theme.capitalize();
   }
 
-  static ThemeData getThemeData(String theme) {
+  static ThemeData getThemeData(String theme, BuildContext buildContext) {
     ColorScheme colorScheme = getColorScheme(theme);
-    TextTheme textTheme = getTextTheme(colorScheme);
+    TextTheme textTheme = getTextTheme(colorScheme, buildContext);
     SwitchThemeData switchThemeData = getSwitchThemeData(colorScheme);
 
     AppBarTheme  appBarTheme = AppBarTheme(
       backgroundColor: colorScheme.primary,
       titleTextStyle: TextStyle(
         color: colorScheme.secondary,
-        fontSize: 24,
+        fontSize: getScaledFontSize(buildContext, 30),
         fontWeight: FontWeight.bold,
       ),
       iconTheme: IconThemeData(
         color: colorScheme.secondary,
-        size: 40.0,
+        size: getScaledFontSize(buildContext, 40.0),
       ),
     );
 
@@ -86,7 +86,7 @@ class Themes {
     );
   }
 
-  static TextTheme getTextTheme(ColorScheme colorScheme) {
+  static TextTheme getTextTheme(ColorScheme colorScheme, BuildContext context) {
     TextStyle mainTextStyle = TextStyle(
       color: colorScheme.primary,
       fontWeight: FontWeight.bold,
@@ -97,20 +97,20 @@ class Themes {
     );
     return TextTheme(
       headlineLarge: headlineTextStyle,
-      headlineMedium: headlineTextStyle,
+      headlineMedium: headlineTextStyle.copyWith(fontSize: getScaledFontSize(context, 34)),
       headlineSmall: headlineTextStyle,
-      titleLarge: mainTextStyle.copyWith(fontSize: 30),
-      titleMedium: mainTextStyle.copyWith(fontSize: 24),
-      titleSmall: mainTextStyle.copyWith(fontSize: 20),
-      bodyLarge: mainTextStyle,
-      bodyMedium: mainTextStyle,
+      titleLarge: mainTextStyle.copyWith(fontSize: getScaledFontSize(context, 30)),
+      titleMedium: mainTextStyle.copyWith(fontSize: getScaledFontSize(context, 24)),
+      titleSmall: mainTextStyle.copyWith(fontSize: getScaledFontSize(context, 20)),
+      bodyLarge: mainTextStyle.copyWith(fontSize: getScaledFontSize(context, 16)),
+      bodyMedium: mainTextStyle.copyWith(fontSize: getScaledFontSize(context, 14)),
       bodySmall: mainTextStyle,
-      labelLarge: mainTextStyle.copyWith( fontWeight: FontWeight.w900),
-      labelMedium: mainTextStyle.copyWith( fontWeight: FontWeight.w900),
-      labelSmall: mainTextStyle.copyWith(fontSize: 12, fontWeight: FontWeight.w900),
+      labelLarge: mainTextStyle.copyWith(fontSize: getScaledFontSize(context, 16), fontWeight: FontWeight.w900),
+      labelMedium: mainTextStyle.copyWith(fontSize: getScaledFontSize(context, 14), fontWeight: FontWeight.w900),
+      labelSmall: mainTextStyle.copyWith(fontSize: getScaledFontSize(context, 12), fontWeight: FontWeight.w900),
       displayLarge: mainTextStyle,
       displayMedium: mainTextStyle,
-      displaySmall: mainTextStyle.copyWith(fontSize: 16),
+      displaySmall: mainTextStyle.copyWith(fontSize: getScaledFontSize(context, 16)),
     );
   }
 
@@ -197,8 +197,8 @@ class Themes {
     return colorScheme;
   }
 
-  static List<Color> getThemeColors(String theme) {
-    ThemeData themeData = getThemeData(theme);
+  static List<Color> getThemeColors(String theme, BuildContext context) {
+    ThemeData themeData = getThemeData(theme, context);
     return [
       themeData.colorScheme.primary, // primary color
       themeData.colorScheme.onPrimary, // highlight color
@@ -207,5 +207,10 @@ class Themes {
       themeData.colorScheme.onSecondary, // inactive elements color
       themeData.colorScheme.outline, // hint color
     ];
+  }
+
+  static double getScaledFontSize(BuildContext context, double baseFontSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth > 500  ? baseFontSize * (screenWidth / 800) : baseFontSize;
   }
 }

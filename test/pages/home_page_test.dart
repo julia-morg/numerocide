@@ -116,7 +116,7 @@ void main() {
     await tester.pumpWidget(
       MediaQuery(
         data: const MediaQueryData(
-            size: Size(400, 1200), padding: EdgeInsets.all(1)),
+            size: Size(400, 400), padding: EdgeInsets.all(1)),
         child: MaterialApp(
           theme: ThemeData(
             elevatedButtonTheme: ElevatedButtonThemeData(

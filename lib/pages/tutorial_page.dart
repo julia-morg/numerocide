@@ -102,8 +102,9 @@ class _TutorialPageState extends State<TutorialPage> {
       save: widget.save,
       title: AppLocalizations.of(context)!.tutorialPageHeader,
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          const SizedBox(height: 20,),
           TextPlate(
               centeredText: '${step+1}/$stepsCount\n',
               justifiedText: getLocalizedStep(context, step + 1)

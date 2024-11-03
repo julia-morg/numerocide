@@ -85,7 +85,7 @@ void main() {
     tutorialPage = TutorialPage(settings: mockSettings, save: mockSave, step: index);
     await tester.pumpWidget(
       MediaQuery(
-        data: const MediaQueryData(size: Size(400, 1200), padding: EdgeInsets.all(1)),
+        data: const MediaQueryData(size: Size(400, 400), padding: EdgeInsets.all(1)),
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: const [Locale('en', '')],

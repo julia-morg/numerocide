@@ -42,11 +42,17 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _themeData = Themes.getThemeData(widget.settings.theme);
 
     if (widget.settings.language.isNotEmpty) {
       _locale = Locale(widget.settings.language);
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _themeData = Themes.getThemeData(widget.settings.theme, context);
   }
 
   void updateTheme(ThemeData newTheme) {

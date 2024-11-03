@@ -39,7 +39,7 @@ class _ThemeTileState extends State<ThemeTile> {
                 });
                 widget.settings.saveSettings();
                 MyApp.updateTheme(
-                    context, Themes.getThemeData(widget.settings.theme));
+                    context, Themes.getThemeData(widget.settings.theme, context));
               },
               child: Container(
                 padding: const EdgeInsets.all(8.0),
@@ -58,7 +58,7 @@ class _ThemeTileState extends State<ThemeTile> {
                       ),
                     ),
                     Row(
-                      children: Themes.getThemeColors(themeName).map((color) {
+                      children: Themes.getThemeColors(themeName, context).map((color) {
                         return Container(
                           width: 30,
                           height: 30,
